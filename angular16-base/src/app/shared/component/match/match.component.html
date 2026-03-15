@@ -1,0 +1,85 @@
+<div class="mobile-wrapper">
+    <!-- Top Navbar -->
+    <header class="top-navbar shadow-sm" *ngIf="!showMatchDetails">
+        <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-3">
+            <a routerLink="/" class="back-button">
+                <i class="fa fa-chevron-left"></i>
+            </a>
+            <h1 class="navbar-brand m-0 mx-auto">Partite Giocate</h1>
+            <div style="width: 24px;"></div> <!-- Spacer -->
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-area p-3" *ngIf="!showMatchDetails">
+
+        <div class="matches-list">
+            <h3 class="section-title mb-4 px-2">Risultati Recenti</h3>
+
+            <!-- List of Matches -->
+            <div *ngFor="let match of matches" class="match-card shadow-sm mb-3" (click)="openMatchDetails(match)"
+                style="cursor: pointer;">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="match-date text-muted"><i class="fa fa-calendar me-1"></i> {{ match.date |
+                        date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+
+                <div class="match-content">
+                    <!-- Home Team -->
+                    <div class="team-container">
+                        <div class="team-logo shadow-sm">
+                            <i class="fa fa-shield" style="font-size: 1.5rem; color: #ff4444;"></i>
+                        </div>
+                        <span class="team-name">{{ match.homeTeam }}</span>
+                    </div>
+
+                    <!-- Score -->
+                    <div class="score-container">
+                        <span class="score-text">{{ match.homeScore }} - {{ match.awayScore }}</span>
+                        <span class="match-status text-success">{{ match.status }}</span>
+                    </div>
+
+                    <!-- Away Team -->
+                    <div class="team-container">
+                        <div class="team-logo shadow-sm">
+                            <i class="fa fa-star" style="font-size: 1.5rem; color: #ffcc00;"></i>
+                        </div>
+                        <span class="team-name">{{ match.awayTeam }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="matches.length === 0" class="text-center text-muted p-4 mt-4">
+                Nessuna partita trovata.
+            </div>
+
+            <!-- SPACER to force scroll past bottom navbar -->
+            <div style="height: 100px;"></div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navbar -->
+    <nav class="bottom-navbar shadow" *ngIf="!showMatchDetails">
+        <div class="nav-item" routerLink="/">
+            <i class="fa fa-home"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" routerLink="/prenotazioni">
+            <i class="fa fa-calendar"></i>
+            <span>Prenotazioni</span>
+        </div>
+        <div class="nav-item active" routerLink="/partite">
+            <i class="fa fa-futbol-o"></i>
+            <span>Partite</span>
+        </div>
+        <div class="nav-item">
+            <i class="fa fa-user"></i>
+            <span>Profilo</span>
+        </div>
+    </nav>
+
+    <!-- Match Details Screen -->
+    <app-match-detail *ngIf="showMatchDetails" [match]="selectedMatch" (close)="closeMatchDetails()"></app-match-detail>
+</div>

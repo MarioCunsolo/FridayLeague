@@ -1,0 +1,128 @@
+<div class="mobile-wrapper">
+  <!-- Top Navbar -->
+  <header class="top-navbar shadow-sm" *ngIf="!showMatchDetails">
+    <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+      <h1 class="navbar-brand m-0">Friday League</h1>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="content-area" *ngIf="!showMatchDetails">
+    <!-- Place for router outlet or homepage content -->
+    <!-- Profile Image Area -->
+    <div class="d-flex justify-content-center mt-4 mb-4">
+      <div class="profile-circle shadow">
+        <i class="fa fa-user" style="font-size: 5rem; color: #555555;"></i>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid container px-3">
+      <div class="row g-3">
+        <!-- Card 1: Goal -->
+        <div class="col-6">
+          <div class="stat-card shadow-sm">
+            <div class="stat-content">
+              <i class="fa fa-soccer-ball-o stat-icon text-success"></i>
+              <div class="stat-details">
+                <span class="stat-title">Goal</span>
+                <span class="stat-value">12</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 2: Assist -->
+        <div class="col-6">
+          <div class="stat-card shadow-sm">
+            <div class="stat-content">
+              <!-- Using an alternative shoe icon if available or text icon representation. We'll stick to a standard icon like a generic footwear or simple text for Assist since fa-shoe-prints isn't in fa4 usually. Let's use fa-magic or something representing assist, or an arrow. Let's try fa-reply or fa-exchange. A good alternative is usually fa-share or an image. Wait, the user asked for a shoe. We'll use a generic icon (fa-asterisk or user) if shoe isn't present, but let's assume fa-futbol-o is fine for now and maybe a different icon context. Let's use a plus sign or hand. Let's try "fa-plus-square" for Assist. Actually, let's just use "fa-handshake-o" for Assist. -->
+              <i class="fa fa-handshake-o stat-icon text-success"></i>
+              <div class="stat-details">
+                <span class="stat-title">Assist</span>
+                <span class="stat-value">8</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 3: MOTM -->
+        <div class="col-6">
+          <div class="stat-card shadow-sm">
+            <div class="stat-content">
+              <i class="fa fa-trophy stat-icon text-success"></i>
+              <div class="stat-details">
+                <span class="stat-title">Man Of The Match</span>
+                <span class="stat-value">3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 4: Partite Giocate -->
+        <div class="col-6">
+          <div class="stat-card shadow-sm">
+            <div class="stat-content">
+              <i class="fa fa-line-chart stat-icon text-success"></i>
+              <div class="stat-details">
+                <span class="stat-title">Partite giocate</span>
+                <span class="stat-value">24</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Match Card -->
+    <div class="container px-3 mt-4" (click)="openMatchDetails()" style="cursor: pointer;">
+      <div class="match-card shadow-sm">
+        <h3 class="match-title">Ultima Partita</h3>
+
+        <div class="match-content">
+          <!-- Home Team -->
+          <div class="team-container">
+            <div class="team-logo shadow-sm">
+              <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+            </div>
+            <span class="team-name">Squali Rossi</span>
+          </div>
+
+          <!-- Score -->
+          <div class="score-container">
+            <span class="score-text">2 - 4</span>
+            <span class="match-status text-success">Terminata</span>
+          </div>
+
+          <!-- Away Team -->
+          <div class="team-container">
+            <div class="team-logo shadow-sm">
+              <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+            </div>
+            <span class="team-name">Leoni FC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navbar -->
+  <nav class="bottom-navbar shadow" *ngIf="!showMatchDetails">
+    <div class="nav-item active" routerLink="/">
+      <i class="fa fa-home"></i>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" routerLink="/prenotazioni">
+      <i class="fa fa-calendar"></i>
+      <span>Prenotazioni123</span>
+    </div>
+    <div class="nav-item" routerLink="/partite">
+      <i class="fa fa-futbol-o"></i>
+      <span>Partite</span>
+    </div>
+    <div class="nav-item">
+      <i class="fa fa-user"></i>
+      <span>Profilo</span>
+    </div>
+  </nav>
+
+  <!-- Match Details Screen -->
+  <app-match-detail *ngIf="showMatchDetails" [match]="selectedMatch" (close)="closeMatchDetails()"></app-match-detail>
+</div>

@@ -1,0 +1,77 @@
+<div class="mobile-wrapper">
+    <!-- Top Navbar -->
+    <header class="top-navbar shadow-sm">
+        <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-3">
+            <div style="width: 24px;"></div> <!-- Spacer to keep title centered -->
+            <h1 class="navbar-brand m-0 mx-auto">Prenotazioni</h1>
+            <div style="width: 24px;"></div> <!-- Spacer to keep title centered -->
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-area p-3">
+
+        <div class="reservation-card shadow-sm">
+            <h3 class="section-title mb-3">Prenotazioni per la prossima settimana</h3>
+            <div class="table-responsive">
+                <table class="table table-dark table-striped custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome e Cognome</th>
+                            <th scope="col">Orario</th>
+                            <th scope="col" class="text-center" style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="scrollable-tbody">
+                        <tr *ngFor="let res of reservations; let i = index">
+                            <td class="fw-bold">{{ res.nomeCognome }}</td>
+                            <td class="text-success fw-bold">{{ res.dataOra | date:'dd/MM HH:mm' }}</td>
+                            <td class="text-center">
+                                <button class="btn btn-delete btn-sm" (click)="deleteReservation(i)">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="reservations.length === 0">
+                            <td colspan="3" class="text-center text-muted p-4">Nessuna prenotazione trovata</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mt-4 px-2">
+            <button class="btn btn-prenota w-100 shadow" [disabled]="isReservationDisabled">
+                PRENOTATI
+            </button>
+            <div *ngIf="isReservationDisabled" class="text-center mt-2 text-muted small">
+                Le prenotazioni aprono domenica alle 17:00.
+            </div>
+        </div>
+
+        <!-- SPACER to force scroll past bottom navbar -->
+        <div style="height: 100px;"></div>
+
+    </main>
+
+    <!-- Bottom Navbar -->
+    <nav class="bottom-navbar shadow">
+        <div class="nav-item" routerLink="/">
+            <i class="fa fa-home"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item active" routerLink="/prenotazioni">
+            <i class="fa fa-calendar"></i>
+            <span>Prenotazioni</span>
+        </div>
+        <div class="nav-item" routerLink="/partite">
+            <i class="fa fa-futbol-o"></i>
+            <span>Partite</span>
+        </div>
+        <div class="nav-item">
+            <i class="fa fa-user"></i>
+            <span>Profilo</span>
+        </div>
+    </nav>
+</div>

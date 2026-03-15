@@ -1,24 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { MatchDetailComponent } from '../match-detail/match-detail.component';
+import { RouterLink } from '@angular/router';
+
 
 @Component({
-  selector: 'app-homepage',
-  templateUrl: './homepage.component.html',
-  styleUrls: ['./homepage.component.css']
+    selector: 'app-homepage',
+    templateUrl: './homepage.component.html',
+    styleUrls: ['./homepage.component.css'],
+    imports: [RouterLink, MatchDetailComponent]
 })
 export class HomepageComponent {
-  showMatchDetails: boolean = false;
-  selectedMatch: any = {
+  showMatchDetails = signal(false);
+  selectedMatch = signal({
     homeTeam: 'Squali Rossi',
     awayTeam: 'Leoni FC',
     homeScore: 2,
     awayScore: 4
-  };
+  });
 
   openMatchDetails() {
-    this.showMatchDetails = true;
+    this.showMatchDetails.set(true);
   }
 
   closeMatchDetails() {
-    this.showMatchDetails = false;
+    this.showMatchDetails.set(false);
   }
 }

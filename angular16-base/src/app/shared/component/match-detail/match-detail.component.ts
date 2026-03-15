@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 
 export interface GoalEvent {
     scorerName: string;
@@ -9,55 +9,52 @@ export interface GoalEvent {
 @Component({
     selector: 'app-match-detail',
     templateUrl: './match-detail.component.html',
-    styleUrls: ['./match-detail.component.css']
+    styleUrls: ['./match-detail.component.css'],
+    imports: []
 })
-export class MatchDetailComponent implements OnInit {
-    @Input() match: any;
-    @Output() close = new EventEmitter<void>();
+export class MatchDetailComponent {
+    match = input<any>();
+    close = output<void>();
 
-    goalTimeline: GoalEvent[] = [];
-
-    ngOnInit() {
-        if (this.match) {
-            // Generate dummy timeline if no real timeline exists
-            if (!this.match.goalTimeline) {
-                this.generateDummyTimeline();
-            } else {
-                this.goalTimeline = this.match.goalTimeline;
-            }
+    goalTimeline = computed<GoalEvent[]>(() => {
+        const matchData = this.match();
+        if (!matchData) return [];
+        
+        if (matchData.goalTimeline) {
+            return matchData.goalTimeline;
         }
-    }
 
-    private generateDummyTimeline() {
-        const homeGoals = this.match.homeScore || 0;
-        const awayGoals = this.match.awayScore || 0;
+        // Generate dummy timeline if no real timeline exists
+        const homeGoals = matchData.homeScore || 0;
+        const awayGoals = matchData.awayScore || 0;
         const totalGoals = homeGoals + awayGoals;
+        const timeline: GoalEvent[] = [];
 
         let homeCount = 0;
         let awayCount = 0;
 
         for (let i = 0; i < totalGoals; i++) {
-            const hasAssist = Math.random() > 0.4; // 60% dei gol ha un assist
+            const hasAssist = Math.random() > 0.4;
             const assistName = hasAssist ? 'Mario Cunsolo' : undefined;
 
-            // Un po' di logica per alternare (in modo fittizio)
             if (homeCount < homeGoals && (i % 2 === 0 || awayCount >= awayGoals)) {
                 homeCount++;
-                this.goalTimeline.push({
+                timeline.push({
                     scorerName: `Giocatore Casa ${homeCount}`,
                     isHome: true,
                     assistName: assistName
                 });
             } else if (awayCount < awayGoals) {
                 awayCount++;
-                this.goalTimeline.push({
+                timeline.push({
                     scorerName: `Avversario ${awayCount}`,
                     isHome: false,
                     assistName: assistName
                 });
             }
         }
-    }
+        return timeline;
+    });
 
     closeDetails() {
         this.close.emit();

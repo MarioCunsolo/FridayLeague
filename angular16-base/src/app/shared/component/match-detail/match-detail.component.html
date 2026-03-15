@@ -1,65 +1,66 @@
 <div class="match-details-container">
-    <header class="details-header shadow-sm">
-        <button class="back-btn" (click)="closeDetails()">
-            <i class="fa fa-arrow-left"></i>
-        </button>
-        <h2 class="details-title m-0">Dettagli Partita</h2>
-    </header>
+  <header class="details-header shadow-sm">
+    <button class="back-btn" (click)="closeDetails()">
+      <i class="fa fa-arrow-left"></i>
+    </button>
+    <h2 class="details-title m-0">Dettagli Partita</h2>
+  </header>
 
-    <main class="details-content-area" *ngIf="match">
-        <div class="match-score-header shadow-sm">
-            <div class="team-info">
-                <div class="team-logo shadow-sm">
-                    <i class="fa fa-shield" style="font-size: 2rem; color: #ff4444;"></i>
-                </div>
-                <span class="team-name mt-2">{{ match.homeTeam }}</span>
-                <span class="team-score">{{ match.homeScore }}</span>
-            </div>
-
-            <div class="vs-divider">
-                <span>-</span>
-            </div>
-
-            <div class="team-info">
-                <div class="team-logo shadow-sm">
-                    <i class="fa fa-star" style="font-size: 2rem; color: #ffcc00;"></i>
-                </div>
-                <span class="team-name mt-2">{{ match.awayTeam }}</span>
-                <span class="team-score">{{ match.awayScore }}</span>
-            </div>
+  @if (match()) {
+    <main class="details-content-area">
+      <div class="match-score-header shadow-sm">
+        <div class="team-info">
+          <div class="team-logo shadow-sm">
+            <i class="fa fa-shield" style="font-size: 2rem; color: #ff4444;"></i>
+          </div>
+          <span class="team-name mt-2">{{ match().homeTeam }}</span>
+          <span class="team-score">{{ match().homeScore }}</span>
         </div>
-        <div class="match-scorers-container mt-4">
-            <!-- Riga Centrale Bianca -->
-            <div class="center-divider"></div>
-
-            <div class="timeline-container w-100">
-                <div class="timeline-row" *ngFor="let goal of goalTimeline">
-
-                    <!-- Lato Casa -->
-                    <div class="timeline-half left-half text-end pe-3 d-flex flex-column align-items-end">
-                        <ng-container *ngIf="goal.isHome">
-                            <div>
-                                {{ goal.scorerName }} <i class="fa fa-soccer-ball-o ms-1"></i>
-                            </div>
-                            <small class="assist-text" *ngIf="goal.assistName">Assist: {{ goal.assistName }}</small>
-                        </ng-container>
-                    </div>
-
-                    <!-- Spazio Centrale -->
-                    <div class="timeline-center"></div>
-
-                    <!-- Lato Trasferta -->
-                    <div class="timeline-half right-half text-start ps-3 d-flex flex-column align-items-start">
-                        <ng-container *ngIf="!goal.isHome">
-                            <div>
-                                <i class="fa fa-soccer-ball-o me-1"></i> {{ goal.scorerName }}
-                            </div>
-                            <small class="assist-text" *ngIf="goal.assistName">Assist: {{ goal.assistName }}</small>
-                        </ng-container>
-                    </div>
-
-                </div>
-            </div>
+        <div class="vs-divider">
+          <span>-</span>
         </div>
+        <div class="team-info">
+          <div class="team-logo shadow-sm">
+            <i class="fa fa-star" style="font-size: 2rem; color: #ffcc00;"></i>
+          </div>
+          <span class="team-name mt-2">{{ match().awayTeam }}</span>
+          <span class="team-score">{{ match().awayScore }}</span>
+        </div>
+      </div>
+      <div class="match-scorers-container mt-4">
+        <!-- Riga Centrale Bianca -->
+        <div class="center-divider"></div>
+        <div class="timeline-container w-100">
+          @for (goal of goalTimeline(); track goal) {
+            <div class="timeline-row">
+              <!-- Lato Casa -->
+              <div class="timeline-half left-half text-end pe-3 d-flex flex-column align-items-end">
+                @if (goal.isHome) {
+                  <div>
+                    {{ goal.scorerName }} <i class="fa fa-soccer-ball-o ms-1"></i>
+                  </div>
+                  @if (goal.assistName) {
+                    <small class="assist-text">Assist: {{ goal.assistName }}</small>
+                  }
+                }
+              </div>
+              <!-- Spazio Centrale -->
+              <div class="timeline-center"></div>
+              <!-- Lato Trasferta -->
+              <div class="timeline-half right-half text-start ps-3 d-flex flex-column align-items-start">
+                @if (!goal.isHome) {
+                  <div>
+                    <i class="fa fa-soccer-ball-o me-1"></i> {{ goal.scorerName }}
+                  </div>
+                  @if (goal.assistName) {
+                    <small class="assist-text">Assist: {{ goal.assistName }}</small>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
     </main>
+  }
 </div>

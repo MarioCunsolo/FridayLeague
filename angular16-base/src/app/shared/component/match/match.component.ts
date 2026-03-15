@@ -1,26 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { MatchDetailComponent } from '../match-detail/match-detail.component';
+import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-match',
-  templateUrl: './match.component.html',
-  styleUrls: ['./match.component.css']
+    selector: 'app-match',
+    templateUrl: './match.component.html',
+    styleUrls: ['./match.component.css'],
+    imports: [RouterLink, MatchDetailComponent, DatePipe]
 })
 export class MatchComponent {
-  showMatchDetails: boolean = false;
-  selectedMatch: any = null;
+  showMatchDetails = signal(false);
+  selectedMatch = signal<any>(null);
 
   openMatchDetails(match: any) {
-    this.selectedMatch = match;
-    this.showMatchDetails = true;
+    this.selectedMatch.set(match);
+    this.showMatchDetails.set(true);
   }
 
   closeMatchDetails() {
-    this.showMatchDetails = false;
-    this.selectedMatch = null;
+    this.showMatchDetails.set(false);
+    this.selectedMatch.set(null);
   }
 
   // Dati di esempio per le partite giocate
-  matches = [
+  matches = signal([
     {
       id: 1,
       homeTeam: 'Squali Rossi',
@@ -57,6 +61,6 @@ export class MatchComponent {
       status: 'Terminata',
       date: new Date('2026-02-06T21:00:00')
     }
-  ];
+  ]);
 
 }

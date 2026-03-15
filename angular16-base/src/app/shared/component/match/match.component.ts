@@ -7,6 +7,7 @@ import { DatePipe } from '@angular/common';
     selector: 'app-match',
     templateUrl: './match.component.html',
     styleUrls: ['./match.component.css'],
+    standalone: true,
     imports: [RouterLink, MatchDetailComponent, DatePipe]
 })
 export class MatchComponent {

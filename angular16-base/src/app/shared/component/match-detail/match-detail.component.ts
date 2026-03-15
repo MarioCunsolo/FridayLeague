@@ -10,6 +10,7 @@ export interface GoalEvent {
     selector: 'app-match-detail',
     templateUrl: './match-detail.component.html',
     styleUrls: ['./match-detail.component.css'],
+    standalone: true,
     imports: []
 })
 export class MatchDetailComponent {

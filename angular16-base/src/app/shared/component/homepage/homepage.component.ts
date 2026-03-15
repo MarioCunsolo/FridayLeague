@@ -7,6 +7,7 @@ import { RouterLink } from '@angular/router';
     selector: 'app-homepage',
     templateUrl: './homepage.component.html',
     styleUrls: ['./homepage.component.css'],
+    standalone: true,
     imports: [RouterLink, MatchDetailComponent]
 })
 export class HomepageComponent {

@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
     selector: 'app-reservation',
     templateUrl: './reservation.component.html',
     styleUrls: ['./reservation.component.css'],
+    standalone: true,
     imports: [RouterLink, DatePipe]
 })
 export class ReservationComponent {

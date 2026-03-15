@@ -4,23 +4,23 @@
     flex-direction: column;
     height: 100vh;
     width: 100%;
-    max-width: 480px;
+    max-width: 30rem;
     margin: 0 auto;
     position: relative;
     background-color: #000000;
     color: #ffffff;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
     overflow: hidden;
 }
 
 /* Top Navbar */
 .top-navbar {
-    height: 60px;
+    height: 3.75rem;
     background-color: #000000;
     display: flex;
     align-items: center;
     z-index: 1000;
-    border-bottom: 1px solid #222222;
+    border-bottom: 0.0625rem solid #222222;
 }
 
 .top-navbar .navbar-brand {
@@ -32,8 +32,8 @@
 
 .back-button {
     color: #ffffff;
-    font-size: 1.2rem;
-    padding: 5px;
+    font-size: 1.25rem;
+    padding: 0.25rem;
     text-decoration: none;
 }
 
@@ -45,23 +45,23 @@
 .content-area {
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 110px;
+    padding-bottom: 7rem;
     /* Make room for bottom absolute navbar */
 }
 
 .section-title {
-    font-size: 1.1rem;
+    font-size: 1.125rem;
     color: #aaaaaa;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.0625rem;
 }
 
 /* match Card (Reused from Homepage) */
 .match-card {
     background-color: #111111;
-    border: 1px solid #333333;
-    border-radius: 12px;
-    padding: 15px;
+    border: 0.0625rem solid #333333;
+    border-radius: 0.75rem;
+    padding: 1rem;
     transition: transform 0.2s ease-in-out, border-color 0.2s;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .match-date {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     font-weight: 500;
 }
 
@@ -79,7 +79,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 5px;
+    padding-top: 0.25rem;
 }
 
 .team-container {
@@ -90,16 +90,16 @@
 }
 
 .team-logo {
-    width: 50px;
-    height: 50px;
+    width: 3.125rem;
+    height: 3.125rem;
     border-radius: 50%;
     background-color: #1a1a1a;
-    border: 2px solid #555555;
+    border: 0.125rem solid #555555;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .team-name {
@@ -119,18 +119,18 @@
 }
 
 .score-text {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 900;
     color: #ffffff;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.125rem;
+    text-shadow: 0 0 0.625rem rgba(255, 255, 255, 0.2);
 }
 
 .match-status {
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    margin-top: 5px;
+    margin-top: 0.25rem;
 }
 
 /* Utility Colors */
@@ -144,7 +144,7 @@
 
 /* Bottom Navbar */
 .bottom-navbar {
-    height: 70px;
+    height: 4.375rem;
     background-color: #000000;
     /* Main color: Black */
     position: absolute;
@@ -153,9 +153,9 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    border-top: 1px solid #222222;
-    border-radius: 15px 15px 0 0;
-    padding: 0 10px;
+    border-top: 0.0625rem solid #222222;
+    border-radius: 1rem 1rem 0 0;
+    padding: 0 0.5rem;
     z-index: 1000;
 }
 
@@ -168,7 +168,7 @@
     /* Third color: White */
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    padding: 8px;
+    padding: 0.5rem;
     width: 25%;
 }
 
@@ -179,8 +179,8 @@
 }
 
 .nav-item i {
-    font-size: 1.4rem;
-    margin-bottom: 4px;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .nav-item span {

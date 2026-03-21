@@ -16,13 +16,13 @@ export class ReservationComponent {
 
   // Dati di esempio per le prenotazioni come Signal
   reservations = signal([
-    { nomeCognome: 'Mario Rossi', dataOra: new Date('2026-03-25T17:00:00') },
-    { nomeCognome: 'Luigi Bianchi', dataOra: new Date('2026-03-26T18:30:00') },
-    { nomeCognome: 'Giuseppe Verdi', dataOra: new Date('2026-03-27T19:00:00') },
-    { nomeCognome: 'Francesco Neri', dataOra: new Date('2026-03-28T20:30:00') },
-    { nomeCognome: 'Andrea Gialli', dataOra: new Date('2026-03-29T21:00:00') },
-    { nomeCognome: 'Simone Nipotini', dataOra: new Date('2026-03-30T10:00:00') },
-    { nomeCognome: 'Carlo Magno', dataOra: new Date('2026-03-31T15:30:00') },
+    { nomeCognome: 'Mario Rossi', dataOra: new Date('2026-03-25T17:00:15') },
+    { nomeCognome: 'Luigi Bianchi', dataOra: new Date('2026-03-26T18:30:42') },
+    { nomeCognome: 'Giuseppe Verdi', dataOra: new Date('2026-03-27T19:00:05') },
+    { nomeCognome: 'Francesco Neri', dataOra: new Date('2026-03-28T20:30:22') },
+    { nomeCognome: 'Andrea Gialli', dataOra: new Date('2026-03-29T21:00:58') },
+    { nomeCognome: 'Simone Nipotini', dataOra: new Date('2026-03-30T10:00:11') },
+    { nomeCognome: 'Carlo Magno', dataOra: new Date('2026-03-31T15:30:34') },
   ]);
 
   deleteReservation(index: number): void {

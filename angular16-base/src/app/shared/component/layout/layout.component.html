@@ -21,6 +21,10 @@
         <i class="fa fa-user"></i>
         <span>Profilo</span>
       </div>
+      <div class="nav-item-desktop" routerLink="/classifiche" routerLinkActive="active">
+        <i class="fa fa-trophy"></i>
+        <span>Classifiche</span>
+      </div>
       <!-- Theme Toggle (Desktop) -->
       <div class="nav-item-desktop mt-4" (click)="toggleTheme()">
         <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
@@ -73,6 +77,10 @@
       <div class="nav-item" routerLink="/profilo" routerLinkActive="active">
         <i class="fa fa-user"></i>
         <span>Profilo</span>
+      </div>
+      <div class="nav-item" routerLink="/classifiche" routerLinkActive="active">
+        <i class="fa fa-trophy"></i>
+        <span>Classifiche</span>
       </div>
     </nav>
   </div>

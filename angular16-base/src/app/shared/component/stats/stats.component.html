@@ -1,0 +1,61 @@
+<div class="stats-container">
+  <div class="stats-header">
+    <h1 class="stats-title">Classifiche</h1>
+    <nz-segmented 
+      [nzOptions]="options" 
+      (nzValueChange)="handleIndexChange($event)"
+      class="custom-segmented">
+    </nz-segmented>
+  </div>
+
+  <div class="leaderboard-wrapper" [@tabAnimation]="activeOption()">
+    <div class="leaderboard">
+    <!-- Top 3 Section -->
+    <div class="top-three">
+      <div class="podium-item second" *ngIf="top3[1]">
+        <div class="avatar-wrapper">
+          <nz-avatar [nzSize]="80" [nzText]="top3[1].avatar" [style.background-color]="top3[1].color"></nz-avatar>
+          <div class="medal silver"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
+        </div>
+        <div class="podium-info">
+          <span class="player-name">{{ top3[1].name }}</span>
+          <span class="value">{{ top3[1].value }}</span>
+        </div>
+      </div>
+
+      <div class="podium-item first" *ngIf="top3[0]">
+        <div class="avatar-wrapper">
+          <nz-avatar [nzSize]="100" [nzText]="top3[0].avatar" [style.background-color]="top3[0].color"></nz-avatar>
+          <div class="medal gold"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
+        </div>
+        <div class="podium-info">
+          <span class="player-name">{{ top3[0].name }}</span>
+          <span class="value">{{ top3[0].value }}</span>
+        </div>
+      </div>
+
+      <div class="podium-item third" *ngIf="top3[2]">
+        <div class="avatar-wrapper">
+          <nz-avatar [nzSize]="70" [nzText]="top3[2].avatar" [style.background-color]="top3[2].color"></nz-avatar>
+          <div class="medal bronze"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
+        </div>
+        <div class="podium-info">
+          <span class="player-name">{{ top3[2].name }}</span>
+          <span class="value">{{ top3[2].value }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Others List -->
+    <div class="others-list">
+      <div class="list-item" *ngFor="let player of others; let i = index">
+        <div class="rank">{{ i + 4 }}</div>
+        <nz-avatar [nzSize]="40" [nzText]="player.avatar" [style.background-color]="player.color"></nz-avatar>
+        <div class="player-details">
+          <span class="name">{{ player.name }}</span>
+        </div>
+        <div class="player-value">{{ player.value }}</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,6 +6,7 @@ import { MatchComponent } from './shared/component/match/match.component';
 import { ProfileComponent } from './shared/component/profile/profile.component';
 import { LayoutComponent } from './shared/component/layout/layout.component';
 import { LoginComponent } from './shared/component/login/login.component';
+import { StatsComponent } from './shared/component/stats/stats.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,6 +18,7 @@ const routes: Routes = [
       { path: 'prenotazioni', component: ReservationComponent },
       { path: 'partite', component: MatchComponent },
       { path: 'profilo', component: ProfileComponent },
+      { path: 'classifiche', component: StatsComponent },
     ]
   },
   { path: '**', redirectTo: '' }

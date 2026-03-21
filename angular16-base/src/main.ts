@@ -9,10 +9,16 @@ import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
 
+import { provideAnimations } from '@angular/platform-browser/animations';
+
 registerLocaleData(en);
 
 
 bootstrapApplication(AppComponent, {
-    providers: [importProvidersFrom(BrowserModule, AppRoutingModule), provideNzI18n(en_US)]
+    providers: [
+      importProvidersFrom(BrowserModule, AppRoutingModule), 
+      provideNzI18n(en_US),
+      provideAnimations()
+    ]
 })
   .catch(err => console.error(err));

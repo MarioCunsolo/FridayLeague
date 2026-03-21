@@ -22,7 +22,7 @@
               @for (res of reservations(); track $index) {
                 <tr>
                   <td class="fw-bold">{{ res.nomeCognome }}</td>
-                  <td class="text-success">{{ res.dataOra | date:'HH:mm' }}</td>
+                  <td class="text-success">{{ res.dataOra | date:'HH:mm:ss' }}</td>
                   <td class="text-center">
                     <button nz-button nzType="text" nzDanger>
                       <i class="fa fa-trash-o"></i>

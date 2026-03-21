@@ -1,82 +1,15 @@
-/* Base container for mobile constraints */
-.mobile-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-    max-width: 30rem;
-    margin: 0 auto;
-    position: relative;
-    background-color: #000000;
-    color: #ffffff;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-}
-
-/* Top Navbar */
-.top-navbar {
-    height: 3.75rem;
-    background-color: #000000;
-    display: flex;
-    align-items: center;
-    z-index: 1000;
-    border-bottom: 0.0625rem solid #222222;
-}
-
-.top-navbar .navbar-brand {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: #00cc66;
-    /* Secondary: Green */
-}
-
-.back-button {
-    color: #ffffff;
-    font-size: 1.25rem;
-    padding: 0.25rem;
-    text-decoration: none;
-}
-
-.back-button:hover {
-    color: #00cc66;
-}
-
-/* Main Content Area */
-.content-area {
-    flex: 1;
-    overflow-y: auto;
-    padding-bottom: 7rem;
-}
-
-/* Reservation Card */
-.reservation-card {
-    background-color: #111111;
-    border: 0.0625rem solid #333333;
-    border-radius: 0.75rem;
-    padding: 1.25rem 1rem; /* Slightly reduced as per feedback */
-    margin-top: 1rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.section-title {
-    font-size: 1.125rem;
-    color: #aaaaaa;
-    text-transform: uppercase;
-    letter-spacing: 0.0625rem;
-}
-
-/* Custom Table Styles */
+/* Custom Table Styles for Reservations */
 .custom-table {
     margin-bottom: 0;
     background-color: transparent;
+    display: flex;
+    flex-direction: column;
 }
 
 .custom-table th {
-    background-color: #1a1a1a;
-    color: #aaaaaa;
-    border-bottom: 0.125rem solid #00cc66;
+    background-color: var(--bg-input);
+    color: var(--text-grey);
+    border-bottom: 0.125rem solid var(--primary-green);
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.8rem;
@@ -86,79 +19,15 @@
 
 .custom-table td {
     background-color: transparent;
-    color: #ffffff;
-    border-bottom: 0.0625rem solid #222222;
+    color: var(--text-white);
+    border-bottom: 0.0625rem solid var(--border-dark);
     padding: 1rem 0.625rem;
     vertical-align: middle;
 }
 
-/* Override Bootstrap striped rows for dark theme */
-.table-striped>tbody>tr:nth-of-type(odd)>* {
-    --bs-table-accent-bg: rgba(255, 255, 255, 0.02);
-    color: #ffffff;
-}
-
-.table-striped>tbody>tr:hover>* {
-    background-color: rgba(0, 204, 102, 0.05);
-}
-
-.text-success {
-    color: #00cc66 !important;
-}
-
-.text-muted {
-    color: #aaaaaa !important;
-}
-
-/* Button styles */
-.btn-prenota {
-    background-color: #00cc66;
-    color: #000000;
-    font-weight: 800;
-    font-size: 1.25rem;
-    padding: 1rem;
-    border-radius: 0.625rem;
-    border: none;
-    text-transform: uppercase;
-    letter-spacing: 0.09375rem;
-    transition: all 0.2s ease;
-    box-shadow: 0 0.25rem 0.625rem rgba(0, 204, 102, 0.3);
-}
-
-.btn-prenota:hover:not([disabled]) {
-    background-color: #00e673;
-    transform: translateY(-0.125rem);
-    box-shadow: 0 0.375rem 1rem rgba(0, 204, 102, 0.4);
-}
-
-.btn-prenota:active:not([disabled]) {
-    transform: translateY(0.0625rem);
-    box-shadow: 0 0.125rem 0.3125rem rgba(0, 204, 102, 0.3);
-}
-
-.btn-prenota[disabled] {
-    background-color: #222222;
-    color: #555555;
-    cursor: not-allowed;
-    opacity: 0.8;
-    box-shadow: none;
-}
-
-/* Scrollable Table Logic */
-.custom-table {
-    display: flex;
-    flex-direction: column;
-}
-
-.custom-table thead {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
 .scrollable-tbody {
     display: block;
-    max-height: 20rem; /* Slightly reduced as per feedback */
+    max-height: 20rem;
     overflow-y: auto;
     width: 100%;
 }
@@ -169,59 +38,69 @@
     table-layout: fixed;
 }
 
-/* Delete button styles */
-.btn-delete {
-    background: transparent;
-    border: none;
-    padding: 0.25rem;
-    transition: transform 0.2s;
-}
-
-.btn-delete:hover {
-    transform: scale(1.1);
-}
-
-.text-danger {
-    color: #ff4444 !important;
-}
-
-/* Bottom Navbar */
-.bottom-navbar {
-    flex-shrink: 0;
-    height: 4.375rem;
-    background-color: #000000;
+.custom-table thead {
+    display: table;
     width: 100%;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 0.0625rem solid #222222;
-    border-radius: 1rem 1rem 0 0;
-    padding: 0 0.5rem;
+    table-layout: fixed;
 }
 
-.nav-item {
-    display: flex;
-    flex-direction: column;
+/* Override Bootstrap striped rows for dark theme */
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    --bs-table-accent-bg: rgba(255, 255, 255, 0.02);
+    color: var(--text-white);
+}
+
+.table-striped>tbody>tr:hover>* {
+    background-color: rgba(0, 204, 102, 0.05);
+}
+
+/* Button styles */
+.btn-prenota {
+    background-color: var(--primary-green) !important;
+    color: #000000 !important;
+    font-weight: 800;
+    font-size: 1.25rem;
+    height: auto !important;
+    min-height: 3.5rem;
+    padding: 0 1rem !important;
+    border-radius: 0.625rem;
+    border: none !important;
+    text-transform: uppercase;
+    letter-spacing: 0.09375rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 204, 102, 0.3);
+    display: flex !important;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    padding: 0.5rem;
-    width: 25%;
 }
 
-.nav-item:hover,
-.nav-item.active {
-    color: #00cc66;
+.btn-prenota:hover:not([disabled]) {
+    background-color: #00e673 !important;
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.375rem 1rem rgba(0, 204, 102, 0.4);
 }
 
-.nav-item i {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
+.btn-prenota:active:not([disabled]) {
+    transform: translateY(0.0625rem);
+    box-shadow: 0 0.125rem 0.3125rem rgba(0, 204, 102, 0.3);
 }
 
-.nav-item span {
-    font-size: 0.75rem;
-    font-weight: 500;
+.btn-prenota[disabled] {
+    background-color: var(--border-dark) !important;
+    color: #555555 !important;
+    cursor: not-allowed;
+    opacity: 0.8;
+    box-shadow: none;
+}
+
+/* Reservation Card Specific */
+.reservation-card {
+    background-color: var(--bg-dark-grey);
+    border: 0.0625rem solid var(--border-grey);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1rem;
+    margin-top: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }

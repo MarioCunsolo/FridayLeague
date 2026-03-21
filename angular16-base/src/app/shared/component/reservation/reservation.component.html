@@ -1,83 +1,48 @@
-<div class="mobile-wrapper">
-  <!-- Top Navbar -->
-  <header class="top-navbar shadow-sm">
-    <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-3">
-      <div style="width: 24px;"></div> <!-- Spacer to keep title centered -->
-      <h1 class="navbar-brand m-0 mx-auto">Prenotazioni</h1>
-      <div style="width: 24px;"></div> <!-- Spacer to keep title centered -->
-    </div>
-  </header>
+<div class="container py-4">
+  <div class="row justify-content-center h-100">
+    <div class="col-12 col-md-10 col-lg-9 d-flex flex-column h-100">
+      <!-- Section Header -->
+      <div class="d-flex align-items-center mb-4">
+        <h2 class="section-title m-0">Prenotazioni</h2>
+      </div>
 
-  <!-- Main Content Area -->
-  <main class="content-area p-3">
+      <div class="reservation-card shadow-sm d-flex flex-column flex-grow-1">
+        <p class="text-muted small mb-3 text-uppercase fw-bold">PROSSIMA SETTIMANA</p>
+        
+        <div class="table-responsive flex-grow-1 mb-3">
+          <table class="table custom-table mb-0">
+            <thead>
+              <tr>
+                <th>GIOCATORE</th>
+                <th>ORARIO</th>
+                <th class="text-center">AZIONI</th>
+              </tr>
+            </thead>
+            <tbody class="scrollable-tbody">
+              @for (res of reservations(); track $index) {
+                <tr>
+                  <td class="fw-bold">{{ res.nomeCognome }}</td>
+                  <td class="text-success">{{ res.dataOra | date:'HH:mm' }}</td>
+                  <td class="text-center">
+                    <button nz-button nzType="text" nzDanger>
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
 
-    <div class="reservation-card shadow-sm">
-      <h3 class="section-title mb-3">Prenotazioni per la prossima settimana</h3>
-      <div class="table-responsive">
-        <table class="table table-dark table-striped custom-table">
-          <thead>
-            <tr>
-              <th scope="col">Nome e Cognome</th>
-              <th scope="col">Orario</th>
-              <th scope="col" class="text-center" style="width: 50px;"></th>
-            </tr>
-          </thead>
-          <tbody class="scrollable-tbody">
-            @for (res of reservations(); track res; let i = $index) {
-              <tr>
-                <td class="fw-bold">{{ res.nomeCognome }}</td>
-                <td class="text-success fw-bold">{{ res.dataOra | date:'dd/MM HH:mm' }}</td>
-                <td class="text-center">
-                  <button class="btn btn-delete btn-sm" (click)="deleteReservation(i)">
-                    <i class="fa fa-trash text-danger"></i>
-                  </button>
-                </td>
-              </tr>
-            }
-            @if (reservations().length === 0) {
-              <tr>
-                <td colspan="3" class="text-center text-muted p-4">Nessuna prenotazione trovata</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <div class="mt-auto">
+          <button nz-button nzType="primary" nzBlock class="btn-prenota shadow" [disabled]="isReservationDisabled()">
+            PRENOTATI
+          </button>
+          <p class="text-center text-muted small mt-2 mb-0">
+            Le prenotazioni aprono domenica alle 17:00
+          </p>
+        </div>
       </div>
     </div>
-
-    <!-- Action Button -->
-    <div class="mt-4 px-2">
-      <button class="btn btn-prenota w-100 shadow" [disabled]="isReservationDisabled()">
-        PRENOTATI
-      </button>
-      @if (isReservationDisabled()) {
-        <div class="text-center mt-2 text-muted small">
-          Le prenotazioni aprono domenica alle 17:00.
-        </div>
-      }
-    </div>
-
-    <!-- SPACER to force scroll past bottom navbar -->
-    <div style="height: 100px;"></div>
-
-  </main>
-
-  <!-- Bottom Navbar -->
-  <nav class="bottom-navbar shadow">
-    <div class="nav-item" routerLink="/">
-      <i class="fa fa-home"></i>
-      <span>Home</span>
-    </div>
-    <div class="nav-item active" routerLink="/prenotazioni">
-      <i class="fa fa-calendar"></i>
-      <span>Prenotazioni</span>
-    </div>
-    <div class="nav-item" routerLink="/partite">
-      <i class="fa fa-futbol-o"></i>
-      <span>Partite</span>
-    </div>
-    <div class="nav-item">
-      <i class="fa fa-user"></i>
-      <span>Profilo</span>
-    </div>
-  </nav>
+  </div>
 </div>

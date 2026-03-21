@@ -1,0 +1,61 @@
+<div class="main-layout-container">
+  <!-- Desktop Sidebar -->
+  <aside class="desktop-sidebar d-none d-lg-flex">
+    <div class="sidebar-header">
+      <h1 class="navbar-brand">Friday League</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item-desktop" routerLink="/" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active">
+        <i class="fa fa-home"></i>
+        <span>Home</span>
+      </div>
+      <div class="nav-item-desktop" routerLink="/prenotazioni" routerLinkActive="active">
+        <i class="fa fa-calendar"></i>
+        <span>Prenota</span>
+      </div>
+      <div class="nav-item-desktop" routerLink="/partite" routerLinkActive="active">
+        <i class="fa fa-futbol-o"></i>
+        <span>Partite</span>
+      </div>
+      <div class="nav-item-desktop" routerLink="/profilo" routerLinkActive="active">
+        <i class="fa fa-user"></i>
+        <span>Profilo</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="content-wrapper">
+    <!-- Top Navbar (Mobile/Tablet) -->
+    <header class="top-navbar d-lg-none shadow-sm">
+      <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+        <h1 class="navbar-brand m-0">Friday League</h1>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Bottom Navbar (Mobile/Tablet) -->
+    <nav class="bottom-navbar d-lg-none shadow">
+      <div class="nav-item" routerLink="/" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active">
+        <i class="fa fa-home"></i>
+        <span>Home</span>
+      </div>
+      <div class="nav-item" routerLink="/prenotazioni" routerLinkActive="active">
+        <i class="fa fa-calendar"></i>
+        <span>Prenota</span>
+      </div>
+      <div class="nav-item" routerLink="/partite" routerLinkActive="active">
+        <i class="fa fa-futbol-o"></i>
+        <span>Partite</span>
+      </div>
+      <div class="nav-item" routerLink="/profilo" routerLinkActive="active">
+        <i class="fa fa-user"></i>
+        <span>Profilo</span>
+      </div>
+    </nav>
+  </div>
+</div>

@@ -6,12 +6,15 @@ export interface GoalEvent {
     assistName?: string;
 }
 
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+
 @Component({
     selector: 'app-match-detail',
     templateUrl: './match-detail.component.html',
     styleUrls: ['./match-detail.component.css'],
     standalone: true,
-    imports: []
+    imports: [NzButtonModule, NzIconModule]
 })
 export class MatchDetailComponent {
     match = input<any>();

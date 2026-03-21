@@ -1,0 +1,79 @@
+.main-layout-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background-color: var(--bg-black);
+    overflow: hidden;
+}
+
+.desktop-sidebar {
+    width: 16rem;
+    background-color: var(--bg-black);
+    border-right: 0.0625rem solid var(--border-dark);
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    z-index: 1100;
+}
+
+.sidebar-header {
+    margin-bottom: 3rem;
+    padding-left: 0.5rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.nav-item-desktop {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-white);
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+}
+
+.nav-item-desktop:hover {
+    background-color: rgba(0, 204, 102, 0.1);
+    color: var(--primary-green);
+}
+
+.nav-item-desktop.active {
+    background-color: var(--primary-green);
+    color: #000000;
+    font-weight: 700;
+}
+
+.nav-item-desktop i {
+    font-size: 1.5rem;
+    width: 2rem;
+    text-align: center;
+}
+
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+/* On mobile, we keep the padding bottom for the nav */
+@media (max-width: 991px) {
+    .page-content {
+        padding-bottom: 4.375rem;
+    }
+}

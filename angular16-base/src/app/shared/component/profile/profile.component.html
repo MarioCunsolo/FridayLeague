@@ -1,33 +1,37 @@
 <div class="container py-4">
   <div class="row justify-content-center">
-    <!-- Welcome Section -->
-    <div class="col-12 text-center mb-5">
-      <h2 class="welcome-text mb-2">Benvenuto!</h2>
-      <p class="text-muted">Pronto per la prossima sfida?</p>
+    <!-- Profile Header -->
+    <div class="col-12 d-flex flex-column align-items-center mb-5">
+      <div class="profile-circle shadow">
+        <i class="fa fa-user" style="font-size: 4.5rem; color: var(--text-grey);"></i>
+      </div>
+      <h2 class="mt-4 mb-1">Mario Cunsolo</h2>
+      <p class="text-success fw-bold">Player Pro</p>
     </div>
 
-    <!-- Quick Action Dashboard -->
-    <div class="col-12 col-md-10 col-lg-8">
-      <div class="row g-4 justify-content-center">
-        <div class="col-6 col-sm-5 col-md-4" routerLink="/prenotazioni">
-          <div class="action-card shadow-sm">
-            <i class="fa fa-calendar action-icon text-success"></i>
-            <span>Prenota</span>
+    <!-- Stats Grid -->
+    <div class="col-12 col-md-10 col-lg-9">
+      <div class="row g-3">
+        @for (stat of userStats(); track stat.label) {
+          <div class="col-6 col-md-6 col-xl-3">
+            <div class="stat-card shadow-sm">
+              <div class="stat-content">
+                <i [class]="'fa ' + stat.icon + ' stat-icon ' + stat.colorClass"></i>
+                <div class="stat-details">
+                  <span class="stat-title">{{ stat.label }}</span>
+                  <span class="stat-value">{{ stat.value }}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="col-6 col-sm-5 col-md-4" routerLink="/partite">
-          <div class="action-card shadow-sm">
-            <i class="fa fa-futbol-o action-icon text-success"></i>
-            <span>Partite</span>
-          </div>
-        </div>
+        }
       </div>
     </div>
 
     <!-- Recent Match Card -->
-    <div class="col-12 col-md-10 col-lg-8 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
+    <div class="col-12 col-md-10 col-lg-9 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
       <div class="match-card shadow-sm">
-        <h3 class="match-title">Ultima Partita</h3>
+        <h3 class="match-title">Ultima Partita Giocata</h3>
         <div class="match-content">
           <div class="team-container">
             <div class="team-logo shadow-sm">

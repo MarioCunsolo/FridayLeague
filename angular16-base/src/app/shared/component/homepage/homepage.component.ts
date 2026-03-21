@@ -1,14 +1,13 @@
 import { Component, signal } from '@angular/core';
-import { MatchDetailComponent } from '../match-detail/match-detail.component';
 import { RouterLink } from '@angular/router';
-
+import { MatchDetailComponent } from '../match-detail/match-detail.component';
 
 @Component({
-    selector: 'app-homepage',
-    templateUrl: './homepage.component.html',
-    styleUrls: ['./homepage.component.css'],
-    standalone: true,
-    imports: [RouterLink, MatchDetailComponent]
+  selector: 'app-homepage',
+  templateUrl: './homepage.component.html',
+  styleUrls: ['./homepage.component.css'],
+  standalone: true,
+  imports: [RouterLink, MatchDetailComponent]
 })
 export class HomepageComponent {
   showMatchDetails = signal(false);
@@ -16,7 +15,9 @@ export class HomepageComponent {
     homeTeam: 'Squali Rossi',
     awayTeam: 'Leoni FC',
     homeScore: 2,
-    awayScore: 4
+    awayScore: 4,
+    status: 'Terminata',
+    date: new Date()
   });
 
   openMatchDetails() {

@@ -1,7 +1,8 @@
-<div class="match-details-container">
+<div class="match-details-backdrop" (click)="closeDetails()"></div>
+<div class="match-details-container shadow-lg">
   <header class="details-header shadow-sm">
-    <button class="back-btn" (click)="closeDetails()">
-      <i class="fa fa-arrow-left"></i>
+    <button nz-button nzType="text" class="back-button" (click)="closeDetails()">
+      <nz-icon nzType="arrow-left" nzTheme="outline"></nz-icon>
     </button>
     <h2 class="details-title m-0">Dettagli Partita</h2>
   </header>

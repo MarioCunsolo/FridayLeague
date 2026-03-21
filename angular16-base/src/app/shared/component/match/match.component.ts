@@ -3,12 +3,15 @@ import { MatchDetailComponent } from '../match-detail/match-detail.component';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+
 @Component({
     selector: 'app-match',
     templateUrl: './match.component.html',
     styleUrls: ['./match.component.css'],
     standalone: true,
-    imports: [RouterLink, MatchDetailComponent, DatePipe]
+    imports: [MatchDetailComponent, DatePipe, NzButtonModule, NzIconModule]
 })
 export class MatchComponent {
   showMatchDetails = signal(false);

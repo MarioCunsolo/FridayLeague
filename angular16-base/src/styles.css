@@ -1,1 +1,214 @@
-/* You can add global styles to this file, and also import other style files */
+/* Design Tokens */
+:root {
+  --primary-green: #00cc66;
+  --bg-black: #000000;
+  --bg-dark-grey: #111111;
+  --bg-input: #1a1a1a;
+  --border-grey: #333333;
+  --border-dark: #222222;
+  --text-white: #ffffff;
+  --text-grey: #aaaaaa;
+  --text-muted: #888888;
+  --danger-red: #ff4444;
+}
+
+/* Global Reset & Typography */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-black);
+  color: var(--text-white);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Layout Utilities */
+.mobile-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  position: relative;
+  background-color: var(--bg-black);
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 7rem;
+}
+
+/* Navbars */
+.top-navbar {
+  height: 3.75rem;
+  background-color: var(--bg-black);
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  border-bottom: 0.0625rem solid var(--border-dark);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--primary-green);
+}
+
+.bottom-navbar {
+  height: 4.375rem;
+  background-color: var(--bg-black);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 0.0625rem solid var(--border-dark);
+  border-radius: 1rem 1rem 0 0;
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-white);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  padding: 0.5rem;
+  width: 25%;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: var(--primary-green);
+}
+
+.nav-item i {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.nav-item span {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Components */
+.back-button {
+  background: none !important;
+  border: none !important;
+  color: var(--text-white) !important;
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.back-button:hover, .back-button:hover nz-icon {
+  color: var(--primary-green) !important;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  color: var(--text-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.0625rem;
+}
+
+/* Cards */
+.match-card {
+  background-color: var(--bg-dark-grey);
+  border: 0.0625rem solid var(--border-grey);
+  border-radius: 1.25rem;
+  padding: 1rem;
+  transition: transform 0.2s ease-in-out, border-color 0.2s;
+  margin-bottom: 1rem;
+}
+
+.match-card:hover {
+  border-color: var(--primary-green);
+}
+
+.match-title {
+  font-size: 0.875rem;
+  color: var(--text-grey);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.match-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.team-logo {
+  width: 3rem;
+  height: 3rem;
+  background-color: var(--bg-input);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.team-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 0.5rem;
+  min-width: 6rem;
+}
+
+.score-text {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: var(--text-white);
+  letter-spacing: 0.125rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 1199px) {
+  .score-text {
+    font-size: 1.75rem;
+  }
+}
+
+.match-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* Helper Classes */
+.text-success { color: var(--primary-green) !important; }
+.text-danger { color: var(--danger-red) !important; }
+.text-muted { color: var(--text-grey) !important; }
+.shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important; }
+.shadow { box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }

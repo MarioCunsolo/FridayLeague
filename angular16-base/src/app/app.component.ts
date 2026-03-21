@@ -8,7 +8,7 @@ import { LayoutComponent } from './shared/component/layout/layout.component';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
     standalone: true,
-    imports: [LayoutComponent]
+    imports: [RouterOutlet]
 })
 export class AppComponent {
   title = 'angular16-base';

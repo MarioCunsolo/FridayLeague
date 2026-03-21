@@ -21,6 +21,16 @@
         <i class="fa fa-user"></i>
         <span>Profilo</span>
       </div>
+      <!-- Theme Toggle (Desktop) -->
+      <div class="nav-item-desktop mt-4" (click)="toggleTheme()">
+        <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
+        <span>{{ currentTheme() === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
+      </div>
+      <!-- Login (Desktop) -->
+      <div class="nav-item-desktop logout-item-desktop mt-4" routerLink="/login">
+        <span nz-icon nzType="logout" nzTheme="outline"></span>
+        <span>Esci</span>
+      </div>
     </nav>
   </aside>
 
@@ -28,8 +38,13 @@
   <div class="content-wrapper">
     <!-- Top Navbar (Mobile/Tablet) -->
     <header class="top-navbar d-lg-none shadow-sm">
-      <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+      <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-4">
+        <div style="width: 2rem;"></div> <!-- Spacer -->
         <h1 class="navbar-brand m-0">Friday League</h1>
+        <!-- Theme Toggle (Mobile) -->
+        <div class="theme-toggle-mobile" (click)="toggleTheme()" style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
+          <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
+        </div>
       </div>
     </header>
 

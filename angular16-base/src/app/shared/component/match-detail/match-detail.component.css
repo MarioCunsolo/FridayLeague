@@ -13,12 +13,13 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: var(--bg-black);
+    background-color: var(--app-bg);
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 2000;
+    transition: background-color var(--transition-speed);
 }
 
 @media (min-width: 992px) {
@@ -30,18 +31,19 @@
         left: 50%;
         transform: translate(-50%, -50%);
         border-radius: 1.5rem;
-        border: 0.0625rem solid var(--border-dark);
-        box-shadow: 0 0 3rem rgba(0, 0, 0, 0.8), 0 0 1rem rgba(0, 204, 102, 0.2);
+        border: 0.0625rem solid var(--border-sub);
+        box-shadow: 0 0 3rem rgba(0, 0, 0, 0.2), 0 0 1rem rgba(0, 204, 102, 0.2);
     }
 }
 
 .details-header {
     height: 3.75rem;
-    background-color: var(--bg-black);
+    background-color: var(--app-bg);
     display: flex;
     align-items: center;
     padding: 0 1rem;
-    border-bottom: 0.0625rem solid var(--border-dark);
+    border-bottom: 0.0625rem solid var(--border-sub);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
 .details-title {
@@ -61,13 +63,14 @@
 }
 
 .match-score-header {
-    background-color: var(--bg-dark-grey);
+    background-color: var(--card-bg);
     border-radius: 1rem;
     padding: 2rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 0.0625rem solid var(--border-grey);
+    border: 0.0625rem solid var(--border-main);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
 .team-info {
@@ -80,11 +83,12 @@
 .team-logo {
     width: 4rem;
     height: 4rem;
-    background-color: var(--bg-input);
+    background-color: var(--input-bg);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: background-color var(--transition-speed);
 }
 
 .team-name {
@@ -96,7 +100,7 @@
 .team-score {
     font-size: 3.5rem;
     font-weight: 900;
-    color: var(--text-white);
+    color: var(--text-primary);
     line-height: 1;
     margin-top: 0.5rem;
 }
@@ -104,16 +108,17 @@
 .vs-divider {
     font-size: 2rem;
     font-weight: 300;
-    color: var(--text-grey);
+    color: var(--text-secondary);
 }
 
 .match-scorers-container {
-    background-color: var(--bg-dark-grey);
+    background-color: var(--card-bg);
     border-radius: 1rem;
     padding: 1.5rem;
-    border: 0.0625rem solid var(--border-grey);
+    border: 0.0625rem solid var(--border-main);
     position: relative;
     min-height: 12.5rem;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
 .center-divider {
@@ -122,7 +127,7 @@
     top: 1.5rem;
     bottom: 1.5rem;
     width: 0.0625rem;
-    background-color: var(--border-grey);
+    background-color: var(--border-main);
     transform: translateX(-50%);
 }
 
@@ -137,7 +142,7 @@
 .timeline-half {
     width: 45%;
     font-size: 0.875rem;
-    color: var(--text-white);
+    color: var(--text-primary);
 }
 
 .timeline-center {

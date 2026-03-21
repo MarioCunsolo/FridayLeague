@@ -1,21 +1,22 @@
 .profile-circle {
     width: 8rem;
     height: 8rem;
-    background-color: var(--bg-input);
+    background-color: var(--input-bg);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 0.125rem solid var(--primary-green);
+    transition: background-color var(--transition-speed);
 }
 
 .stat-card {
-    background-color: var(--bg-dark-grey);
-    border: 0.0625rem solid var(--border-grey);
+    background-color: var(--stat-card-bg);
+    border: 0.0625rem solid var(--border-main);
     border-radius: 0.75rem;
     padding: 0.75rem;
     height: 100%;
-    transition: transform 0.2s;
+    transition: transform 0.2s, background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
 .stat-card:hover {
@@ -47,7 +48,7 @@
 
 .stat-title {
     font-size: 0.65rem;
-    color: var(--text-grey);
+    color: var(--text-secondary);
     text-transform: uppercase;
     font-weight: 600;
 }
@@ -55,5 +56,5 @@
 .stat-value {
     font-size: 1.125rem;
     font-weight: 800;
-    color: var(--text-white);
+    color: var(--text-primary);
 }

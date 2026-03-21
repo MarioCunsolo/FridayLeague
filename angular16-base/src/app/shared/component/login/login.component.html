@@ -1,0 +1,42 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="brand-section">
+      <h1 class="navbar-brand mb-1">Friday League</h1>
+      <p class="text-secondary subtitle">Benvenuto! Accedi per continuare.</p>
+    </div>
+
+    <form nz-form [formGroup]="loginForm" (ngSubmit)="submitForm()" class="login-form">
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Inserisci un'email valida!">
+          <nz-input-group nzPrefixIcon="user">
+            <input type="email" nz-input formControlName="email" placeholder="Email" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Inserisci la tua password!">
+          <nz-input-group nzPrefixIcon="lock">
+            <input type="password" nz-input formControlName="password" placeholder="Password" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="login-options mb-4">
+        <label nz-checkbox formControlName="remember">
+          <span>Ricordami</span>
+        </label>
+        <a class="forgot-link">Password dimenticata?</a>
+      </div>
+
+      <button nz-button nzType="primary" class="login-button" [nzLoading]="false">
+        ENTRA
+      </button>
+
+      <div class="register-section mt-4">
+        <span>Non hai un account? </span>
+        <a class="text-success fw-bold">Registrati</a>
+      </div>
+    </form>
+  </div>
+</div>

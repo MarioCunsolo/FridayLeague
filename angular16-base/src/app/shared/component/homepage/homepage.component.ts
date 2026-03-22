@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { MatchDetailComponent } from '../match-detail/match-detail.component';
+import { MatchService } from '../../service/match.service';
 
 @Component({
   selector: 'app-homepage',
@@ -10,21 +11,15 @@ import { MatchDetailComponent } from '../match-detail/match-detail.component';
   imports: [RouterLink, MatchDetailComponent]
 })
 export class HomepageComponent {
-  showMatchDetails = signal(false);
-  selectedMatch = signal({
-    homeTeam: 'Squali Rossi',
-    awayTeam: 'Leoni FC',
-    homeScore: 2,
-    awayScore: 4,
-    status: 'Terminata',
-    date: new Date()
-  });
+  private matchService = inject(MatchService);
+  private router = inject(Router);
+
+  selectedMatch = signal(this.matchService.getLastMatch());
 
   openMatchDetails() {
-    this.showMatchDetails.set(true);
-  }
-
-  closeMatchDetails() {
-    this.showMatchDetails.set(false);
+    const match = this.selectedMatch();
+    if (match) {
+      this.router.navigate(['/partite'], { queryParams: { matchId: match.id } });
+    }
   }
 }

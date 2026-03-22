@@ -24,7 +24,7 @@ export class MatchDetailComponent {
     goalTimeline = computed<GoalEvent[]>(() => {
         const matchData = this.match();
         if (!matchData) return [];
-        
+
         if (matchData.goalTimeline) {
             return matchData.goalTimeline;
         }

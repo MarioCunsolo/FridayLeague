@@ -3,7 +3,7 @@
 }
 
 <div [class.match-details-container]="isModal()" [class.match-details-page]="!isModal()" [class.shadow-lg]="isModal()">
-  <header class="details-header shadow-sm">
+  <header class="details-header">
     <button nz-button nzType="text" class="back-button" (click)="closeDetails()">
       <nz-icon nzType="arrow-left" nzTheme="outline"></nz-icon>
     </button>
@@ -12,9 +12,9 @@
 
   @if (match()) {
   <main class="details-content-area">
-    <div class="match-score-header shadow-sm">
+    <div class="match-score-header">
       <div class="team-info">
-        <div class="team-logo shadow-sm mb-2">
+        <div class="team-logo mb-2">
           <i class="fa fa-shield" style="font-size: 2rem; color: #ff4444;"></i>
         </div>
         <span class="team-name">{{ match().homeTeam }}</span>
@@ -53,7 +53,7 @@
         <span>-</span>
       </div>
       <div class="team-info">
-        <div class="team-logo shadow-sm mb-2">
+        <div class="team-logo mb-2">
           <i class="fa fa-star" style="font-size: 2rem; color: #ffcc00;"></i>
         </div>
         <span class="team-name">{{ match().awayTeam }}</span>

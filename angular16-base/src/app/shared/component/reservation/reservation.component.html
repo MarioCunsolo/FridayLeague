@@ -8,7 +8,7 @@
 
       <div class="reservation-card shadow-sm d-flex flex-column flex-grow-1">
         <p class="text-muted small mb-3 text-uppercase fw-bold">PROSSIMA SETTIMANA</p>
-        
+
         <div class="table-responsive flex-grow-1 mb-3">
           <table class="table custom-table mb-0">
             <thead>
@@ -20,15 +20,15 @@
             </thead>
             <tbody class="scrollable-tbody">
               @for (res of reservations(); track $index) {
-                <tr>
-                  <td class="fw-bold">{{ res.nomeCognome }}</td>
-                  <td class="text-success">{{ res.dataOra | date:'HH:mm:ss' }}</td>
-                  <td class="text-center">
-                    <button nz-button nzType="text" nzDanger>
-                      <i class="fa fa-trash-o"></i>
-                    </button>
-                  </td>
-                </tr>
+              <tr>
+                <td class="fw-bold">{{ res.nomeCognome }}</td>
+                <td class="text-success">{{ res.dataOra | date:'HH:mm:ss' }}</td>
+                <td class="text-center">
+                  <button nz-button nzType="text" nzDanger>
+                    <i class="fa fa-trash-o"></i>
+                  </button>
+                </td>
+              </tr>
               }
             </tbody>
           </table>
@@ -39,7 +39,7 @@
             PRENOTATI
           </button>
           <p class="text-center text-muted small mt-2 mb-0">
-            Le prenotazioni aprono domenica alle 17:00
+            Le prenotazioni aprono Domenica alle 17:00
           </p>
         </div>
       </div>

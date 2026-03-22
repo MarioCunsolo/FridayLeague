@@ -1,8 +1,8 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { MatchDetailComponent } from '../match-detail/match-detail.component';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
+import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { MatchService } from '../../service/match.service';
+import { MatchService } from 'src/app/shared/service/match.service';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';

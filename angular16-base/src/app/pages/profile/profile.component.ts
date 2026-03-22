@@ -1,16 +1,15 @@
 import { Component, signal } from '@angular/core';
-import { MatchDetailComponent } from '../match-detail/match-detail.component';
-import { RouterLink } from '@angular/router';
-import { UserStats } from '../../../models/interface/user-stats.interface';
-import { Match } from '../../../models/interface/match.interface';
+import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
+import { UserStats } from 'src/app/models/interface/user-stats.interface';
+import { Match } from 'src/app/models/interface/match.interface';
 
 
 @Component({
-    selector: 'app-profile',
-    templateUrl: './profile.component.html',
-    styleUrls: ['./profile.component.css'],
-    standalone: true,
-    imports: [MatchDetailComponent]
+  selector: 'app-profile',
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css'],
+  standalone: true,
+  imports: [MatchDetailComponent]
 })
 export class ProfileComponent {
   showMatchDetails = signal(false);

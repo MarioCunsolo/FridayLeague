@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomepageComponent } from './shared/component/homepage/homepage.component';
-import { ReservationComponent } from './shared/component/reservation/reservation.component';
-import { MatchComponent } from './shared/component/match/match.component';
-import { ProfileComponent } from './shared/component/profile/profile.component';
+import { HomepageComponent } from './pages/homepage/homepage.component';
+import { ReservationComponent } from './pages/reservation/reservation.component';
+import { MatchComponent } from './pages/match/match.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 import { LayoutComponent } from './shared/component/layout/layout.component';
-import { LoginComponent } from './shared/component/login/login.component';
-import { StatsComponent } from './shared/component/stats/stats.component';
+import { LoginComponent } from './pages/login/login.component';
+import { StatsComponent } from './pages/stats/stats.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },

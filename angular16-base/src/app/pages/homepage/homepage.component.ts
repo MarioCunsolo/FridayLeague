@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { MatchService } from '../../service/match.service';
+import { MatchService } from 'src/app/shared/service/match.service';
 
 @Component({
   selector: 'app-homepage',

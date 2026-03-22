@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { PlayerStats } from '../../../models/interface/player-stats.interface';
+import { PlayerStats } from '../../models/interface/player-stats.interface';
 
 import { trigger, transition, style, animate, keyframes } from '@angular/animations';
 

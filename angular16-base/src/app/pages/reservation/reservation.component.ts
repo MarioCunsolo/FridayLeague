@@ -1,17 +1,16 @@
 import { Component, signal, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { Reservation } from '../../../models/interface/reservation.interface';
+import { Reservation } from '../../models/interface/reservation.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
-    selector: 'app-reservation',
-    templateUrl: './reservation.component.html',
-    styleUrls: ['./reservation.component.css'],
-    standalone: true,
-    imports: [DatePipe, NzButtonModule, NzIconModule]
+  selector: 'app-reservation',
+  templateUrl: './reservation.component.html',
+  styleUrls: ['./reservation.component.css'],
+  standalone: true,
+  imports: [DatePipe, NzButtonModule, NzIconModule]
 })
 export class ReservationComponent {
 

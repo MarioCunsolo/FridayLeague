@@ -1,10 +1,5 @@
 import { Component, input, output, computed } from '@angular/core';
-
-export interface GoalEvent {
-    scorerName: string;
-    isHome: boolean;
-    assistName?: string;
-}
+import { GoalEvent } from '../../../models/interface/match.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';

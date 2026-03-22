@@ -1,22 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-
-export interface Player {
-  name: string;
-  goals: number;
-  assists: number;
-}
-
-export interface Match {
-  id: number;
-  homeTeam: string;
-  awayTeam: string;
-  homeScore: number;
-  awayScore: number;
-  status: string;
-  date: Date;
-  homePlayers?: Player[];
-  awayPlayers?: Player[];
-}
+import { Match, Player } from '../../models/interface/match.interface';
 
 @Injectable({
   providedIn: 'root'

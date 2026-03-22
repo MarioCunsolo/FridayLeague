@@ -1,6 +1,7 @@
 import { Component, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { Reservation } from '../../../models/interface/reservation.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -15,7 +16,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 export class ReservationComponent {
 
   // Dati di esempio per le prenotazioni come Signal
-  reservations = signal([
+  reservations = signal<Reservation[]>([
     { nomeCognome: 'Mario Rossi', dataOra: new Date('2026-03-25T17:00:15') },
     { nomeCognome: 'Luigi Bianchi', dataOra: new Date('2026-03-26T18:30:42') },
     { nomeCognome: 'Giuseppe Verdi', dataOra: new Date('2026-03-27T19:00:05') },

@@ -1,6 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { MatchDetailComponent } from '../match-detail/match-detail.component';
 import { RouterLink } from '@angular/router';
+import { UserStats } from '../../../models/interface/user-stats.interface';
+import { Match } from '../../../models/interface/match.interface';
 
 
 @Component({
@@ -12,14 +14,14 @@ import { RouterLink } from '@angular/router';
 })
 export class ProfileComponent {
   showMatchDetails = signal(false);
-  userStats = signal([
+  userStats = signal<UserStats[]>([
     { label: 'GOAL', value: 12, icon: 'fa-futbol-o', colorClass: 'text-success' },
     { label: 'ASSIST', value: 8, icon: 'fa-handshake-o', colorClass: 'text-success' },
     { label: 'MAN OF THE MATCH', value: 3, icon: 'fa-trophy', colorClass: 'text-success' },
     { label: 'PARTITE GIOCATE', value: 24, icon: 'fa-line-chart', colorClass: 'text-success' }
   ]);
 
-  selectedMatch = signal({
+  selectedMatch = signal<Partial<Match>>({
     homeTeam: 'Squali Rossi',
     awayTeam: 'Leoni FC',
     homeScore: 2,

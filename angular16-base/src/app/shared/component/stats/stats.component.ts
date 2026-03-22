@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { PlayerStats } from '../../../models/interface/player-stats.interface';
 
 import { trigger, transition, style, animate, keyframes } from '@angular/animations';
 
@@ -31,7 +32,7 @@ export class StatsComponent {
   options = ['GOL', 'ASSIST'];
   activeOption = signal('GOL');
 
-  scorers = signal([
+  scorers = signal<PlayerStats[]>([
     { name: 'Mario Cunsolo', team: 'Squali Rossi', value: 12, avatar: 'MC', color: '#00cc66' },
     { name: 'Luigi Verdi', team: 'Leoni FC', value: 9, avatar: 'LV', color: '#3399ff' },
     { name: 'Francesco Rossi', team: 'Aquile Nere', value: 8, avatar: 'FR', color: '#ffcc00' },

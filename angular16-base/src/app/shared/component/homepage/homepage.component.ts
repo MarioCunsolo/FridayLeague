@@ -1,6 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { MatchDetailComponent } from '../match-detail/match-detail.component';
 import { MatchService } from '../../service/match.service';
 
 @Component({
@@ -8,7 +7,7 @@ import { MatchService } from '../../service/match.service';
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.css'],
   standalone: true,
-  imports: [RouterLink, MatchDetailComponent]
+  imports: [RouterLink]
 })
 export class HomepageComponent {
   private matchService = inject(MatchService);

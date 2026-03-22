@@ -6,6 +6,58 @@
     flex-direction: column;
 }
 
+/* Titolari e Sostituti Styling */
+.section-header-row td {
+    background-color: var(--input-bg) !important;
+    padding: 0.5rem 0.625rem !important;
+    border-bottom: 0.0625rem solid var(--border-main) !important;
+}
+
+.section-divider-text {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--primary-green);
+    letter-spacing: 0.05rem;
+}
+
+.substitute-title {
+    color: var(--text-tertiary);
+}
+
+.position-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-right: 0.5rem;
+}
+
+.starter-badge {
+    background-color: rgba(0, 204, 102, 0.15);
+    color: var(--primary-green);
+}
+
+.substitute-badge {
+    background-color: var(--border-main);
+    color: var(--text-tertiary);
+}
+
+.substitute-row td {
+    opacity: 0.85;
+}
+
+.substitute-row .fw-bold {
+    color: var(--text-secondary);
+}
+
+.substitute-row .text-muted {
+    font-size: 0.75rem;
+}
+
 .custom-table th {
     background-color: var(--input-bg);
     color: var(--text-secondary);

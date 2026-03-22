@@ -15,17 +15,45 @@
             <span>Prenota</span>
           </div>
         </div>
-        <div class="col-6 col-sm-5 col-md-4" routerLink="/partite">
+        <div class="col-6 col-sm-5 col-md-4" routerLink="/calendario">
           <div class="action-card shadow-sm">
             <i class="fa fa-futbol-o action-icon text-success"></i>
-            <span>Partite</span>
+            <span>Calendario</span>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Next Match Card -->
+    @if (nextMatch()) {
+    <div class="col-12 col-md-10 col-lg-8 mt-4" (click)="goToMatchDetails(nextMatch()!.id)" style="cursor: pointer;">
+      <div class="match-card shadow-sm next-match">
+        <h3 class="match-title">Prossima Partita</h3>
+        <div class="match-content">
+          <div class="team-container">
+            <div class="team-logo shadow-sm">
+              <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+            </div>
+            <span class="team-name text-truncate w-100">{{ nextMatch()!.homeTeam }}</span>
+          </div>
+          <div class="score-container">
+            <span class="score-text">VS</span>
+            <span class="match-date text-primary">{{ nextMatch()!.date | date:'d MMMM' | titlecase }}</span>
+          </div>
+          <div class="team-container">
+            <div class="team-logo shadow-sm">
+              <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+            </div>
+            <span class="team-name text-truncate w-100">{{ nextMatch()!.awayTeam }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
     <!-- Recent Match Card -->
-    <div class="col-12 col-md-10 col-lg-8 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
+    @if (lastMatch()) {
+    <div class="col-12 col-md-10 col-lg-8 mt-4" (click)="goToMatchDetails(lastMatch()!.id)" style="cursor: pointer;">
       <div class="match-card shadow-sm">
         <h3 class="match-title">Ultima Partita</h3>
         <div class="match-content">
@@ -33,20 +61,21 @@
             <div class="team-logo shadow-sm">
               <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
             </div>
-            <span class="team-name text-truncate w-100">{{ selectedMatch().homeTeam }}</span>
+            <span class="team-name text-truncate w-100">{{ lastMatch()!.homeTeam }}</span>
           </div>
           <div class="score-container">
-            <span class="score-text">{{ selectedMatch().homeScore }} - {{ selectedMatch().awayScore }}</span>
-            <span class="match-status text-success">{{ selectedMatch().status }}</span>
+            <span class="score-text">{{ lastMatch()!.homeScore }} - {{ lastMatch()!.awayScore }}</span>
+            <span class="match-status text-success">{{ lastMatch()!.status }}</span>
           </div>
           <div class="team-container">
             <div class="team-logo shadow-sm">
               <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
             </div>
-            <span class="team-name text-truncate w-100">{{ selectedMatch().awayTeam }}</span>
+            <span class="team-name text-truncate w-100">{{ lastMatch()!.awayTeam }}</span>
           </div>
         </div>
       </div>
     </div>
+    }
   </div>
 </div>

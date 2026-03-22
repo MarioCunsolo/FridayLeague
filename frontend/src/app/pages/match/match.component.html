@@ -4,45 +4,51 @@
     <div class="col-12 col-md-10 col-lg-9">
       <!-- Section Header -->
       <div class="d-flex align-items-center mb-4">
-        <h2 class="section-title m-0">Partite Recenti</h2>
+        <h2 class="section-title m-0">Calendario Partite</h2>
       </div>
 
       <div class="matches-list">
-        <div class="row g-3">
-          @for (match of matches(); track match.id) {
-          <div class="col-12 col-lg-6">
-            <div class="match-card shadow-sm" [class.next-match]="match.status === 'Programmata'" (click)="openMatchDetails(match)" style="cursor: pointer;">
-              @if (match.status === 'Programmata') {
+        @for (group of groupedMatches(); track group.month) {
+        <div class="month-section mb-5">
+          <h3 class="month-title mb-4 pb-2 border-bottom border-secondary border-opacity-25">{{ group.month }}:</h3>
+          <div class="row g-4">
+            @for (match of group.matches; track match.id) {
+            <div class="col-12 col-md-6">
+              <div class="match-card shadow-sm" [class.next-match]="match.id === nextMatchId()"
+                (click)="openMatchDetails(match)" style="cursor: pointer;">
+                @if (match.id === nextMatchId()) {
                 <div class="next-match-badge shadow-sm">PROSSIMA</div>
-              }
-              <div class="match-title">Venerdì {{ match.date | date:'dd/MM' }}</div>
-              <div class="match-content">
-                <div class="team-container">
-                  <div class="team-logo shadow-sm">
-                    <i class="fa fa-shield" style="font-size: 1.5rem; color: #ff4444;"></i>
+                }
+                <div class="match-title">Venerdì {{ match.date | date:'dd/MM' }}</div>
+                <div class="match-content">
+                  <div class="team-container">
+                    <div class="team-logo shadow-sm">
+                      <i class="fa fa-shield" style="font-size: 1.5rem; color: #ff4444;"></i>
+                    </div>
+                    <span class="team-name text-truncate w-100">{{ match.homeTeam }}</span>
                   </div>
-                  <span class="team-name text-truncate w-100">{{ match.homeTeam }}</span>
-                </div>
-                <div class="score-container">
-                  @if (match.status === 'Programmata') {
+                  <div class="score-container">
+                    @if (match.status === 'Programmata') {
                     <span class="score-text">VS</span>
                     <span class="match-status text-primary">{{ match.status }}</span>
-                  } @else {
+                    } @else {
                     <span class="score-text">{{ match.homeScore }} - {{ match.awayScore }}</span>
                     <span class="match-status text-success">{{ match.status }}</span>
-                  }
-                </div>
-                <div class="team-container">
-                  <div class="team-logo shadow-sm">
-                    <i class="fa fa-star" style="font-size: 1.5rem; color: #ffcc00;"></i>
+                    }
                   </div>
-                  <span class="team-name text-truncate w-100">{{ match.awayTeam }}</span>
+                  <div class="team-container">
+                    <div class="team-logo shadow-sm">
+                      <i class="fa fa-star" style="font-size: 1.5rem; color: #ffcc00;"></i>
+                    </div>
+                    <span class="team-name text-truncate w-100">{{ match.awayTeam }}</span>
+                  </div>
                 </div>
               </div>
             </div>
+            }
           </div>
-          }
         </div>
+        }
       </div>
     </div>
   </div>

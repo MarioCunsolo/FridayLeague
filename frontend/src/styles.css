@@ -234,3 +234,84 @@ body {
 .text-muted { color: var(--text-secondary) !important; }
 .shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.05)!important; }
 .shadow { box-shadow: 0 .5rem 1rem rgba(0,0,0,.1)!important; }
+
+/* Ant Design Modal Overrides */
+.ant-modal-content {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 0.0625rem solid var(--border-main) !important;
+    border-radius: 1.25rem !important;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.4) !important;
+}
+
+.ant-modal-header {
+    background-color: var(--card-bg) !important;
+    border-bottom: 0.0625rem solid var(--border-sub) !important;
+    border-radius: 1.25rem 1.25rem 0 0 !important;
+}
+
+.ant-modal-title {
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+}
+
+.ant-modal-close {
+    color: var(--text-secondary) !important;
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-title {
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-content {
+    color: var(--text-secondary) !important;
+    margin-top: 0.75rem !important;
+}
+
+/* Modal Icons and Buttons */
+.ant-modal-confirm-body .ant-modal-confirm-icon {
+    display: none; /* Hide standard icon to use our clean title only if preferred, or style it */
+}
+
+/* If keeping the icon, style it:
+.ant-modal-confirm-body .ant-modal-confirm-icon {
+    color: var(--danger-red) !important;
+}
+*/
+
+.ant-modal-confirm-btns {
+    margin-top: 1.5rem !important;
+}
+
+.ant-modal-confirm-btns .ant-btn {
+    border-radius: 0.75rem !important;
+    font-weight: 600 !important;
+    height: 2.5rem !important;
+    padding: 0 1.5rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.ant-modal-confirm-btns .ant-btn-primary {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    color: #000000 !important;
+}
+
+.ant-modal-confirm-btns .ant-btn-dangerous.ant-btn-primary {
+    background-color: var(--danger-red) !important;
+    border-color: var(--danger-red) !important;
+    color: #ffffff !important;
+}
+
+.ant-modal-confirm-btns .ant-btn:not(.ant-btn-primary) {
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-main) !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-modal-confirm-btns .ant-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-0.125rem);
+}

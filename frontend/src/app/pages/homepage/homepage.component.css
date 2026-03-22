@@ -30,3 +30,21 @@
 .action-icon {
     font-size: 2rem;
 }
+
+/* Match Cards on Homepage */
+.next-match {
+    border: 0.125rem solid rgba(0, 204, 102, 0.4) !important;
+    background: linear-gradient(to bottom right, var(--stat-card-bg), rgba(0, 204, 102, 0.05)) !important;
+}
+
+.next-match:hover {
+    border-color: var(--primary-green) !important;
+}
+
+.match-date {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    margin-top: 0.25rem;
+}

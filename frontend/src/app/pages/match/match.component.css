@@ -26,7 +26,38 @@
 }
 
 .next-match {
-    border: 1px solid var(--primary-green) !important;
+    border: 0.125rem solid rgba(0, 204, 102, 0.4) !important;
+    background: linear-gradient(to bottom right, var(--stat-card-bg), rgba(0, 204, 102, 0.05)) !important;
 }
 
-/* Specific overrides or additions for MatchComponent if any */
+.next-match:hover {
+    border-color: var(--primary-green) !important;
+}
+
+.month-section {
+    position: relative;
+    margin-bottom: 2.5rem;
+}
+
+.month-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    display: inline-block;
+    position: relative;
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 0.5rem;
+}
+
+.month-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 2.5rem;
+    height: 0.1875rem;
+    background-color: var(--primary-green);
+    border-radius: 1rem;
+}

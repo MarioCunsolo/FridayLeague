@@ -16,7 +16,7 @@ const routes: Routes = [
     children: [
       { path: '', component: HomepageComponent },
       { path: 'prenotazioni', component: ReservationComponent },
-      { path: 'partite', component: MatchComponent },
+      { path: 'calendario', component: MatchComponent },
       { path: 'profilo', component: ProfileComponent },
       { path: 'classifiche', component: StatsComponent },
     ]

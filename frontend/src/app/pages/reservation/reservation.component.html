@@ -2,8 +2,18 @@
   <div class="row justify-content-center h-100">
     <div class="col-12 col-md-10 col-lg-9 d-flex flex-column h-100">
       <!-- Section Header -->
-      <div class="d-flex align-items-center mb-4">
-        <h2 class="section-title m-0">Prenotazioni</h2>
+      <h2 class="section-title mb-4">Prenotazioni</h2>
+
+      <div class="mb-4">
+        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow" [disabled]="isReservationDisabled()">
+          PRENOTATI
+        </button>
+        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow mt-2" [disabled]="isReservationDisabled()">
+          PRENOTA ALTRE PERSONE
+        </button>
+        <p class="text-center text-muted small mt-2 mb-0">
+          Le prenotazioni aprono Domenica alle 17:00
+        </p>
       </div>
 
       <div class="reservation-card shadow-sm d-flex flex-column flex-grow-1">
@@ -19,29 +29,50 @@
               </tr>
             </thead>
             <tbody class="scrollable-tbody">
-              @for (res of reservations(); track $index) {
+              <!-- Titolari Section -->
+              <tr class="section-header-row">
+                <td colspan="3" class="section-divider-text">TITOLARI ({{ starters().length }}/14)</td>
+              </tr>
+              @for (res of starters(); track $index) {
               <tr>
-                <td class="fw-bold">{{ res.nomeCognome }}</td>
-                <td class="text-success">{{ res.dataOra | date:'HH:mm:ss' }}</td>
+                <td class="fw-bold text-nowrap">
+                  <span class="position-badge starter-badge">{{ $index + 1 }}</span>
+                  {{ res.nomeCognome }}
+                </td>
+                <td class="text-success text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
                 <td class="text-center">
-                  <button nz-button nzType="text" nzDanger>
+                  <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)">
                     <i class="fa fa-trash-o"></i>
                   </button>
                 </td>
               </tr>
               }
+
+              <!-- Sostituti Section -->
+              @if (substitutes().length > 0) {
+              <tr class="section-header-row mt-3">
+                <td colspan="3" class="section-divider-text substitute-title">SOSTITUTI ({{ substitutes().length }})
+                </td>
+              </tr>
+              @for (res of substitutes(); track $index) {
+              <tr class="substitute-row">
+                <td class="fw-bold text-nowrap">
+                  <span class="position-badge substitute-badge">{{ $index + 15 }}</span>
+                  {{ res.nomeCognome }}
+                </td>
+                <td class="text-muted text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
+                <td class="text-center">
+                  <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)">
+                    <i class="fa fa-trash-o"></i>
+                  </button>
+                </td>
+              </tr>
+              }
+              }
             </tbody>
           </table>
         </div>
 
-        <div class="mt-auto">
-          <button nz-button nzType="primary" nzBlock class="btn-prenota shadow" [disabled]="isReservationDisabled()">
-            PRENOTATI
-          </button>
-          <p class="text-center text-muted small mt-2 mb-0">
-            Le prenotazioni aprono Domenica alle 17:00
-          </p>
-        </div>
       </div>
     </div>
   </div>

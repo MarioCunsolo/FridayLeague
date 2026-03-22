@@ -7,6 +7,96 @@ import { Match, Player } from '../../models/interface/match.interface';
 export class MatchService {
   private matches = signal<Match[]>([
     {
+      id: 15,
+      homeTeam: 'Aquile Nere',
+      awayTeam: 'Leoni FC',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-06-26T21:00:00')
+    },
+    {
+      id: 14,
+      homeTeam: 'Lupi Selvaggi',
+      awayTeam: 'Pirati del Campo',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-06-19T21:00:00')
+    },
+    {
+      id: 13,
+      homeTeam: 'Squali Rossi',
+      awayTeam: 'Tigri Bianche',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-06-12T21:00:00')
+    },
+    {
+      id: 12,
+      homeTeam: 'Leoni FC',
+      awayTeam: 'Aquile Nere',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-06-05T21:00:00')
+    },
+    {
+      id: 11,
+      homeTeam: 'Pirati del Campo',
+      awayTeam: 'Squali Rossi',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-04-17T21:00:00')
+    },
+    {
+      id: 10,
+      homeTeam: 'Tigri Bianche',
+      awayTeam: 'Lupi Selvaggi',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-04-10T21:00:00')
+    },
+    {
+      id: 6,
+      homeTeam: 'Leoni FC',
+      awayTeam: 'Squali Rossi',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-04-03T21:00:00')
+    },
+    {
+      id: 9,
+      homeTeam: 'Lupi Selvaggi',
+      awayTeam: 'Aquile Nere',
+      homeScore: 3,
+      awayScore: 1,
+      status: 'Terminata',
+      date: new Date('2026-03-20T21:00:00')
+    },
+    {
+      id: 8,
+      homeTeam: 'Pirati del Campo',
+      awayTeam: 'Leoni FC',
+      homeScore: 2,
+      awayScore: 2,
+      status: 'Terminata',
+      date: new Date('2026-03-13T21:00:00')
+    },
+    {
+      id: 7,
+      homeTeam: 'Tigri Bianche',
+      awayTeam: 'Squali Rossi',
+      homeScore: 1,
+      awayScore: 4,
+      status: 'Terminata',
+      date: new Date('2026-03-06T21:00:00')
+    },
+    {
       id: 5,
       homeTeam: 'Squali Rossi',
       awayTeam: 'Tigri Bianche',
@@ -173,6 +263,13 @@ export class MatchService {
 
   getMatchById(id: number) {
     return this.matches().find(m => m.id === id);
+  }
+
+  getNextMatch() {
+    const programmable = this.matches()
+      .filter(m => m.status === 'Programmata')
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+    return programmable.length > 0 ? programmable[0] : null;
   }
 
   getLastMatch() {

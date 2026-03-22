@@ -1,24 +1,23 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatchService } from 'src/app/shared/service/match.service';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.css'],
   standalone: true,
-  imports: [RouterLink]
+  imports: [RouterLink, DatePipe, TitleCasePipe]
 })
 export class HomepageComponent {
   private matchService = inject(MatchService);
   private router = inject(Router);
 
-  selectedMatch = signal(this.matchService.getLastMatch());
+  lastMatch = signal(this.matchService.getLastMatch());
+  nextMatch = signal(this.matchService.getNextMatch());
 
-  openMatchDetails() {
-    const match = this.selectedMatch();
-    if (match) {
-      this.router.navigate(['/partite'], { queryParams: { matchId: match.id } });
-    }
+  goToMatchDetails(matchId: number) {
+    this.router.navigate(['/calendario'], { queryParams: { matchId } });
   }
 }

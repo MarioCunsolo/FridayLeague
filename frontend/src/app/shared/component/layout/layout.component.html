@@ -13,9 +13,9 @@
         <i class="fa fa-calendar"></i>
         <span>Prenota</span>
       </div>
-      <div class="nav-item-desktop" routerLink="/partite" routerLinkActive="active">
+      <div class="nav-item-desktop" routerLink="/calendario" routerLinkActive="active">
         <i class="fa fa-futbol-o"></i>
-        <span>Partite</span>
+        <span>Calendario</span>
       </div>
       <div class="nav-item-desktop" routerLink="/profilo" routerLinkActive="active">
         <i class="fa fa-user"></i>
@@ -44,12 +44,14 @@
     <header class="top-navbar d-lg-none shadow-sm">
       <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-4">
         <!-- Logout (Mobile) -->
-        <div class="logout-mobile" routerLink="/login" style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
+        <div class="logout-mobile" routerLink="/login"
+          style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
           <span nz-icon nzType="logout" nzTheme="outline"></span>
         </div>
         <h1 class="navbar-brand m-0">Friday League</h1>
         <!-- Theme Toggle (Mobile) -->
-        <div class="theme-toggle-mobile" (click)="toggleTheme()" style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
+        <div class="theme-toggle-mobile" (click)="toggleTheme()"
+          style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
           <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
         </div>
       </div>
@@ -70,9 +72,9 @@
         <i class="fa fa-calendar"></i>
         <span>Prenota</span>
       </div>
-      <div class="nav-item" routerLink="/partite" routerLinkActive="active">
+      <div class="nav-item" routerLink="/calendario" routerLinkActive="active">
         <i class="fa fa-futbol-o"></i>
-        <span>Partite</span>
+        <span>Calendario</span>
       </div>
       <div class="nav-item" routerLink="/profilo" routerLinkActive="active">
         <i class="fa fa-user"></i>

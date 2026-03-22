@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { Match, Player } from '../../models/interface/match.interface';
 
 @Injectable({
@@ -6,6 +6,15 @@ import { Match, Player } from '../../models/interface/match.interface';
 })
 export class MatchService {
   private matches = signal<Match[]>([
+    {
+      id: 5,
+      homeTeam: 'Squali Rossi',
+      awayTeam: 'Tigri Bianche',
+      homeScore: 0,
+      awayScore: 0,
+      status: 'Programmata',
+      date: new Date('2026-03-27T21:00:00')
+    },
     {
       id: 1,
       homeTeam: 'Squali Rossi',
@@ -113,11 +122,53 @@ export class MatchService {
         { name: 'Lupo Six', goals: 0, assists: 0 },
         { name: 'Lupo Seven', goals: 0, assists: 0 }
       ]
+    },
+    // Season 2025
+    {
+      id: 101,
+      homeTeam: 'Squali Rossi',
+      awayTeam: 'Leoni FC',
+      homeScore: 3,
+      awayScore: 3,
+      status: 'Terminata',
+      date: new Date('2025-11-15T21:00:00')
+    },
+    {
+      id: 102,
+      homeTeam: 'Aquile Nere',
+      awayTeam: 'Squali Rossi',
+      homeScore: 0,
+      awayScore: 2,
+      status: 'Terminata',
+      date: new Date('2025-05-10T21:00:00')
+    },
+    // Season 2024
+    {
+      id: 201,
+      homeTeam: 'Squali Rossi',
+      awayTeam: 'Lupi Selvaggi',
+      homeScore: 4,
+      awayScore: 1,
+      status: 'Terminata',
+      date: new Date('2024-12-20T21:00:00')
+    },
+    {
+      id: 202,
+      homeTeam: 'Tigri Bianche',
+      awayTeam: 'Squali Rossi',
+      homeScore: 2,
+      awayScore: 2,
+      status: 'Terminata',
+      date: new Date('2024-06-15T21:00:00')
     }
   ]);
 
+  getAvailableSeasons() {
+    return ['2024', '2025', '2026'];
+  }
+
   getMatches() {
-    return this.matches.asReadonly();
+    return computed(() => [...this.matches()].sort((a, b) => b.date.getTime() - a.date.getTime()));
   }
 
   getMatchById(id: number) {
@@ -125,7 +176,10 @@ export class MatchService {
   }
 
   getLastMatch() {
-    const sorted = [...this.matches()].sort((a, b) => b.date.getTime() - a.date.getTime());
-    return sorted[0];
+    // Return the latest completed match for the home page card
+    const completed = this.matches()
+      .filter(m => m.status === 'Terminata')
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    return completed.length > 0 ? completed[0] : this.getMatches()()[0];
   }
 }

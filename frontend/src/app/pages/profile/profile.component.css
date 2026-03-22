@@ -16,13 +16,39 @@
     border-radius: 0.75rem;
     padding: 0.75rem;
     height: 100%;
-    transition: transform 0.2s, background-color var(--transition-speed), border-color var(--transition-speed);
+    position: relative;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
-.stat-card:hover {
-    transform: translateY(-0.125rem);
-    border-color: var(--primary-green);
+.stat-rank {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.125rem 0.4rem;
+    border-radius: 1rem;
+    background-color: var(--border-sub);
+    color: var(--text-secondary);
 }
+
+/* Rank Colors */
+.rank-1 {
+    background: linear-gradient(135deg, #FFD700, #FFAB00) !important;
+    color: #000 !important;
+}
+
+.rank-2 {
+    background: linear-gradient(135deg, #C0C0C0, #A0A0A0) !important;
+    color: #000 !important;
+}
+
+.rank-3 {
+    background: linear-gradient(135deg, #CD7F32, #A0522D) !important;
+    color: #fff !important;
+}
+
+
 
 .stat-content {
     display: flex;
@@ -57,4 +83,57 @@
     font-size: 1.125rem;
     font-weight: 800;
     color: var(--text-primary);
+}
+
+/* Season Select Styles */
+.season-select-container {
+    background-color: var(--stat-card-bg);
+    padding: 0.5rem 1.25rem;
+    border-radius: 3rem;
+    border: 0.0625rem solid var(--border-sub);
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
+}
+
+.season-select {
+    width: 100px;
+}
+
+::ng-deep .season-select .ant-select-selector {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--primary-green) !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+}
+
+::ng-deep .season-select .ant-select-arrow {
+    color: var(--primary-green) !important;
+}
+
+/* For the dropdown list */
+::ng-deep .ant-select-dropdown {
+    background-color: var(--app-bg) !important;
+    border: 0.0625rem solid var(--border-sub) !important;
+    border-radius: 0.75rem !important;
+}
+
+::ng-deep .ant-select-item {
+    color: var(--text-primary) !important;
+}
+
+::ng-deep .ant-select-item-option-selected {
+    background-color: rgba(0, 204, 102, 0.1) !important;
+    color: var(--primary-green) !important;
+    font-weight: 700 !important;
+}
+
+/* Hover/Active Item Fix */
+::ng-deep .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: var(--border-sub) !important;
+    color: var(--primary-green) !important;
+}
+
+::ng-deep .ant-select-item:hover {
+    background-color: var(--border-sub) !important;
 }

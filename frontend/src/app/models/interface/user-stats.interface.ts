@@ -3,4 +3,5 @@ export interface UserStats {
   value: number;
   icon: string;
   colorClass: string;
+  rank?: number;
 }

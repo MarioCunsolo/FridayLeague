@@ -43,6 +43,7 @@
     width: 100%;
     min-height: 100%;
 }
+
 @media (max-width: 991px) {
     .match-details-page {
         position: fixed;
@@ -59,25 +60,39 @@
     background-color: var(--app-bg);
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 0 1rem;
     border-bottom: 0.0625rem solid var(--border-sub);
+    position: relative;
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
 .match-details-page .details-header {
-    background-color: transparent;
-    border-bottom: none;
-    padding: 0;
+    background-color: var(--app-bg);
+    border-bottom: 0.0625rem solid var(--border-sub);
+    padding: 0 1rem;
     margin-bottom: 1rem;
+}
+
+@media (min-width: 992px) {
+    .match-details-page .details-header {
+        background-color: transparent;
+        border-bottom: none;
+        padding: 0;
+    }
 }
 
 .details-title {
     font-weight: 700;
     font-size: 1.25rem;
     color: var(--primary-green);
-    flex: 1;
     text-align: center;
-    margin-right: 2.5rem; /* Balance the back button */
+}
+
+.back-button {
+    position: absolute;
+    left: 1rem;
+    z-index: 10;
 }
 
 .details-content-area {
@@ -146,8 +161,13 @@
     border-radius: 50%;
 }
 
-.home-dot { background-color: #ff4444; }
-.away-dot { background-color: #ffcc00; }
+.home-dot {
+    background-color: #ff4444;
+}
+
+.away-dot {
+    background-color: #ffcc00;
+}
 
 .player-name-header {
     font-weight: 600;
@@ -174,8 +194,13 @@
     filter: invert(1) brightness(2);
 }
 
-.mr-1 { margin-right: 0.25rem; }
-.ml-1 { margin-left: 0.25rem; }
+.mr-1 {
+    margin-right: 0.25rem;
+}
+
+.ml-1 {
+    margin-left: 0.25rem;
+}
 
 .vs-divider {
     font-size: 2rem;

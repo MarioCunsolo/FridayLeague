@@ -10,12 +10,34 @@
         <p class="text-success fw-bold">Player Pro</p>
       </div>
 
+      <!-- Season Selector -->
+      <div class="col-12 d-flex justify-content-center mb-4">
+        <div class="season-select-container d-flex align-items-center gap-2">
+          <span class="text-secondary fw-bold small text-uppercase">Stagione:</span>
+          <nz-select 
+            [ngModel]="selectedSeason()" 
+            (ngModelChange)="onSeasonChange($event)"
+            class="season-select"
+            nzSize="large"
+            [nzSuffixIcon]="'down-circle'">
+            @for (season of availableSeasons; track season) {
+              <nz-option [nzValue]="season" [nzLabel]="season"></nz-option>
+            }
+          </nz-select>
+        </div>
+      </div>
+
       <!-- Stats Grid -->
       <div class="col-12 col-md-10 col-lg-9">
         <div class="row g-3">
           @for (stat of userStats(); track stat.label) {
             <div class="col-6 col-md-6 col-xl-3">
               <div class="stat-card shadow-sm">
+                @if (stat.rank) {
+                  <div class="stat-rank shadow-sm" [class]="'rank-' + stat.rank">
+                    #{{ stat.rank }}
+                  </div>
+                }
                 <div class="stat-content">
                   <i [class]="'fa ' + stat.icon + ' stat-icon ' + stat.colorClass"></i>
                   <div class="stat-details">

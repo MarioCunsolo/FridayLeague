@@ -29,7 +29,7 @@ import { trigger, transition, style, animate, keyframes } from '@angular/animati
   ]
 })
 export class StatsComponent {
-  options = ['GOL', 'ASSIST'];
+  options = ['GOL', 'ASSIST', 'MOTM'];
   activeOption = signal('GOL');
 
   scorers = signal<PlayerStats[]>([
@@ -52,13 +52,28 @@ export class StatsComponent {
     { name: 'Giuseppe Bianchi', team: 'Pirati del Campo', value: 2, avatar: 'GB', color: '#33cccc' },
   ]);
 
+  motm = signal([
+    { name: 'Mario Cunsolo', team: 'Squali Rossi', value: 3, avatar: 'MC', color: '#00cc66' },
+    { name: 'Francesco Rossi', team: 'Aquile Nere', value: 2, avatar: 'FR', color: '#ffcc00' },
+    { name: 'Luigi Verdi', team: 'Leoni FC', value: 2, avatar: 'LV', color: '#3399ff' },
+    { name: 'Simone Neri', team: 'Lupi Selvaggi', value: 1, avatar: 'SN', color: '#9933ff' },
+    { name: 'Carlo Gialli', team: 'Tigri Bianche', value: 1, avatar: 'CG', color: '#ff9933' },
+    { name: 'Giuseppe Bianchi', team: 'Pirati del Campo', value: 1, avatar: 'GB', color: '#33cccc' },
+    { name: 'Andrea Blu', team: 'Squali Rossi', value: 1, avatar: 'AB', color: '#ff4444' },
+  ]);
+
   handleIndexChange(value: string | number): void {
     const selected = typeof value === 'number' ? this.options[value] : value;
     this.activeOption.set(selected);
   }
 
   get activeList() {
-    return this.activeOption() === 'GOL' ? this.scorers() : this.assists();
+    switch (this.activeOption()) {
+      case 'GOL': return this.scorers();
+      case 'ASSIST': return this.assists();
+      case 'MOTM': return this.motm();
+      default: return this.scorers();
+    }
   }
 
   get top3() {

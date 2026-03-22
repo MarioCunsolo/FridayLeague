@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -6,6 +6,7 @@ import { MatchService } from 'src/app/shared/service/match.service';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 
 @Component({
   selector: 'app-match',
@@ -20,6 +21,8 @@ export class MatchComponent implements OnInit {
 
   showMatchDetails = signal(false);
   selectedMatch = signal<any>(null);
+
+  matches = this.matchService.getMatches();
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -42,6 +45,4 @@ export class MatchComponent implements OnInit {
     this.showMatchDetails.set(false);
     this.selectedMatch.set(null);
   }
-
-  matches = this.matchService.getMatches();
 }

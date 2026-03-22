@@ -1,24 +1,50 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
 import { UserStats } from 'src/app/models/interface/user-stats.interface';
 import { Match } from 'src/app/models/interface/match.interface';
-
+import { FormsModule } from '@angular/forms';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
   standalone: true,
-  imports: [MatchDetailComponent]
+  imports: [MatchDetailComponent, NzSelectModule, FormsModule]
 })
 export class ProfileComponent {
   showMatchDetails = signal(false);
-  userStats = signal<UserStats[]>([
-    { label: 'GOAL', value: 12, icon: 'fa-futbol-o', colorClass: 'text-success' },
-    { label: 'ASSIST', value: 8, icon: 'fa-handshake-o', colorClass: 'text-success' },
-    { label: 'MAN OF THE MATCH', value: 3, icon: 'fa-trophy', colorClass: 'text-success' },
-    { label: 'PARTITE GIOCATE', value: 24, icon: 'fa-line-chart', colorClass: 'text-success' }
-  ]);
+  
+  availableSeasons = ['2024', '2025', '2026'];
+  selectedSeason = signal('2026');
+
+  private seasonStats: Record<string, UserStats[]> = {
+    '2026': [
+      { label: 'GOAL', value: 12, icon: 'fa-futbol-o', colorClass: 'text-success', rank: 2 },
+      { label: 'ASSIST', value: 8, icon: 'fa-handshake-o', colorClass: 'text-success', rank: 4 },
+      { label: 'MOTM', value: 3, icon: 'fa-trophy', colorClass: 'text-success', rank: 1 },
+      { label: 'PARTITE', value: 24, icon: 'fa-line-chart', colorClass: 'text-success' }
+    ],
+    '2025': [
+      { label: 'GOAL', value: 18, icon: 'fa-futbol-o', colorClass: 'text-success', rank: 1 },
+      { label: 'ASSIST', value: 12, icon: 'fa-handshake-o', colorClass: 'text-success', rank: 2 },
+      { label: 'MOTM', value: 5, icon: 'fa-trophy', colorClass: 'text-success', rank: 1 },
+      { label: 'PARTITE', value: 30, icon: 'fa-line-chart', colorClass: 'text-success' }
+    ],
+    '2024': [
+      { label: 'GOAL', value: 10, icon: 'fa-futbol-o', colorClass: 'text-success', rank: 5 },
+      { label: 'ASSIST', value: 5, icon: 'fa-handshake-o', colorClass: 'text-success', rank: 8 },
+      { label: 'MOTM', value: 2, icon: 'fa-trophy', colorClass: 'text-success', rank: 3 },
+      { label: 'PARTITE', value: 20, icon: 'fa-line-chart', colorClass: 'text-success' }
+    ]
+  };
+
+  userStats = computed(() => this.seasonStats[this.selectedSeason()]);
+
+  onSeasonChange(index: number | string) {
+    const season = typeof index === 'number' ? this.availableSeasons[index] : index;
+    this.selectedSeason.set(season);
+  }
 
   selectedMatch = signal<Partial<Match>>({
     homeTeam: 'Squali Rossi',

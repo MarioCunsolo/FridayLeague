@@ -36,6 +36,24 @@
     }
 }
 
+/* Page Mode (Integrated) */
+.match-details-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100%;
+}
+@media (max-width: 991px) {
+    .match-details-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 2000;
+        border-radius: 0;
+    }
+}
+
 .details-header {
     height: 3.75rem;
     background-color: var(--app-bg);
@@ -44,6 +62,13 @@
     padding: 0 1rem;
     border-bottom: 0.0625rem solid var(--border-sub);
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.match-details-page .details-header {
+    background-color: transparent;
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 1rem;
 }
 
 .details-title {
@@ -65,10 +90,10 @@
 .match-score-header {
     background-color: var(--card-bg);
     border-radius: 1rem;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     border: 0.0625rem solid var(--border-main);
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
@@ -77,12 +102,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 40%;
+    width: 45%;
 }
 
 .team-logo {
-    width: 4rem;
-    height: 4rem;
+    width: 3.5rem;
+    height: 3.5rem;
     background-color: var(--input-bg);
     border-radius: 50%;
     display: flex;
@@ -92,18 +117,65 @@
 }
 
 .team-name {
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 800;
     text-align: center;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 .team-score {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 900;
     color: var(--text-primary);
     line-height: 1;
-    margin-top: 0.5rem;
 }
+
+.player-list-header {
+    border-top: 0.0625rem solid var(--border-main);
+    padding-top: 0.75rem;
+}
+
+.player-item-header {
+    font-size: 0.75rem;
+}
+
+.player-dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+}
+
+.home-dot { background-color: #ff4444; }
+.away-dot { background-color: #ffcc00; }
+
+.player-name-header {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.bonus-icons {
+    display: flex;
+    gap: 0.125rem;
+}
+
+.bonus-icon-goal {
+    font-size: 0.7rem;
+    color: var(--primary-green);
+}
+
+.bonus-icon-assist {
+    width: 0.9rem;
+    height: 0.9rem;
+    object-fit: contain;
+}
+
+:host-context([data-theme='dark']) .bonus-icon-assist {
+    filter: invert(1) brightness(2);
+}
+
+.mr-1 { margin-right: 0.25rem; }
+.ml-1 { margin-left: 0.25rem; }
 
 .vs-divider {
     font-size: 2rem;

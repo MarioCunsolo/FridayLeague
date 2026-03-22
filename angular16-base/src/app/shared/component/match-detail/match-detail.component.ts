@@ -18,6 +18,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 })
 export class MatchDetailComponent {
     match = input<any>();
+    isModal = input<boolean>(true);
     close = output<void>();
 
     goalTimeline = computed<GoalEvent[]>(() => {

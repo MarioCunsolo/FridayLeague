@@ -24,7 +24,25 @@ export class ProfileComponent {
     awayTeam: 'Leoni FC',
     homeScore: 2,
     awayScore: 4,
-    status: 'TERMINATA'
+    status: 'TERMINATA',
+    homePlayers: [
+      { name: 'Mario Cunsolo', goals: 1, assists: 1 },
+      { name: 'Salvatore Vitale', goals: 1, assists: 0 },
+      { name: 'Giuseppe Rossi', goals: 0, assists: 0 },
+      { name: 'Luca Bianchi', goals: 0, assists: 1 },
+      { name: 'Marco Neri', goals: 0, assists: 0 },
+      { name: 'Andrea Gialli', goals: 0, assists: 0 },
+      { name: 'Paolo Rossi', goals: 0, assists: 0 }
+    ],
+    awayPlayers: [
+      { name: 'Roberto Verdi', goals: 2, assists: 0 },
+      { name: 'Franco Nipotini', goals: 1, assists: 1 },
+      { name: 'Giorgio Vanni', goals: 1, assists: 1 },
+      { name: 'Stefano Sogni', goals: 0, assists: 2 },
+      { name: 'Davide Danni', goals: 0, assists: 0 },
+      { name: 'Claudio Canti', goals: 0, assists: 0 },
+      { name: 'Enzo Esposito', goals: 0, assists: 0 }
+    ]
   });
 
   openMatchDetails() {

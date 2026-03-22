@@ -1,61 +1,64 @@
 <div class="container py-4">
-  <div class="row justify-content-center">
-    <!-- Profile Header -->
-    <div class="col-12 d-flex flex-column align-items-center mb-5">
-      <div class="profile-circle shadow">
-        <i class="fa fa-user" style="font-size: 4.5rem; color: var(--text-grey);"></i>
+  @if (!showMatchDetails()) {
+    <div class="row justify-content-center">
+      <!-- Profile Header -->
+      <div class="col-12 d-flex flex-column align-items-center mb-5">
+        <div class="profile-circle shadow">
+          <i class="fa fa-user" style="font-size: 4.5rem; color: var(--text-grey);"></i>
+        </div>
+        <h2 class="mt-4 mb-1">Mario Cunsolo</h2>
+        <p class="text-success fw-bold">Player Pro</p>
       </div>
-      <h2 class="mt-4 mb-1">Mario Cunsolo</h2>
-      <p class="text-success fw-bold">Player Pro</p>
-    </div>
 
-    <!-- Stats Grid -->
-    <div class="col-12 col-md-10 col-lg-9">
-      <div class="row g-3">
-        @for (stat of userStats(); track stat.label) {
-          <div class="col-6 col-md-6 col-xl-3">
-            <div class="stat-card shadow-sm">
-              <div class="stat-content">
-                <i [class]="'fa ' + stat.icon + ' stat-icon ' + stat.colorClass"></i>
-                <div class="stat-details">
-                  <span class="stat-title">{{ stat.label }}</span>
-                  <span class="stat-value">{{ stat.value }}</span>
+      <!-- Stats Grid -->
+      <div class="col-12 col-md-10 col-lg-9">
+        <div class="row g-3">
+          @for (stat of userStats(); track stat.label) {
+            <div class="col-6 col-md-6 col-xl-3">
+              <div class="stat-card shadow-sm">
+                <div class="stat-content">
+                  <i [class]="'fa ' + stat.icon + ' stat-icon ' + stat.colorClass"></i>
+                  <div class="stat-details">
+                    <span class="stat-title">{{ stat.label }}</span>
+                    <span class="stat-value">{{ stat.value }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        }
+          }
+        </div>
       </div>
-    </div>
 
-    <!-- Recent Match Card -->
-    <div class="col-12 col-md-10 col-lg-9 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
-      <div class="match-card shadow-sm">
-        <h3 class="match-title">Ultima Partita Giocata</h3>
-        <div class="match-content">
-          <div class="team-container">
-            <div class="team-logo shadow-sm">
-              <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+      <!-- Recent Match Card -->
+      <div class="col-12 col-md-10 col-lg-9 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
+        <div class="match-card shadow-sm">
+          <h3 class="match-title">Ultima Partita Giocata</h3>
+          <div class="match-content">
+            <div class="team-container">
+              <div class="team-logo shadow-sm">
+                <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+              </div>
+              <span class="team-name text-truncate w-100">{{ selectedMatch().homeTeam }}</span>
             </div>
-            <span class="team-name text-truncate w-100">{{ selectedMatch().homeTeam }}</span>
-          </div>
-          <div class="score-container">
-            <span class="score-text">{{ selectedMatch().homeScore }} - {{ selectedMatch().awayScore }}</span>
-            <span class="match-status text-success">{{ selectedMatch().status }}</span>
-          </div>
-          <div class="team-container">
-            <div class="team-logo shadow-sm">
-              <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+            <div class="score-container">
+              <span class="score-text">{{ selectedMatch().homeScore }} - {{ selectedMatch().awayScore }}</span>
+              <span class="match-status text-success">{{ selectedMatch().status }}</span>
             </div>
-            <span class="team-name text-truncate w-100">{{ selectedMatch().awayTeam }}</span>
+            <div class="team-container">
+              <div class="team-logo shadow-sm">
+                <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+              </div>
+              <span class="team-name text-truncate w-100">{{ selectedMatch().awayTeam }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  } @else {
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-9">
+        <app-match-detail [match]="selectedMatch()" [isModal]="false" (close)="closeMatchDetails()"></app-match-detail>
+      </div>
+    </div>
+  }
 </div>
-
-<!-- Match Details Overlay -->
-@if (showMatchDetails()) {
-  <app-match-detail [match]="selectedMatch()" (close)="closeMatchDetails()"></app-match-detail>
-}

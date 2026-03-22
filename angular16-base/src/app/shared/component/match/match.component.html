@@ -1,45 +1,48 @@
 <div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-10 col-lg-9">
-      <!-- Section Header -->
-      <div class="d-flex align-items-center mb-4">
-        <h2 class="section-title m-0">Partite Recenti</h2>
-      </div>
+  @if (!showMatchDetails()) {
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-9">
+        <!-- Section Header -->
+        <div class="d-flex align-items-center mb-4">
+          <h2 class="section-title m-0">Partite Recenti</h2>
+        </div>
 
-      <div class="matches-list">
-        <div class="row g-3">
-          @for (match of matches(); track match.id) {
-            <div class="col-12 col-lg-6">
-              <div class="match-card shadow-sm" (click)="openMatchDetails(match)" style="cursor: pointer;">
-                <div class="match-title">Venerdì {{ match.date | date:'dd/MM' }}</div>
-                <div class="match-content">
-                  <div class="team-container">
-                    <div class="team-logo shadow-sm">
-                      <i class="fa fa-shield" style="font-size: 1.5rem; color: #ff4444;"></i>
+        <div class="matches-list">
+          <div class="row g-3">
+            @for (match of matches(); track match.id) {
+              <div class="col-12 col-lg-6">
+                <div class="match-card shadow-sm" (click)="openMatchDetails(match)" style="cursor: pointer;">
+                  <div class="match-title">Venerdì {{ match.date | date:'dd/MM' }}</div>
+                  <div class="match-content">
+                    <div class="team-container">
+                      <div class="team-logo shadow-sm">
+                        <i class="fa fa-shield" style="font-size: 1.5rem; color: #ff4444;"></i>
+                      </div>
+                      <span class="team-name text-truncate w-100">{{ match.homeTeam }}</span>
                     </div>
-                    <span class="team-name text-truncate w-100">{{ match.homeTeam }}</span>
-                  </div>
-                  <div class="score-container">
-                    <span class="score-text">{{ match.homeScore }} - {{ match.awayScore }}</span>
-                    <span class="match-status text-success">{{ match.status }}</span>
-                  </div>
-                  <div class="team-container">
-                    <div class="team-logo shadow-sm">
-                      <i class="fa fa-star" style="font-size: 1.5rem; color: #ffcc00;"></i>
+                    <div class="score-container">
+                      <span class="score-text">{{ match.homeScore }} - {{ match.awayScore }}</span>
+                      <span class="match-status text-success">{{ match.status }}</span>
                     </div>
-                    <span class="team-name text-truncate w-100">{{ match.awayTeam }}</span>
+                    <div class="team-container">
+                      <div class="team-logo shadow-sm">
+                        <i class="fa fa-star" style="font-size: 1.5rem; color: #ffcc00;"></i>
+                      </div>
+                      <span class="team-name text-truncate w-100">{{ match.awayTeam }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          }
+            }
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  } @else {
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-9">
+        <app-match-detail [match]="selectedMatch()" [isModal]="false" (close)="closeMatchDetails()"></app-match-detail>
+      </div>
+    </div>
+  }
 </div>
-
-<!-- Match Details Overlay -->
-@if (showMatchDetails()) {
-  <app-match-detail [match]="selectedMatch()" (close)="closeMatchDetails()"></app-match-detail>
-}

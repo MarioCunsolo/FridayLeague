@@ -8,13 +8,33 @@
         <button nz-button nzType="primary" nzBlock class="btn-prenota shadow" [disabled]="isReservationDisabled()">
           PRENOTATI
         </button>
-        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow mt-2" [disabled]="isReservationDisabled()">
+        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow mt-2" [disabled]="isReservationDisabled()"
+          (click)="openAddOthersModal(modalTpl)">
           PRENOTA ALTRE PERSONE
         </button>
         <p class="text-center text-muted small mt-2 mb-0">
           Le prenotazioni aprono Domenica alle 17:00
         </p>
       </div>
+
+      <ng-template #modalTpl>
+        <div class="modal-form-container">
+          <form nz-form [formGroup]="validateForm" nzLayout="vertical">
+            <nz-form-item class="mb-3">
+              <nz-form-label class="modal-label" nzFor="person-name">Nome e Cognome</nz-form-label>
+              <nz-form-control nzErrorTip="Inserisci il nome e cognome">
+                <input nz-input class="custom-input" formControlName="nomeCognome" placeholder="Nome e Cognome"
+                  id="person-name" [nzAutocomplete]="auto" />
+                <nz-autocomplete #auto>
+                  @for (option of filteredOptions; track option.id) {
+                  <nz-auto-option [nzValue]="option.nomeCognome">{{ option.nomeCognome }}</nz-auto-option>
+                  }
+                </nz-autocomplete>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+        </div>
+      </ng-template>
 
       <div class="reservation-card shadow-sm d-flex flex-column flex-grow-1">
         <p class="text-muted small mb-3 text-uppercase fw-bold">PROSSIMA SETTIMANA</p>
@@ -38,6 +58,11 @@
                 <td class="fw-bold text-nowrap">
                   <span class="position-badge starter-badge">{{ $index + 1 }}</span>
                   {{ res.nomeCognome }}
+                  @if (res.playerId) {
+                  <span nz-icon nzType="check-circle" nzTheme="fill" class="ms-1 text-primary small"
+                    style="font-size: 12px; vertical-align: middle;"
+                    nz-tooltip nzTooltipTitle="Utente Registrato"></span>
+                  }
                 </td>
                 <td class="text-success text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
                 <td class="text-center">
@@ -59,6 +84,11 @@
                 <td class="fw-bold text-nowrap">
                   <span class="position-badge substitute-badge">{{ $index + 15 }}</span>
                   {{ res.nomeCognome }}
+                  @if (res.playerId) {
+                  <span nz-icon nzType="check-circle" nzTheme="fill" class="ms-1 text-primary small"
+                    style="font-size: 12px; vertical-align: middle;"
+                    nz-tooltip nzTooltipTitle="Utente Registrato"></span>
+                  }
                 </td>
                 <td class="text-muted text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
                 <td class="text-center">

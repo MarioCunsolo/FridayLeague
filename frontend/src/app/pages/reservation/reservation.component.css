@@ -158,3 +158,72 @@
     display: flex;
     flex-direction: column;
 }
+
+/* Modal Form Styles */
+.modal-form-container {
+    padding: 0.5rem 0;
+}
+
+::ng-deep .modal-label label {
+    font-size: 0.75rem !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05rem !important;
+    margin-bottom: 0 !important;
+}
+
+.custom-input {
+    background-color: var(--input-bg) !important;
+    border: 0.0625rem solid var(--border-main) !important;
+    color: var(--text-primary) !important;
+    border-radius: 0.75rem !important;
+    height: 3.25rem !important;
+    font-weight: 500;
+    transition: all 0.2s ease !important;
+}
+
+.custom-input:focus, .custom-input:hover:not([disabled]) {
+    border-color: var(--primary-green) !important;
+    background-color: var(--card-bg) !important;
+}
+
+.custom-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+/* Modal Footer Buttons */
+::ng-deep .ant-modal-footer {
+    border-top: 0.0625rem solid var(--border-sub) !important;
+    padding: 1rem 1.5rem !important;
+    background-color: var(--card-bg) !important;
+    border-radius: 0 0 1.25rem 1.25rem !important;
+}
+
+::ng-deep .ant-modal-footer .ant-btn {
+    border-radius: 0.75rem !important;
+    font-weight: 700 !important;
+    height: 2.75rem !important;
+    padding: 0 1.5rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.03rem;
+}
+
+::ng-deep .ant-modal-footer .ant-btn-primary {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    color: #000000 !important;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 204, 102, 0.2) !important;
+}
+
+::ng-deep .ant-modal-footer .ant-btn-default {
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-main) !important;
+    color: var(--text-primary) !important;
+}
+
+::ng-deep .ant-modal-footer .ant-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-0.125rem);
+}

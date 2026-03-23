@@ -1,21 +1,55 @@
-import { Component, signal, computed } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, signal, computed, inject, TemplateRef } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { Reservation } from '../../models/interface/reservation.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
-import { inject } from '@angular/core';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 
 @Component({
   selector: 'app-reservation',
   templateUrl: './reservation.component.html',
   styleUrls: ['./reservation.component.css'],
   standalone: true,
-  imports: [DatePipe, NzButtonModule, NzIconModule, NzModalModule]
+  imports: [
+    CommonModule,
+    DatePipe,
+    ReactiveFormsModule,
+    NzButtonModule,
+    NzIconModule,
+    NzModalModule,
+    NzFormModule,
+    NzInputModule,
+    NzAutocompleteModule
+  ]
 })
 export class ReservationComponent {
   private modal = inject(NzModalService);
+  private fb = inject(FormBuilder);
+
+  validateForm = this.fb.group({
+    nomeCognome: ['', [Validators.required]]
+  });
+
+  // Mocked list of registered users with IDs
+  registeredUsers: { id: number, nomeCognome: string }[] = [
+    { id: 1, nomeCognome: 'Mario Rossi' },
+    { id: 2, nomeCognome: 'Luigi Bianchi' },
+    { id: 3, nomeCognome: 'Giuseppe Verdi' },
+    { id: 4, nomeCognome: 'Francesco Neri' },
+    { id: 5, nomeCognome: 'Andrea Gialli' },
+    { id: 6, nomeCognome: 'Simone Nipotini' },
+    { id: 7, nomeCognome: 'Carlo Magno' },
+    { id: 8, nomeCognome: 'Luca Romano' },
+    { id: 9, nomeCognome: 'Paolo Rossi' },
+    { id: 10, nomeCognome: 'Giorgio Neri' }
+  ];
+
+  filteredOptions: { id: number, nomeCognome: string }[] = [];
 
   // Dati di esempio per le prenotazioni come Signal
   reservations = signal<Reservation[]>([
@@ -69,5 +103,51 @@ export class ReservationComponent {
 
     return false;
   });
+
+
+  openAddOthersModal(tpl: TemplateRef<any>): void {
+    this.validateForm.reset();
+    this.filteredOptions = this.registeredUsers;
+
+    const modalRef = this.modal.create({
+      nzTitle: 'Prenota altra persona',
+      nzContent: tpl,
+      nzWidth: 500,
+      nzOkDisabled: true,
+      nzOnOk: () => {
+        if (this.validateForm.valid) {
+          const typedName = this.validateForm.value.nomeCognome as string;
+          
+          // Check if the typed name matches a registered user (case insensitive)
+          const matchedUser = this.registeredUsers.find(u => 
+            u.nomeCognome.toLowerCase() === typedName.trim().toLowerCase()
+          );
+
+          const newReservation: Reservation = {
+            nomeCognome: typedName,
+            dataOra: new Date(),
+            playerId: matchedUser?.id // Set the ID if it's a registered user
+          };
+
+          this.reservations.update(res => [...res, newReservation]);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    });
+
+    this.validateForm.get('nomeCognome')?.valueChanges.subscribe(value => {
+      this.filteredOptions = this.registeredUsers.filter(option =>
+        option.nomeCognome.toLowerCase().includes((value || '').toLowerCase())
+      );
+    });
+
+    this.validateForm.statusChanges.subscribe(() => {
+      modalRef.updateConfig({
+        nzOkDisabled: !this.validateForm.valid
+      });
+    });
+  }
 
 }

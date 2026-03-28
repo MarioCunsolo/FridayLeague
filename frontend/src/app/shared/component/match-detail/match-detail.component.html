@@ -10,20 +10,20 @@
     <h2 class="details-title m-0">Dettagli Partita</h2>
   </header>
 
-  @if (match()) {
+  @if (match(); as m) {
   <main class="details-content-area">
     <div class="match-score-header">
       <div class="team-info">
         <div class="team-logo mb-2">
           <i class="fa fa-shield" style="font-size: 2rem; color: #ff4444;"></i>
         </div>
-        <span class="team-name">{{ match().homeTeam }}</span>
-        <span class="team-score mb-3">{{ match().homeScore }}</span>
+        <span class="team-name">{{ m.homeTeam }}</span>
+        <span class="team-score mb-3">{{ m.homeScore }}</span>
 
         <!-- Lineup Home -->
-        @if (match().homePlayers) {
+        @if (m.homePlayers) {
         <div class="player-list-header text-start w-100">
-          @for (player of match().homePlayers; track player.name) {
+          @for (player of m.homePlayers; track player.name) {
           <div class="player-item-header d-flex align-items-center mb-1">
             <span class="player-dot home-dot mr-1"></span>
             <span class="player-name-header">{{ player.name }}</span>
@@ -56,13 +56,13 @@
         <div class="team-logo mb-2">
           <i class="fa fa-star" style="font-size: 2rem; color: #ffcc00;"></i>
         </div>
-        <span class="team-name">{{ match().awayTeam }}</span>
-        <span class="team-score mb-3">{{ match().awayScore }}</span>
+        <span class="team-name">{{ m.awayTeam }}</span>
+        <span class="team-score mb-3">{{ m.awayScore }}</span>
 
         <!-- Lineup Away -->
-        @if (match().awayPlayers) {
+        @if (m.awayPlayers) {
         <div class="player-list-header text-end w-100">
-          @for (player of match().awayPlayers; track player.name) {
+          @for (player of m.awayPlayers; track player.name) {
           <div class="player-item-header d-flex flex-row-reverse align-items-center mb-1">
             <span class="player-dot away-dot ml-1"></span>
             <span class="player-name-header">{{ player.name }}</span>

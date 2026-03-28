@@ -1,5 +1,5 @@
 import { Component, input, output, computed } from '@angular/core';
-import { GoalEvent } from '../../../models/interface/match.interface';
+import { GoalEvent, Match } from '../../../models/interface/match.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -12,7 +12,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     imports: [NzButtonModule, NzIconModule]
 })
 export class MatchDetailComponent {
-    match = input<any>();
+    match = input<Match | null>(null);
     isModal = input<boolean>(true);
     close = output<void>();
 

@@ -42,7 +42,7 @@ export class StatsComponent {
     { name: 'Giuseppe Bianchi', team: 'Pirati del Campo', value: 3, avatar: 'GB', color: '#33cccc' },
   ]);
 
-  assists = signal([
+  assists = signal<PlayerStats[]>([
     { name: 'Andrea Blu', team: 'Squali Rossi', value: 8, avatar: 'AB', color: '#ff4444' },
     { name: 'Mario Cunsolo', team: 'Squali Rossi', value: 7, avatar: 'MC', color: '#00cc66' },
     { name: 'Carlo Gialli', team: 'Tigri Bianche', value: 6, avatar: 'CG', color: '#ff9933' },
@@ -52,7 +52,7 @@ export class StatsComponent {
     { name: 'Giuseppe Bianchi', team: 'Pirati del Campo', value: 2, avatar: 'GB', color: '#33cccc' },
   ]);
 
-  motm = signal([
+  motm = signal<PlayerStats[]>([
     { name: 'Mario Cunsolo', team: 'Squali Rossi', value: 3, avatar: 'MC', color: '#00cc66' },
     { name: 'Francesco Rossi', team: 'Aquile Nere', value: 2, avatar: 'FR', color: '#ffcc00' },
     { name: 'Luigi Verdi', team: 'Leoni FC', value: 2, avatar: 'LV', color: '#3399ff' },

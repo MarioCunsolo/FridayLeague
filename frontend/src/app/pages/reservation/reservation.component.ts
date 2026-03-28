@@ -105,7 +105,7 @@ export class ReservationComponent {
   });
 
 
-  openAddOthersModal(tpl: TemplateRef<any>): void {
+  openAddOthersModal(tpl: TemplateRef<unknown>): void {
     this.validateForm.reset();
     this.filteredOptions = this.registeredUsers;
 
@@ -137,7 +137,7 @@ export class ReservationComponent {
       }
     });
 
-    this.validateForm.get('nomeCognome')?.valueChanges.subscribe(value => {
+    this.validateForm.get('nomeCognome')?.valueChanges.subscribe((value: string | null) => {
       this.filteredOptions = this.registeredUsers.filter(option =>
         option.nomeCognome.toLowerCase().includes((value || '').toLowerCase())
       );

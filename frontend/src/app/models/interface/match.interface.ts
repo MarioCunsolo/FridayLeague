@@ -10,13 +10,15 @@ export interface GoalEvent {
   assistName?: string;
 }
 
+export type MatchStatus = 'Programmata' | 'Terminata' | 'In Corso';
+
 export interface Match {
   id: number;
   homeTeam: string;
   awayTeam: string;
   homeScore: number;
   awayScore: number;
-  status: string;
+  status: MatchStatus;
   date: Date;
   homePlayers?: Player[];
   awayPlayers?: Player[];

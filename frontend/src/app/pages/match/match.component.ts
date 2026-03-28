@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit, computed, AfterViewInit } from '@angular/core';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
+import { Match } from 'src/app/models/interface/match.interface';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatchService } from 'src/app/shared/service/match.service';
@@ -20,7 +21,7 @@ export class MatchComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
 
   showMatchDetails = signal(false);
-  selectedMatch = signal<any>(null);
+  selectedMatch = signal<Match | null>(null);
 
   matches = this.matchService.getMatches();
 
@@ -31,8 +32,13 @@ export class MatchComponent implements OnInit, AfterViewInit {
       'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
       'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
     ];
+    
+    interface MatchGroup {
+      month: string;
+      matches: Match[];
+    }
 
-    const groups: { month: string, matches: any[] }[] = [];
+    const groups: MatchGroup[] = [];
 
     allMatches.forEach(match => {
       const date = new Date(match.date);
@@ -68,7 +74,7 @@ export class MatchComponent implements OnInit, AfterViewInit {
     });
   }
 
-  openMatchDetails(match: any) {
+  openMatchDetails(match: Match) {
     this.selectedMatch.set(match);
     this.showMatchDetails.set(true);
   }

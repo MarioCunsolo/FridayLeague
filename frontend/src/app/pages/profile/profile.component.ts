@@ -46,12 +46,14 @@ export class ProfileComponent {
     this.selectedSeason.set(season);
   }
 
-  selectedMatch = signal<Partial<Match>>({
+  selectedMatch = signal<Match>({
+    id: 1,
     homeTeam: 'Squali Rossi',
     awayTeam: 'Leoni FC',
     homeScore: 2,
     awayScore: 4,
-    status: 'TERMINATA',
+    status: 'Terminata',
+    date: new Date('2026-02-20T21:00:00'),
     homePlayers: [
       { name: 'Mario Cunsolo', goals: 1, assists: 1 },
       { name: 'Salvatore Vitale', goals: 1, assists: 0 },

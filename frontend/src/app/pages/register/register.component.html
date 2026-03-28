@@ -1,0 +1,55 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="brand-section">
+      <h1 class="navbar-brand">Friday League</h1>
+      <p class="subtitle">Unisciti alla lega! Crea il tuo account.</p>
+    </div>
+
+    <form nz-form [formGroup]="registerForm" (ngSubmit)="submitForm()" class="register-form">
+      <!-- Nome -->
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Il nome è obbligatorio">
+          <nz-input-group nzPrefixIcon="user">
+            <input type="text" nz-input formControlName="nome" placeholder="Nome" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Cognome -->
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Il cognome è obbligatorio">
+          <nz-input-group nzPrefixIcon="user">
+            <input type="text" nz-input formControlName="cognome" placeholder="Cognome" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Email -->
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Inserisci un'email valida">
+          <nz-input-group nzPrefixIcon="mail">
+            <input type="email" nz-input formControlName="email" placeholder="Email" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Password -->
+      <nz-form-item>
+        <nz-form-control nzErrorTip="La password è obbligatoria (min. 6 caratteri)">
+          <nz-input-group nzPrefixIcon="lock">
+            <input type="password" nz-input formControlName="password" placeholder="Password" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <button nz-button nzType="primary" class="register-button" [nzLoading]="false">
+        REGISTRATI
+      </button>
+
+      <div class="login-link-section">
+        <span>Hai già un account? </span>
+        <a routerLink="/login" class="text-success fw-bold">Accedi</a>
+      </div>
+    </form>
+  </div>
+</div>

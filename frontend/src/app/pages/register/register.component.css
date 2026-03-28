@@ -1,0 +1,115 @@
+.register-container {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--app-bg);
+    transition: background-color var(--transition-speed);
+    padding: 1.5rem;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 28rem;
+    background-color: var(--card-bg);
+    border: 0.0625rem solid var(--border-main);
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-speed);
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(1rem); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.brand-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.brand-section h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-button {
+    width: 100%;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    font-weight: 800;
+    font-size: 1.125rem;
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+    transition: all 0.2s ease;
+    margin-top: 1rem;
+}
+
+.register-button:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1rem rgba(0, 204, 102, 0.2);
+}
+
+.login-link-section {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* NG-ZORRO Overrides for theme consistency */
+:host ::ng-deep .ant-input-affix-wrapper {
+    background-color: var(--input-bg);
+    border-color: var(--border-sub);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+:host ::ng-deep .ant-input-affix-wrapper-focused,
+:host ::ng-deep .ant-input-affix-wrapper:focus,
+:host ::ng-deep .ant-input-affix-wrapper:hover {
+    background-color: var(--input-bg) !important;
+    border-color: var(--primary-green) !important;
+    box-shadow: 0 0 0 0.125rem rgba(0, 204, 102, 0.1) !important;
+}
+
+:host ::ng-deep .ant-input {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    font-size: 1rem;
+    box-shadow: none !important;
+}
+
+:host ::ng-deep .ant-input-prefix {
+    color: var(--text-tertiary);
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+:host ::ng-deep .ant-form-item {
+    margin-bottom: 1.25rem;
+}
+
+/* Fix for Chrome autofill background */
+:host ::ng-deep input:-webkit-autofill,
+:host ::ng-deep input:-webkit-autofill:hover,
+:host ::ng-deep input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-primary) !important;
+    -webkit-box-shadow: 0 0 0rem 1000rem var(--input-bg) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}

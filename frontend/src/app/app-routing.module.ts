@@ -6,11 +6,13 @@ import { MatchComponent } from './pages/match/match.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { LayoutComponent } from './shared/component/layout/layout.component';
 import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
 import { StatsComponent } from './pages/stats/stats.component';
 import { authGuard } from './shared/guard/auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   {
     path: '',
     component: LayoutComponent,

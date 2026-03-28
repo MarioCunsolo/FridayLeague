@@ -31,6 +31,19 @@ export class AuthService {
   }
 
   /**
+   * Registra un nuovo utente nel sistema.
+   * @param userData Oggetto contenente nome, cognome, email e password.
+   */
+  register(userData: any) {
+    return this.http.post<{user: any, token: string}>(`${this.BASE_URL}/register`, userData).pipe(
+      tap(response => {
+        localStorage.setItem(this.TOKEN_KEY, response.token);
+        this._currentUser.set(response.user);
+      })
+    );
+  }
+
+  /**
    * Effettua il logout dell'utente corrente e pulisce lo stato locale (Signal e LocalStorage).
    */
   logout() {

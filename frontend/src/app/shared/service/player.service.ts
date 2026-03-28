@@ -2,13 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Player } from '../../models/interface/match.interface';
 import { PlayerStats } from '../../models/interface/player-stats.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerService {
   private http = inject(HttpClient);
-  private readonly BASE_URL = 'http://localhost:8080/api/players';
+  private readonly BASE_URL = `${environment.apiUrl}/players`;
 
   /**
    * Recupera l'elenco completo di tutti i giocatori registrati.

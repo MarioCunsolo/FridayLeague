@@ -1,13 +1,14 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PlayerStats } from '../../models/interface/player-stats.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StatsService {
   private http = inject(HttpClient);
-  private readonly BASE_URL = 'http://localhost:8080/api/stats';
+  private readonly BASE_URL = `${environment.apiUrl}/stats`;
 
   /**
    * Recupera la classifica dei marcatori (Gol).

@@ -1,13 +1,14 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private readonly BASE_URL = 'http://localhost:8080/api/auth';
+  private readonly BASE_URL = `${environment.apiUrl}/auth`;
 
   private _currentUser = signal<any>(null); // Replace any with User interface if available
   public currentUser = this._currentUser.asReadonly();

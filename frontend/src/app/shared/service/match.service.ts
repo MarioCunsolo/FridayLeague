@@ -2,13 +2,14 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Match, Player } from '../../models/interface/match.interface';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MatchService {
   private http = inject(HttpClient);
-  private readonly BASE_URL = 'http://localhost:8080/api/matches';
+  private readonly BASE_URL = `${environment.apiUrl}/matches`;
 
   private matches = signal<Match[]>([
     {

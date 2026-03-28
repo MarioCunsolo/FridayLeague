@@ -2,13 +2,14 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Reservation } from '../../models/interface/reservation.interface';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReservationService {
   private http = inject(HttpClient);
-  private readonly BASE_URL = 'http://localhost:8080/api/reservations';
+  private readonly BASE_URL = `${environment.apiUrl}/reservations`;
 
   private _reservations = signal<Reservation[]>([]);
   public reservations = this._reservations.asReadonly();

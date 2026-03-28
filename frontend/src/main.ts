@@ -1,4 +1,5 @@
 import { importProvidersFrom, LOCALE_ID } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import { AppComponent } from './app/app.component';
 import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
@@ -15,6 +16,7 @@ bootstrapApplication(AppComponent, {
       importProvidersFrom(BrowserModule, AppRoutingModule), 
       provideNzI18n(it_IT),
       provideAnimations(),
+      provideHttpClient(),
       { provide: LOCALE_ID, useValue: 'it-IT' }
     ]
 })

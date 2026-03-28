@@ -1,10 +1,15 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Match, Player } from '../../models/interface/match.interface';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MatchService {
+  private http = inject(HttpClient);
+  private readonly BASE_URL = 'http://localhost:8080/api/matches';
+
   private matches = signal<Match[]>([
     {
       id: 15,
@@ -253,18 +258,34 @@ export class MatchService {
     }
   ]);
 
+  /**
+   * Recupera l'elenco delle stagioni disponibili.
+   * @returns Un array di stringhe rappresentanti gli anni delle stagioni.
+   */
   getAvailableSeasons() {
     return ['2024', '2025', '2026'];
   }
 
+  /**
+   * Ritorna un Signal computato che contiene l'elenco delle partite ordinate per data decrescente.
+   */
   getMatches() {
     return computed(() => [...this.matches()].sort((a, b) => b.date.getTime() - a.date.getTime()));
   }
 
+  /**
+   * Trova una partita specifica tramite il suo identificativo.
+   * @param id L'ID della partita da cercare.
+   * @returns La partita corrispondente o undefined se non trovata.
+   */
   getMatchById(id: number) {
     return this.matches().find(m => m.id === id);
   }
 
+  /**
+   * Identifica la prossima partita programmata (quella con data più vicina al presente).
+   * @returns La prossima partita o null se non ci sono partite in programma.
+   */
   getNextMatch() {
     const programmable = this.matches()
       .filter(m => m.status === 'Programmata')
@@ -272,11 +293,63 @@ export class MatchService {
     return programmable.length > 0 ? programmable[0] : null;
   }
 
+  /**
+   * Recupera l'ultima partita terminata (utilizzato per la card in home page).
+   * @returns L'ultima partita completata o la prima disponibile se nessuna è terminata.
+   */
   getLastMatch() {
     // Return the latest completed match for the home page card
     const completed = this.matches()
       .filter(m => m.status === 'Terminata')
       .sort((a, b) => b.date.getTime() - a.date.getTime());
     return completed.length > 0 ? completed[0] : this.getMatches()()[0];
+  }
+
+  // --- API Methods ---
+
+  /**
+   * Carica l'elenco completo delle partite dal backend e aggiorna il segnale interno.
+   * @returns Un Observable con l'array delle partite.
+   */
+  loadMatches() {
+    return this.http.get<Match[]>(this.BASE_URL).pipe(
+      tap(matches => this.matches.set(matches))
+    );
+  }
+
+  /**
+   * Crea una nuova partita nel sistema.
+   * @param match I dati della partita (senza ID).
+   * @returns Un Observable con la partita appena creata.
+   */
+  createMatch(match: Omit<Match, 'id'>) {
+    return this.http.post<Match>(this.BASE_URL, match).pipe(
+      tap(newMatch => this.matches.update(prev => [...prev, newMatch]))
+    );
+  }
+
+  /**
+   * Aggiorna i dati di una partita esistente.
+   * @param id L'ID della partita da aggiornare.
+   * @param match I campi della partita da modificare.
+   * @returns Un Observable con la partita aggiornata.
+   */
+  updateMatch(id: number, match: Partial<Match>) {
+    return this.http.put<Match>(`${this.BASE_URL}/${id}`, match).pipe(
+      tap(updatedMatch => this.matches.update(prev => 
+        prev.map(m => m.id === id ? updatedMatch : m)
+      ))
+    );
+  }
+
+  /**
+   * Rimuove una partita dal sistema.
+   * @param id L'ID della partita da eliminare.
+   * @returns Un Observable di tipo void.
+   */
+  deleteMatch(id: number) {
+    return this.http.delete<void>(`${this.BASE_URL}/${id}`).pipe(
+      tap(() => this.matches.update(prev => prev.filter(m => m.id !== id)))
+    );
   }
 }

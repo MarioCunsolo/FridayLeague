@@ -7,12 +7,14 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { LayoutComponent } from './shared/component/layout/layout.component';
 import { LoginComponent } from './pages/login/login.component';
 import { StatsComponent } from './pages/stats/stats.component';
+import { authGuard } from './shared/guard/auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {
     path: '',
     component: LayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', component: HomepageComponent },
       { path: 'prenotazioni', component: ReservationComponent },

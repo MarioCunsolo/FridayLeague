@@ -1,5 +1,6 @@
 import { importProvidersFrom, LOCALE_ID } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './app/shared/interceptor/auth.interceptor';
 import { AppComponent } from './app/app.component';
 import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
@@ -16,7 +17,7 @@ bootstrapApplication(AppComponent, {
       importProvidersFrom(BrowserModule, AppRoutingModule), 
       provideNzI18n(it_IT),
       provideAnimations(),
-      provideHttpClient(),
+      provideHttpClient(withInterceptors([authInterceptor])),
       { provide: LOCALE_ID, useValue: 'it-IT' }
     ]
 })

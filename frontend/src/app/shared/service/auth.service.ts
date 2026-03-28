@@ -1,6 +1,6 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { tap, catchError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -9,28 +9,43 @@ import { environment } from '../../../environments/environment';
 export class AuthService {
   private http = inject(HttpClient);
   private readonly BASE_URL = `${environment.apiUrl}/auth`;
+  private readonly TOKEN_KEY = 'auth_token';
 
-  private _currentUser = signal<any>(null); // Replace any with User interface if available
+  private _currentUser = signal<any>(null); // Sostituire any con l'interfaccia User
   public currentUser = this._currentUser.asReadonly();
+  
+  public isAuthenticated = computed(() => !!this.getToken());
 
   /**
    * Effettua il login dell'utente inviando le credenziali al server.
+   * Salva il token ricevuto nel localStorage.
    * @param credentials Oggetto contenente email e password.
-   * @returns Un Observable con l'oggetto User se il login ha successo.
    */
   login(credentials: any) {
-    return this.http.post<any>(`${this.BASE_URL}/login`, credentials).pipe(
-      tap(user => this._currentUser.set(user))
+    return this.http.post<{user: any, token: string}>(`${this.BASE_URL}/login`, credentials).pipe(
+      tap(response => {
+        localStorage.setItem(this.TOKEN_KEY, response.token);
+        this._currentUser.set(response.user);
+      })
     );
   }
 
   /**
-   * Effettua il logout dell'utente corrente e pulisce lo stato locale.
-   * @returns Un Observable di tipo void.
+   * Effettua il logout dell'utente corrente e pulisce lo stato locale (Signal e LocalStorage).
    */
   logout() {
     this._currentUser.set(null);
-    return this.http.post<void>(`${this.BASE_URL}/logout`, {});
+    localStorage.removeItem(this.TOKEN_KEY);
+    return this.http.post<void>(`${this.BASE_URL}/logout`, {}).pipe(
+      catchError(() => of(void 0)) // Ignora errori di logout se il token è già scaduto
+    );
+  }
+
+  /**
+   * Recupera il token salvato nel localStorage.
+   */
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
   /**

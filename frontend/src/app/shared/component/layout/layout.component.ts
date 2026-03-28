@@ -1,5 +1,6 @@
-import { Component, signal, effect } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, signal, effect, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../service/auth.service';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
@@ -10,6 +11,9 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NzIconModule]
 })
 export class LayoutComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   currentTheme = signal<'dark' | 'light'>('dark');
 
   constructor() {
@@ -29,5 +33,17 @@ export class LayoutComponent {
 
   toggleTheme() {
     this.currentTheme.update(t => t === 'dark' ? 'light' : 'dark');
+  }
+
+  logout() {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        // Fallback: naviga comunque se il server dà errore (es. token già nullo)
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }

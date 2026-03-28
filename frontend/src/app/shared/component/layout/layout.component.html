@@ -31,7 +31,7 @@
         <span>{{ currentTheme() === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
       </div>
       <!-- Login (Desktop) -->
-      <div class="nav-item-desktop logout-item-desktop mt-4" routerLink="/login">
+      <div class="nav-item-desktop logout-item-desktop mt-4" (click)="logout()" style="cursor: pointer;">
         <span nz-icon nzType="logout" nzTheme="outline"></span>
         <span>Esci</span>
       </div>
@@ -44,7 +44,7 @@
     <header class="top-navbar d-lg-none shadow-sm">
       <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-4">
         <!-- Logout (Mobile) -->
-        <div class="logout-mobile" routerLink="/login"
+        <div class="logout-mobile" (click)="logout()"
           style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
           <span nz-icon nzType="logout" nzTheme="outline"></span>
         </div>

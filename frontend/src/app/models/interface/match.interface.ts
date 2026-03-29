@@ -10,7 +10,11 @@ export interface GoalEvent {
   assistName?: string;
 }
 
-export type MatchStatus = 'Programmata' | 'Terminata' | 'In Corso';
+export enum MatchStatus {
+  PROGRAMMATA = 'Programmata',
+  TERMINATA = 'Terminata',
+  IN_CORSO = 'In Corso'
+}
 
 export interface Match {
   id: number;

@@ -1,5 +1,5 @@
 import { Component, input, output, computed, signal, inject } from '@angular/core';
-import { GoalEvent, Match } from '../../../models/interface/match.interface';
+import { GoalEvent, Match, MatchStatus } from '../../../models/interface/match.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -17,6 +17,9 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 export class MatchDetailComponent {
     private matchService = inject(MatchService);
     private message = inject(NzMessageService);
+
+    // Expose enum to template
+    MatchStatus = MatchStatus;
 
     match = input<Match | null>(null);
     isModal = input<boolean>(true);

@@ -1,7 +1,7 @@
 import { Component, signal, computed } from '@angular/core';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
 import { UserStats } from 'src/app/models/interface/user-stats.interface';
-import { Match } from 'src/app/models/interface/match.interface';
+import { Match, MatchStatus } from 'src/app/models/interface/match.interface';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
@@ -52,7 +52,7 @@ export class ProfileComponent {
     awayTeam: 'Leoni FC',
     homeScore: 2,
     awayScore: 4,
-    status: 'Terminata',
+    status: MatchStatus.TERMINATA,
     date: new Date('2026-02-20T21:00:00'),
     homePlayers: [
       { name: 'Mario Cunsolo', goals: 1, assists: 1 },

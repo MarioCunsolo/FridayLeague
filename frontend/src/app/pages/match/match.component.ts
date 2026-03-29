@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit, computed, AfterViewInit } from '@angular/core';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
-import { Match } from 'src/app/models/interface/match.interface';
+import { Match, MatchStatus } from 'src/app/models/interface/match.interface';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatchService } from 'src/app/shared/service/match.service';
@@ -19,6 +19,9 @@ import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 export class MatchComponent implements OnInit, AfterViewInit {
   private matchService = inject(MatchService);
   private route = inject(ActivatedRoute);
+  
+  // Expose Enum to Template
+  MatchStatus = MatchStatus;
 
   showMatchDetails = signal(false);
   selectedMatch = signal<Match | null>(null);
@@ -57,7 +60,7 @@ export class MatchComponent implements OnInit, AfterViewInit {
 
   nextMatchId = computed(() => {
     const programmable = this.matches()
-      .filter(m => m.status === 'Programmata')
+      .filter(m => m.status === MatchStatus.PROGRAMMATA)
       .sort((a, b) => a.date.getTime() - b.date.getTime());
     return programmable.length > 0 ? programmable[0].id : null;
   });

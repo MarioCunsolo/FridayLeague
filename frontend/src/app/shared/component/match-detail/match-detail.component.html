@@ -90,7 +90,7 @@
       </div>
     </div>
 
-    @if (m.status === 'In Corso') {
+    @if (m.status === MatchStatus.IN_CORSO) {
     <div class="d-flex justify-content-center mt-3">
       <button nz-button nzType="primary" nzShape="round" (click)="openAddGoalModal()" class="add-goal-btn">
         <nz-icon nzType="plus" nzTheme="outline"></nz-icon>

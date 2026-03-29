@@ -28,7 +28,7 @@
                     <span class="team-name text-truncate w-100">{{ match.homeTeam }}</span>
                   </div>
                   <div class="score-container">
-                    @if (match.status === 'Programmata') {
+                    @if (match.status === MatchStatus.PROGRAMMATA) {
                     <span class="score-text">VS</span>
                     <span class="match-status text-primary">{{ match.status }}</span>
                     } @else {

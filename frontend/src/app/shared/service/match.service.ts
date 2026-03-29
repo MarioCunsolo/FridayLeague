@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { GoalEvent, Match, Player } from '../../models/interface/match.interface';
+import { GoalEvent, Match, MatchStatus, Player } from '../../models/interface/match.interface';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
@@ -18,7 +18,7 @@ export class MatchService {
       awayTeam: 'Pirati del Campo',
       homeScore: 1,
       awayScore: 0,
-      status: 'In Corso',
+      status: MatchStatus.IN_CORSO,
       date: new Date(),
       homePlayers: [
         { name: 'Mario Cunsolo', goals: 1, assists: 0 },
@@ -39,7 +39,7 @@ export class MatchService {
       awayTeam: 'Leoni FC',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-06-26T21:00:00')
     },
     {
@@ -48,7 +48,7 @@ export class MatchService {
       awayTeam: 'Pirati del Campo',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-06-19T21:00:00')
     },
     {
@@ -57,7 +57,7 @@ export class MatchService {
       awayTeam: 'Tigri Bianche',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-06-12T21:00:00')
     },
     {
@@ -66,7 +66,7 @@ export class MatchService {
       awayTeam: 'Aquile Nere',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-06-05T21:00:00')
     },
     {
@@ -75,7 +75,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-04-17T21:00:00')
     },
     {
@@ -84,7 +84,7 @@ export class MatchService {
       awayTeam: 'Lupi Selvaggi',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-04-10T21:00:00')
     },
     {
@@ -93,7 +93,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-04-03T21:00:00')
     },
     {
@@ -102,7 +102,7 @@ export class MatchService {
       awayTeam: 'Aquile Nere',
       homeScore: 3,
       awayScore: 1,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2026-03-20T21:00:00')
     },
     {
@@ -111,7 +111,7 @@ export class MatchService {
       awayTeam: 'Leoni FC',
       homeScore: 2,
       awayScore: 2,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2026-03-13T21:00:00')
     },
     {
@@ -120,7 +120,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 1,
       awayScore: 4,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2026-03-06T21:00:00')
     },
     {
@@ -129,7 +129,7 @@ export class MatchService {
       awayTeam: 'Tigri Bianche',
       homeScore: 0,
       awayScore: 0,
-      status: 'Programmata',
+      status: MatchStatus.PROGRAMMATA,
       date: new Date('2026-03-27T21:00:00')
     },
     {
@@ -138,7 +138,7 @@ export class MatchService {
       awayTeam: 'Leoni FC',
       homeScore: 2,
       awayScore: 4,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2026-02-20T21:00:00'),
       homePlayers: [
         { name: 'Mario Cunsolo', goals: 1, assists: 1 },
@@ -165,7 +165,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 1,
       awayScore: 1,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2026-02-13T20:30:00'),
       homePlayers: [
         { name: 'Alice Astri', goals: 1, assists: 0 },
@@ -192,7 +192,7 @@ export class MatchService {
       awayTeam: 'Pirati del Campo',
       homeScore: 3,
       awayScore: 0,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2026-02-12T19:00:00'),
       homePlayers: [
         { name: 'Ugo Ugolini', goals: 2, assists: 0 },
@@ -219,7 +219,7 @@ export class MatchService {
       awayTeam: 'Lupi Selvaggi',
       homeScore: 5,
       awayScore: 2,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2026-02-06T21:00:00'),
       homePlayers: [
         { name: 'Mario Cunsolo', goals: 3, assists: 0 },
@@ -247,7 +247,7 @@ export class MatchService {
       awayTeam: 'Leoni FC',
       homeScore: 3,
       awayScore: 3,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2025-11-15T21:00:00')
     },
     {
@@ -256,7 +256,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 0,
       awayScore: 2,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2025-05-10T21:00:00')
     },
     // Season 2024
@@ -266,7 +266,7 @@ export class MatchService {
       awayTeam: 'Lupi Selvaggi',
       homeScore: 4,
       awayScore: 1,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2024-12-20T21:00:00')
     },
     {
@@ -275,7 +275,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 2,
       awayScore: 2,
-      status: 'Terminata',
+      status: MatchStatus.TERMINATA,
       date: new Date('2024-06-15T21:00:00')
     }
   ]);
@@ -295,6 +295,18 @@ export class MatchService {
     return computed(() => [...this.matches()].sort((a, b) => b.date.getTime() - a.date.getTime()));
   }
 
+  upcomingMatches = computed(() => {
+    return this.matches()
+      .filter(m => m.status === MatchStatus.PROGRAMMATA)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  });
+
+  pastMatches = computed(() => {
+    return this.matches()
+      .filter(m => m.status === MatchStatus.TERMINATA)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  });
+
   /**
    * Trova una partita specifica tramite il suo identificativo.
    * @param id L'ID della partita da cercare.
@@ -310,7 +322,7 @@ export class MatchService {
    */
   getNextMatch() {
     const programmable = this.matches()
-      .filter(m => m.status === 'Programmata')
+      .filter(m => m.status === MatchStatus.PROGRAMMATA)
       .sort((a, b) => a.date.getTime() - b.date.getTime());
     return programmable.length > 0 ? programmable[0] : null;
   }
@@ -322,7 +334,7 @@ export class MatchService {
   getLastMatch() {
     // Return the latest completed match for the home page card
     const completed = this.matches()
-      .filter(m => m.status === 'Terminata')
+      .filter(m => m.status === MatchStatus.TERMINATA)
       .sort((a, b) => b.date.getTime() - a.date.getTime());
     return completed.length > 0 ? completed[0] : this.getMatches()()[0];
   }

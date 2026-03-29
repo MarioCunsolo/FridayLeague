@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap, catchError, of } from 'rxjs';
+import { tap, catchError, of, delay, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -13,35 +13,78 @@ export class AuthService {
 
   private _currentUser = signal<any>(null); // Sostituire any con l'interfaccia User
   public currentUser = this._currentUser.asReadonly();
-  
-  public isAuthenticated = computed(() => !!this.getToken());
+
+  // BYPASS TEMPORANEO: Ritorna sempre true per permettere lo sviluppo senza backend
+  public isAuthenticated = computed(() => true || !!this.getToken());
+
+  constructor() {
+    // Se non c'è un utente loggato (es. al refresh o dopo logout in modalità mock), 
+    // impostiamo un utente di default per evitare errori nei componenti.
+    if (!this.getToken()) {
+      this._currentUser.set({
+        id: 1,
+        nome: 'Mario (Mock)',
+        cognome: 'Cunsolo',
+        email: 'mario@test.com'
+      });
+    }
+  }
+
 
   /**
-   * Effettua il login dell'utente inviando le credenziali al server.
-   * Salva il token ricevuto nel localStorage.
+   * Effettua il login dell'utente simulando il successo (bypass API backend).
    * @param credentials Oggetto contenente email e password.
    */
   login(credentials: any) {
-    return this.http.post<{user: any, token: string}>(`${this.BASE_URL}/login`, credentials).pipe(
+    // CODICE COMMENTATO TEMPORANEAMENTE (Sostituito da mock):
+    /*
+    return this.http.post<{ user: any, token: string }>(`${this.BASE_URL}/login`, credentials).pipe(
       tap(response => {
         localStorage.setItem(this.TOKEN_KEY, response.token);
         this._currentUser.set(response.user);
       })
     );
+    */
+
+    // MOCK LOGIN SUCCESS
+    const mockResponse = {
+      user: { id: 1, email: credentials.email || 'mario@test.com', nome: 'Mario (Mock)', cognome: 'Cunsolo' },
+      token: 'fake-jwt-token-development'
+    };
+
+    localStorage.setItem(this.TOKEN_KEY, mockResponse.token);
+    this._currentUser.set(mockResponse.user);
+    
+    return of(mockResponse).pipe(delay(500));
   }
 
   /**
-   * Registra un nuovo utente nel sistema.
+   * Registra un nuovo utente simulando il successo (bypass API backend).
    * @param userData Oggetto contenente nome, cognome, email e password.
    */
   register(userData: any) {
-    return this.http.post<{user: any, token: string}>(`${this.BASE_URL}/register`, userData).pipe(
+    // CODICE COMMENTATO TEMPORANEAMENTE (Sostituito da mock):
+    /*
+    return this.http.post<{ user: any, token: string }>(`${this.BASE_URL}/register`, userData).pipe(
       tap(response => {
         localStorage.setItem(this.TOKEN_KEY, response.token);
         this._currentUser.set(response.user);
       })
     );
+    */
+
+    // MOCK REGISTER SUCCESS
+    const mockResponse = {
+      user: { id: Date.now(), email: userData.email, nome: userData.nome, cognome: userData.cognome },
+      token: 'fake-jwt-token-development'
+    };
+
+    localStorage.setItem(this.TOKEN_KEY, mockResponse.token);
+    this._currentUser.set(mockResponse.user);
+    
+    return of(mockResponse).pipe(delay(500));
   }
+
 
   /**
    * Effettua il logout dell'utente corrente e pulisce lo stato locale (Signal e LocalStorage).

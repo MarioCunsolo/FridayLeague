@@ -10,10 +10,15 @@ export const authGuard = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  // COMMENTATO TEMPORANEAMENTE: Permette l'accesso senza token (Bypass per sviluppo locale senza DB)
+  /*
   if (authService.isAuthenticated()) {
     return true;
   }
 
-  // Memorizza l'URL tentato per reindirizzamenti futuri (opzionale)
   return router.parseUrl('/login');
+  */
+  
+  return true;
+
 };

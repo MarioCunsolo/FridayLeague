@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Match, Player } from '../../models/interface/match.interface';
+import { GoalEvent, Match, Player } from '../../models/interface/match.interface';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
@@ -12,6 +12,27 @@ export class MatchService {
   private readonly BASE_URL = `${environment.apiUrl}/matches`;
 
   private matches = signal<Match[]>([
+    {
+      id: 16,
+      homeTeam: 'Squali Rossi',
+      awayTeam: 'Pirati del Campo',
+      homeScore: 1,
+      awayScore: 0,
+      status: 'In Corso',
+      date: new Date(),
+      homePlayers: [
+        { name: 'Mario Cunsolo', goals: 1, assists: 0 },
+        { name: 'Salvatore Vitale', goals: 0, assists: 1 },
+        { name: 'Giuseppe Rossi', goals: 0, assists: 0 }
+      ],
+      awayPlayers: [
+        { name: 'Pedro Pirata', goals: 0, assists: 0 },
+        { name: 'Jack Jack', goals: 0, assists: 0 }
+      ],
+      goalTimeline: [
+        { scorerName: 'Mario Cunsolo', isHome: true, assistName: 'Salvatore Vitale' }
+      ]
+    },
     {
       id: 15,
       homeTeam: 'Aquile Nere',
@@ -351,6 +372,56 @@ export class MatchService {
   deleteMatch(id: number) {
     return this.http.delete<void>(`${this.BASE_URL}/${id}`).pipe(
       tap(() => this.matches.update(prev => prev.filter(m => m.id !== id)))
+    );
+  }
+
+  /**
+   * Registra un nuovo goal per una partita in corso.
+   * @param matchId L'ID della partita.
+   * @param goal I dati del goal (marcatore, assist, squadra).
+   * @returns Un Observable con l'evento creato.
+   */
+  addGoal(matchId: number, goal: GoalEvent) {
+    return this.http.post<GoalEvent>(`${this.BASE_URL}/${matchId}/goals`, goal).pipe(
+      tap(() => {
+        this.matches.update(prev => prev.map(m => {
+          if (m.id === matchId) {
+            // Aggiorna lo score
+            const updatedHomeScore = goal.isHome ? m.homeScore + 1 : m.homeScore;
+            const updatedAwayScore = !goal.isHome ? m.awayScore + 1 : m.awayScore;
+            
+            // Aggiorna la timeline
+            const updatedTimeline = [...(m.goalTimeline || []), goal];
+            
+            // Aggiorna le statistiche dei giocatori se presenti
+            const updatedHomePlayers = m.homePlayers?.map(p => {
+              if (goal.isHome) {
+                if (p.name === goal.scorerName) return { ...p, goals: p.goals + 1 };
+                if (p.name === goal.assistName) return { ...p, assists: p.assists + 1 };
+              }
+              return p;
+            });
+
+            const updatedAwayPlayers = m.awayPlayers?.map(p => {
+              if (!goal.isHome) {
+                if (p.name === goal.scorerName) return { ...p, goals: p.goals + 1 };
+                if (p.name === goal.assistName) return { ...p, assists: p.assists + 1 };
+              }
+              return p;
+            });
+
+            return { 
+              ...m, 
+              homeScore: updatedHomeScore, 
+              awayScore: updatedAwayScore, 
+              goalTimeline: updatedTimeline,
+              homePlayers: updatedHomePlayers,
+              awayPlayers: updatedAwayPlayers
+            };
+          }
+          return m;
+        }));
+      })
     );
   }
 }

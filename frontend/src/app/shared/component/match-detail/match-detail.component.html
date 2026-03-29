@@ -89,6 +89,15 @@
         }
       </div>
     </div>
+
+    @if (m.status === 'In Corso') {
+    <div class="d-flex justify-content-center mt-3">
+      <button nz-button nzType="primary" nzShape="round" (click)="openAddGoalModal()" class="add-goal-btn">
+        <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
+        Aggiungi Goal
+      </button>
+    </div>
+    }
     <div class="match-scorers-container mt-4">
       <!-- Riga Centrale Bianca -->
       <div class="center-divider"></div>
@@ -125,5 +134,13 @@
     </div>
 
   </main>
+  }
+
+  @if (isAddGoalModalVisible()) {
+    <app-add-goal-modal 
+      [match]="match()" 
+      (submit)="handleGoalSubmit($event)" 
+      (cancel)="handleGoalCancel()">
+    </app-add-goal-modal>
   }
 </div>

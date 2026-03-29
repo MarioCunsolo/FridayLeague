@@ -1,0 +1,59 @@
+<!-- Backdrop with blur, consistent with MatchDetailComponent -->
+<div class="modal-backdrop" (click)="handleCancel()"></div>
+
+<!-- Centered container with premium styling -->
+<div class="modal-container shadow-lg">
+  <header class="modal-header">
+    <button nz-button type="button" nzType="text" class="back-button" (click)="handleCancel()">
+      <nz-icon nzType="arrow-left" nzTheme="outline"></nz-icon>
+    </button>
+    <h2 class="modal-title m-0">Registra Goal</h2>
+  </header>
+
+  <main class="modal-content-area">
+    <form nz-form [formGroup]="goalForm" nzLayout="vertical" class="goal-form">
+      <nz-form-item>
+        <nz-form-label nzRequired>Chi ha segnato?</nz-form-label>
+        <nz-form-control>
+          <nz-radio-group formControlName="isHome" (ngModelChange)="onTeamChange()" class="team-selector">
+            <label nz-radio [nzValue]="true">
+              <span class="team-label home">{{ match()?.homeTeam }}</span>
+            </label>
+            <label nz-radio [nzValue]="false">
+              <span class="team-label away">{{ match()?.awayTeam }}</span>
+            </label>
+          </nz-radio-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Marcatore</nz-form-label>
+        <nz-form-control nzErrorTip="Seleziona il marcatore">
+          <nz-select formControlName="scorerName" nzPlaceHolder="Seleziona giocatore" nzShowSearch class="custom-select">
+            @for (player of currentPlayers(); track player.name) {
+              <nz-option [nzLabel]="player.name" [nzValue]="player.name"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label>Assist (Opzionale)</nz-form-label>
+        <nz-form-control>
+          <nz-select formControlName="assistName" nzPlaceHolder="Seleziona chi ha fatto l'assist" nzAllowClear nzShowSearch class="custom-select">
+            @for (player of currentPlayers(); track player.name) {
+              @if (player.name !== goalForm.get('scorerName')?.value) {
+                <nz-option [nzLabel]="player.name" [nzValue]="player.name"></nz-option>
+              }
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="modal-footer mt-4">
+        <button nz-button type="button" nzType="default" (click)="handleCancel()" class="footer-btn cancel-btn">Annulla</button>
+        <button nz-button type="button" nzType="primary" (click)="handleOk()" [nzLoading]="isConfirmLoading" [disabled]="goalForm.invalid" class="footer-btn save-btn">Salva Goal</button>
+      </div>
+    </form>
+  </main>
+</div>

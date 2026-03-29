@@ -9,7 +9,7 @@
 
 .next-match-badge {
     position: absolute;
-    top: 18px;
+    top: 22px;
     right: -40px;
     background: var(--primary-green);
     color: white;

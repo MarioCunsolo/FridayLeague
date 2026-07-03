@@ -14,8 +14,7 @@ export class AuthService {
   private _currentUser = signal<any>(null); // Sostituire any con l'interfaccia User
   public currentUser = this._currentUser.asReadonly();
 
-  // BYPASS TEMPORANEO: Ritorna sempre true per permettere lo sviluppo senza backend
-  public isAuthenticated = computed(() => true || !!this.getToken());
+  public isAuthenticated = computed(() => !!this.getToken());
 
   constructor() {
     // Se c'è uno stato salvato dell'utente con la lega nel localStorage, lo carichiamo
@@ -39,53 +38,31 @@ export class AuthService {
 
 
   /**
-   * Effettua il login dell'utente simulando il successo (bypass API backend).
+   * Effettua il login dell'utente chiamando le API reali del backend.
    * @param credentials Oggetto contenente email e password.
    */
   login(credentials: any) {
-    // MOCK LOGIN SUCCESS - Inizialmente senza lega per far spuntare la pagina
-    const mockResponse = {
-      user: { 
-        id: 1, 
-        email: credentials.email || 'mario@test.com', 
-        nome: 'Mario (Mock)', 
-        cognome: 'Cunsolo',
-        legaId: null,
-        leghe: []
-      },
-      token: 'fake-jwt-token-development'
-    };
-
-    localStorage.setItem(this.TOKEN_KEY, mockResponse.token);
-    localStorage.removeItem('mock_user_lega'); // Rimuoviamo eventuale lega precedente
-    this._currentUser.set(mockResponse.user);
-    
-    return of(mockResponse).pipe(delay(500));
+    return this.http.post<any>(`${this.BASE_URL}/login`, credentials).pipe(
+      tap(response => {
+        localStorage.setItem(this.TOKEN_KEY, response.token);
+        localStorage.removeItem('mock_user_lega'); // Rimuoviamo eventuale lega precedente
+        this._currentUser.set(response.user);
+      })
+    );
   }
 
   /**
-   * Registra un nuovo utente simulando il successo (bypass API backend).
+   * Registra un nuovo utente chiamando le API reali del backend.
    * @param userData Oggetto contenente nome, cognome, email e password.
    */
   register(userData: any) {
-    // MOCK REGISTER SUCCESS - Utente senza lega
-    const mockResponse = {
-      user: { 
-        id: Date.now(), 
-        email: userData.email, 
-        nome: userData.nome, 
-        cognome: userData.cognome,
-        legaId: null,
-        leghe: []
-      },
-      token: 'fake-jwt-token-development'
-    };
-
-    localStorage.setItem(this.TOKEN_KEY, mockResponse.token);
-    localStorage.removeItem('mock_user_lega');
-    this._currentUser.set(mockResponse.user);
-    
-    return of(mockResponse).pipe(delay(500));
+    return this.http.post<any>(`${this.BASE_URL}/register`, userData).pipe(
+      tap(response => {
+        localStorage.setItem(this.TOKEN_KEY, response.token);
+        localStorage.removeItem('mock_user_lega');
+        this._currentUser.set(response.user);
+      })
+    );
   }
 
 

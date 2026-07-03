@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -32,6 +32,8 @@ export class LoginComponent {
     remember: FormControl<boolean>;
   }>;
 
+  errorMessage = signal<string | null>(null);
+
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private authService = inject(AuthService);
@@ -46,13 +48,20 @@ export class LoginComponent {
 
   submitForm(): void {
     if (this.loginForm.valid) {
+      this.errorMessage.set(null);
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
           this.router.navigate(['/']);
         },
         error: (err) => {
           console.error('Login failed', err);
-          // Qui si potrebbe aggiungere un messaggio di errore per l'utente
+          if (err.error && typeof err.error === 'string') {
+            this.errorMessage.set(err.error);
+          } else if (err.error && err.error.message) {
+            this.errorMessage.set(err.error.message);
+          } else {
+            this.errorMessage.set('Email o password errati.');
+          }
         }
       });
     } else {

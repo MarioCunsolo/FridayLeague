@@ -6,6 +6,13 @@
     </div>
 
     <form nz-form [formGroup]="loginForm" (ngSubmit)="submitForm()" class="login-form">
+      @if (errorMessage()) {
+        <div class="form-error-alert mb-4">
+          <span nz-icon nzType="close-circle" nzTheme="fill"></span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
       <nz-form-item>
         <nz-form-control nzErrorTip="Inserisci un'email valida!">
           <nz-input-group nzPrefixIcon="user">

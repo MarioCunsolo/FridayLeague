@@ -75,95 +75,46 @@ export class AuthService {
   /**
    * Simula la creazione di una nuova lega da parte dell'utente.
    */
+  /**
+   * Crea una nuova lega nel backend.
+   */
   creaLega(nomeLega: string, descrizione?: string) {
-    let user = this._currentUser();
-    if (!user) {
-      // Fallback difensivo se l'utente dovesse essere null
-      user = {
-        id: 1,
-        nome: 'Mario (Mock)',
-        cognome: 'Cunsolo',
-        email: 'mario@test.com',
-        legaId: null,
-        leghe: []
-      };
-    }
-    const nuovaLegaId = Date.now();
-    const nuovaLega = { id: nuovaLegaId, nome: nomeLega, ruolo: 'AMMINISTRATORE' };
-    
-    // Prepariamo l'elenco includendo due leghe mock per testare lo switcher
-    const nuoveLeghe = [
-      nuovaLega,
-      { id: 1001, nome: 'Lega Calcio 8 (Mock)', ruolo: 'GIOCATORE' },
-      { id: 1002, nome: 'Champions Friday (Mock)', ruolo: 'GIOCATORE' }
-    ];
-
-    const updatedUser = {
-      ...user,
-      legaId: nuovaLegaId, // Imposta questa lega come attiva
-      nomeLega: nomeLega,
-      leghe: nuoveLeghe
-    };
-    this._currentUser.set(updatedUser);
-    localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
-    return of({ success: true, message: 'Lega creata con successo' }).pipe(delay(600));
+    return this.http.post<any>(`${this.BASE_URL}/crea-lega`, { nomeLega, descrizione }).pipe(
+      tap(user => {
+        this._currentUser.set(user);
+      })
+    );
   }
 
   /**
    * Simula la partecipazione a una lega esistente tramite codice.
    */
+  /**
+   * Partecipa ad una lega esistente tramite codice.
+   */
   partecipaLega(codiceLega: string) {
-    let user = this._currentUser();
-    if (!user) {
-      // Fallback difensivo se l'utente dovesse essere null
-      user = {
-        id: 1,
-        nome: 'Mario (Mock)',
-        cognome: 'Cunsolo',
-        email: 'mario@test.com',
-        legaId: null,
-        leghe: []
-      };
-    }
-    const nuovaLegaId = Date.now();
-    const nomeLega = 'Lega ' + codiceLega.toUpperCase();
-    const nuovaLega = { id: nuovaLegaId, nome: nomeLega, ruolo: 'GIOCATORE' };
-
-    // Prepariamo l'elenco includendo due leghe mock per testare lo switcher
-    const nuoveLeghe = [
-      nuovaLega,
-      { id: 1001, nome: 'Lega Calcio 8 (Mock)', ruolo: 'GIOCATORE' },
-      { id: 1002, nome: 'Champions Friday (Mock)', ruolo: 'GIOCATORE' }
-    ];
-
-    const updatedUser = {
-      ...user,
-      legaId: nuovaLegaId, // Imposta questa lega come attiva
-      nomeLega: nomeLega,
-      leghe: nuoveLeghe
-    };
-    this._currentUser.set(updatedUser);
-    localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
-    return of({ success: true, message: 'Lega unita con successo' }).pipe(delay(600));
+    return this.http.post<any>(`${this.BASE_URL}/partecipa-lega`, { codiceLega }).pipe(
+      tap(user => {
+        this._currentUser.set(user);
+      })
+    );
   }
 
   /**
    * Cambia la lega attualmente attiva selezionata dall'utente.
    */
+  /**
+   * Cambia la lega attualmente attiva.
+   */
   cambiaLega(idLega: number) {
-    const user = this._currentUser();
-    if (user && user.leghe) {
-      const legaTrovata = user.leghe.find((l: any) => l.id === idLega);
-      if (legaTrovata) {
-        const updatedUser = {
-          ...user,
-          legaId: legaTrovata.id,
-          nomeLega: legaTrovata.nome
-        };
-        this._currentUser.set(updatedUser);
-        localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
+    this.http.post<any>(`${this.BASE_URL}/cambia-lega`, { idLega }).subscribe({
+      next: user => {
+        this._currentUser.set(user);
+      },
+      error: err => {
+        console.error('Errore durante il cambio della lega', err);
       }
-    }
+    });
   }
 
   /**

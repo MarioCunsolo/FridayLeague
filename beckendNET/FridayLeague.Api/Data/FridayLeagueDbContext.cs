@@ -12,6 +12,8 @@ public class FridayLeagueDbContext : DbContext
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<Player> Players => Set<Player>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Lega> Leghe => Set<Lega>();
+    public DbSet<UserLega> UserLeghe => Set<UserLega>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,6 +21,15 @@ public class FridayLeagueDbContext : DbContext
 
         // Unique index for User Email
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+        // Composite key for UserLega
+        modelBuilder.Entity<UserLega>()
+            .HasKey(ul => new { ul.UserId, ul.LegaId });
+
+        // Unique index for invite code
+        modelBuilder.Entity<Lega>()
+            .HasIndex(l => l.CodiceInvito)
+            .IsUnique();
 
         // Seed data
         modelBuilder.Entity<Team>().HasData(

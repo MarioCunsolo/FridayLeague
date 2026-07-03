@@ -40,7 +40,7 @@ public class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        var userDto = MapToUserDto(user);
+        var userDto = await MapToUserDtoWithLegheAsync(user);
         var token = _tokenService.CreateToken(user);
 
         return Ok(new AuthResponse
@@ -68,7 +68,7 @@ public class AuthController : ControllerBase
             return Unauthorized("Credenziali non valide.");
         }
 
-        var userDto = MapToUserDto(user);
+        var userDto = await MapToUserDtoWithLegheAsync(user);
         var token = _tokenService.CreateToken(user);
 
         return Ok(new AuthResponse
@@ -98,7 +98,107 @@ public class AuthController : ControllerBase
             return NotFound("Utente non trovato.");
         }
 
-        return Ok(MapToUserDto(user));
+        return Ok(await MapToUserDtoWithLegheAsync(user));
+    }
+
+    [Authorize]
+    [HttpPost("crea-lega")]
+    public async Task<ActionResult<UserDto>> CreaLega(CreaLegaRequest request)
+    {
+        var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
+            ?? User.FindFirst("email")?.Value;
+
+        if (string.IsNullOrEmpty(emailClaim)) return Unauthorized();
+
+        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == emailClaim);
+        if (user == null) return NotFound("Utente non trovato.");
+
+        var inviteCode = await GenerateUniqueInviteCode();
+
+        var newLega = new Lega
+        {
+            Nome = request.NomeLega,
+            Descrizione = request.Descrizione,
+            CodiceInvito = inviteCode
+        };
+
+        _context.Leghe.Add(newLega);
+        await _context.SaveChangesAsync();
+
+        var userLega = new UserLega
+        {
+            UserId = user.Id,
+            LegaId = newLega.Id,
+            Ruolo = "AMMINISTRATORE"
+        };
+
+        _context.UserLeghe.Add(userLega);
+
+        user.LegaId = newLega.Id;
+        await _context.SaveChangesAsync();
+
+        return Ok(await MapToUserDtoWithLegheAsync(user));
+    }
+
+    [Authorize]
+    [HttpPost("partecipa-lega")]
+    public async Task<ActionResult<UserDto>> PartecipaLega(PartecipaLegaRequest request)
+    {
+        var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
+            ?? User.FindFirst("email")?.Value;
+
+        if (string.IsNullOrEmpty(emailClaim)) return Unauthorized();
+
+        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == emailClaim);
+        if (user == null) return NotFound("Utente non trovato.");
+
+        var codeUpper = request.CodiceLega.ToUpper();
+        var lega = await _context.Leghe.SingleOrDefaultAsync(l => l.CodiceInvito == codeUpper);
+        if (lega == null)
+        {
+            return NotFound("Codice non valido o lega non trovata.");
+        }
+
+        var exists = await _context.UserLeghe.AnyAsync(ul => ul.UserId == user.Id && ul.LegaId == lega.Id);
+        if (!exists)
+        {
+            var userLega = new UserLega
+            {
+                UserId = user.Id,
+                LegaId = lega.Id,
+                Ruolo = "GIOCATORE"
+            };
+            _context.UserLeghe.Add(userLega);
+        }
+
+        user.LegaId = lega.Id;
+        await _context.SaveChangesAsync();
+
+        return Ok(await MapToUserDtoWithLegheAsync(user));
+    }
+
+    [Authorize]
+    [HttpPost("cambia-lega")]
+    public async Task<ActionResult<UserDto>> CambiaLega(CambiaLegaRequest request)
+    {
+        var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
+            ?? User.FindFirst("email")?.Value;
+
+        if (string.IsNullOrEmpty(emailClaim)) return Unauthorized();
+
+        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == emailClaim);
+        if (user == null) return NotFound("Utente non trovato.");
+
+        var isMember = await _context.UserLeghe.AnyAsync(ul => ul.UserId == user.Id && ul.LegaId == request.IdLega);
+        if (!isMember)
+        {
+            return BadRequest("Non appartieni a questa lega.");
+        }
+
+        user.LegaId = request.IdLega;
+        await _context.SaveChangesAsync();
+
+        return Ok(await MapToUserDtoWithLegheAsync(user));
     }
 
     private async Task<bool> UserExists(string email)
@@ -106,8 +206,19 @@ public class AuthController : ControllerBase
         return await _context.Users.AnyAsync(x => x.Email == email.ToLower());
     }
 
-    private static UserDto MapToUserDto(User user)
+    private async Task<UserDto> MapToUserDtoWithLegheAsync(User user)
     {
+        var userLeghe = await _context.UserLeghe
+            .Where(ul => ul.UserId == user.Id)
+            .Include(ul => ul.Lega)
+            .Select(ul => new LegaDto
+            {
+                Id = ul.LegaId,
+                Nome = ul.Lega.Nome,
+                Ruolo = ul.Ruolo
+            })
+            .ToListAsync();
+
         return new UserDto
         {
             Id = user.Id,
@@ -115,7 +226,23 @@ public class AuthController : ControllerBase
             Cognome = user.Cognome,
             Email = user.Email,
             LegaId = user.LegaId,
-            Leghe = new List<LegaDto>()
+            Leghe = userLeghe
         };
+    }
+
+    private async Task<string> GenerateUniqueInviteCode()
+    {
+        var random = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        while (true)
+        {
+            var code = new string(Enumerable.Repeat(chars, 6)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            if (!await _context.Leghe.AnyAsync(l => l.CodiceInvito == code))
+            {
+                return code;
+            }
+        }
     }
 }

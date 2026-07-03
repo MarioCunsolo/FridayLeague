@@ -7,6 +7,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/service/auth.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-seleziona-lega',
@@ -26,6 +27,7 @@ export class SelezionaLegaComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   public authService = inject(AuthService);
+  private message = inject(NzMessageService);
 
   // Stato per gestire quale vista visualizzare: 'none' | 'create' | 'join'
   activeForm = signal<'none' | 'create' | 'join'>('none');
@@ -93,6 +95,7 @@ export class SelezionaLegaComponent {
       this.authService.creaLega(nome!, descrizione).subscribe({
         next: () => {
           this.loadingCreate.set(false);
+          this.message.success('Lega creata con successo!');
           this.router.navigate(['/']);
         },
         error: (err) => {
@@ -118,6 +121,7 @@ export class SelezionaLegaComponent {
       this.authService.partecipaLega(codice!).subscribe({
         next: () => {
           this.loadingJoin.set(false);
+          this.message.success('Sei entrato nella lega con successo!');
           this.router.navigate(['/']);
         },
         error: (err) => {

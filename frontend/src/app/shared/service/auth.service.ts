@@ -17,22 +17,16 @@ export class AuthService {
   public isAuthenticated = computed(() => !!this.getToken());
 
   constructor() {
-    // Se c'è uno stato salvato dell'utente con la lega nel localStorage, lo carichiamo
-    const savedUserLega = localStorage.getItem('mock_user_lega');
-    if (savedUserLega) {
-      this._currentUser.set(JSON.parse(savedUserLega));
-    } else {
-      // Se non c'è una lega salvata, impostiamo comunque l'utente di default
-      // (anche se ha già un token nel browser) così da evitare che l'oggetto _currentUser sia null
-      // Inizialmente NON appartiene a nessuna lega (legaId: null, leghe: []) per testare il reindirizzamento
-      this._currentUser.set({
-        id: 1,
-        nome: 'Mario (Mock)',
-        cognome: 'Cunsolo',
-        email: 'mario@test.com',
-        legaId: null,
-        leghe: []
+    const token = this.getToken();
+    if (token) {
+      this.getCurrentUser().subscribe({
+        error: (err) => {
+          console.error('Session load failed. Logging out.', err);
+          this.logout().subscribe();
+        }
       });
+    } else {
+      this._currentUser.set(null);
     }
   }
 

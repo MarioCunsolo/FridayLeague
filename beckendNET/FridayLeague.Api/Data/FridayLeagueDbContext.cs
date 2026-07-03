@@ -33,6 +33,12 @@ public class FridayLeagueDbContext : DbContext
             .WithMany()
             .HasForeignKey(ul => ul.RuoloId);
 
+        // Relationship between UserLega and User
+        modelBuilder.Entity<UserLega>()
+            .HasOne(ul => ul.User)
+            .WithMany()
+            .HasForeignKey(ul => ul.UserId);
+
         // Unique index for invite code
         modelBuilder.Entity<Lega>()
             .HasIndex(l => l.CodiceInvito)

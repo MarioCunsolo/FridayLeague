@@ -85,3 +85,109 @@
         padding-bottom: 4.375rem;
     }
 }
+
+/* Selettore Lega nella Sidebar */
+.sidebar-league-selector {
+    margin-bottom: 2rem;
+    padding: 0 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-bottom: 0.0625rem solid var(--border-sub);
+    padding-bottom: 1.5rem;
+}
+
+.selector-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+
+.league-select-nz {
+    width: 100%;
+}
+
+:host ::ng-deep .league-select-nz .ant-select-selector {
+    background-color: var(--input-bg) !important;
+    border: 0.0625rem solid var(--border-sub) !important;
+    border-radius: 0.75rem !important;
+    color: var(--text-primary) !important;
+    height: 2.75rem !important;
+    padding: 0 1rem !important;
+    display: flex;
+    align-items: center;
+}
+
+:host ::ng-deep .league-select-nz .ant-select-selection-item {
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    color: var(--text-primary) !important;
+    line-height: 2.75rem !important;
+}
+
+:host ::ng-deep .league-select-nz .ant-select-arrow {
+    color: var(--text-secondary) !important;
+}
+
+.add-league-btn {
+    background: none;
+    border: none;
+    color: var(--primary-green);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0;
+    width: fit-content;
+    transition: opacity 0.2s ease;
+}
+
+.add-league-btn:hover {
+    opacity: 0.8;
+}
+
+/* Selettore Lega su Mobile (Header) */
+.league-select-mobile {
+    min-width: 8rem;
+    max-width: 12rem;
+}
+
+:host ::ng-deep .league-select-mobile .ant-select-selector {
+    background-color: transparent !important;
+    border: none !important;
+    color: var(--primary-green) !important;
+    height: 2.5rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none !important;
+}
+
+:host ::ng-deep .league-select-mobile .ant-select-selection-item {
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    color: var(--primary-green) !important;
+    line-height: 2.5rem !important;
+    text-align: center;
+}
+
+:host ::ng-deep .league-select-mobile .ant-select-arrow {
+    color: var(--primary-green) !important;
+}
+
+.add-league-mobile {
+    cursor: pointer;
+    font-size: 1.35rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.add-league-mobile:hover {
+    color: var(--primary-green);
+}

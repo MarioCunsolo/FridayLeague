@@ -3,7 +3,7 @@
     
     <!-- Top Action Header -->
     <div class="card-top-nav">
-      @if (activeForm() !== 'none') {
+      @if (activeForm() !== 'none' || (authService.currentUser()?.legaId)) {
         <button class="back-btn-link" (click)="goBack()">
           <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
           <span>Indietro</span>

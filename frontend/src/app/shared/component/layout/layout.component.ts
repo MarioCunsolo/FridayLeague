@@ -1,17 +1,19 @@
 import { Component, signal, effect, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../../service/auth.service';
+import { FormsModule } from '@angular/forms';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NzIconModule]
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NzIconModule, NzSelectModule, FormsModule]
 })
 export class LayoutComponent {
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   currentTheme = signal<'dark' | 'light'>('dark');
@@ -33,6 +35,12 @@ export class LayoutComponent {
 
   toggleTheme() {
     this.currentTheme.update(t => t === 'dark' ? 'light' : 'dark');
+  }
+
+  onLeagueChange(idLega: number): void {
+    this.authService.cambiaLega(idLega);
+    // Reindirizziamo alla homepage per rinfrescare i dati della lega attiva
+    this.router.navigate(['/']);
   }
 
   logout() {

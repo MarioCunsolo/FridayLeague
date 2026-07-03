@@ -316,3 +316,50 @@ body {
     opacity: 0.9;
     transform: translateY(-0.125rem);
 }
+
+/* Ant Design Select Dropdown Overrides for Theme Consistency */
+.ant-select-dropdown {
+    background-color: var(--card-bg) !important;
+    border: 0.0625rem solid var(--border-main) !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.4) !important;
+    padding: 0.25rem !important;
+}
+
+.ant-select-item {
+    color: var(--text-primary) !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.15s ease !important;
+    margin: 0.125rem 0 !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.9rem !important;
+}
+
+.ant-select-item-option-selected {
+    background-color: rgba(0, 204, 102, 0.1) !important;
+    color: var(--primary-green) !important;
+    font-weight: 700 !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--primary-green) !important;
+}
+
+.ant-select-item:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--primary-green) !important;
+}
+
+/* Light theme adjustments for dropdowns */
+[data-theme='light'] .ant-select-dropdown {
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme='light'] .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme='light'] .ant-select-item:hover {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}

@@ -25,7 +25,7 @@ import { AuthService } from 'src/app/shared/service/auth.service';
 export class SelezionaLegaComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
 
   // Stato per gestire quale vista visualizzare: 'none' | 'create' | 'join'
   activeForm = signal<'none' | 'create' | 'join'>('none');
@@ -67,11 +67,18 @@ export class SelezionaLegaComponent {
   }
 
   /**
-   * Ripristina lo stato iniziale con le due card.
+   * Ripristina lo stato iniziale con le due card o torna alla Home se l'utente ha già una lega.
    */
   goBack(): void {
-    this.activeForm.set('none');
-    this.errorMessage.set(null);
+    if (this.activeForm() === 'none') {
+      const user = this.authService.currentUser();
+      if (user && user.legaId) {
+        this.router.navigate(['/']);
+      }
+    } else {
+      this.activeForm.set('none');
+      this.errorMessage.set(null);
+    }
   }
 
   /**

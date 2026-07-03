@@ -22,15 +22,17 @@ export class AuthService {
     const savedUserLega = localStorage.getItem('mock_user_lega');
     if (savedUserLega) {
       this._currentUser.set(JSON.parse(savedUserLega));
-    } else if (!this.getToken()) {
-      // Se non c'è un utente loggato, impostiamo l'utente di default
-      // Inizialmente NON appartiene a nessuna lega (legaId: null) per testare il reindirizzamento
+    } else {
+      // Se non c'è una lega salvata, impostiamo comunque l'utente di default
+      // (anche se ha già un token nel browser) così da evitare che l'oggetto _currentUser sia null
+      // Inizialmente NON appartiene a nessuna lega (legaId: null, leghe: []) per testare il reindirizzamento
       this._currentUser.set({
         id: 1,
         nome: 'Mario (Mock)',
         cognome: 'Cunsolo',
         email: 'mario@test.com',
-        legaId: null
+        legaId: null,
+        leghe: []
       });
     }
   }
@@ -41,16 +43,6 @@ export class AuthService {
    * @param credentials Oggetto contenente email e password.
    */
   login(credentials: any) {
-    // CODICE COMMENTATO TEMPORANEAMENTE (Sostituito da mock):
-    /*
-    return this.http.post<{ user: any, token: string }>(`${this.BASE_URL}/login`, credentials).pipe(
-      tap(response => {
-        localStorage.setItem(this.TOKEN_KEY, response.token);
-        this._currentUser.set(response.user);
-      })
-    );
-    */
-
     // MOCK LOGIN SUCCESS - Inizialmente senza lega per far spuntare la pagina
     const mockResponse = {
       user: { 
@@ -58,7 +50,8 @@ export class AuthService {
         email: credentials.email || 'mario@test.com', 
         nome: 'Mario (Mock)', 
         cognome: 'Cunsolo',
-        legaId: null
+        legaId: null,
+        leghe: []
       },
       token: 'fake-jwt-token-development'
     };
@@ -75,16 +68,6 @@ export class AuthService {
    * @param userData Oggetto contenente nome, cognome, email e password.
    */
   register(userData: any) {
-    // CODICE COMMENTATO TEMPORANEAMENTE (Sostituito da mock):
-    /*
-    return this.http.post<{ user: any, token: string }>(`${this.BASE_URL}/register`, userData).pipe(
-      tap(response => {
-        localStorage.setItem(this.TOKEN_KEY, response.token);
-        this._currentUser.set(response.user);
-      })
-    );
-    */
-
     // MOCK REGISTER SUCCESS - Utente senza lega
     const mockResponse = {
       user: { 
@@ -92,7 +75,8 @@ export class AuthService {
         email: userData.email, 
         nome: userData.nome, 
         cognome: userData.cognome,
-        legaId: null
+        legaId: null,
+        leghe: []
       },
       token: 'fake-jwt-token-development'
     };
@@ -121,18 +105,36 @@ export class AuthService {
    * Simula la creazione di una nuova lega da parte dell'utente.
    */
   creaLega(nomeLega: string, descrizione?: string) {
-    const user = this._currentUser();
-    if (user) {
-      const updatedUser = {
-        ...user,
-        legaId: 100, // ID fittizio per la nuova lega creata
-        nomeLega: nomeLega,
-        descrizioneLega: descrizione || '',
-        ruoloLega: 'AMMINISTRATORE'
+    let user = this._currentUser();
+    if (!user) {
+      // Fallback difensivo se l'utente dovesse essere null
+      user = {
+        id: 1,
+        nome: 'Mario (Mock)',
+        cognome: 'Cunsolo',
+        email: 'mario@test.com',
+        legaId: null,
+        leghe: []
       };
-      this._currentUser.set(updatedUser);
-      localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
     }
+    const nuovaLegaId = Date.now();
+    const nuovaLega = { id: nuovaLegaId, nome: nomeLega, ruolo: 'AMMINISTRATORE' };
+    
+    // Prepariamo l'elenco includendo due leghe mock per testare lo switcher
+    const nuoveLeghe = [
+      nuovaLega,
+      { id: 1001, nome: 'Lega Calcio 8 (Mock)', ruolo: 'GIOCATORE' },
+      { id: 1002, nome: 'Champions Friday (Mock)', ruolo: 'GIOCATORE' }
+    ];
+
+    const updatedUser = {
+      ...user,
+      legaId: nuovaLegaId, // Imposta questa lega come attiva
+      nomeLega: nomeLega,
+      leghe: nuoveLeghe
+    };
+    this._currentUser.set(updatedUser);
+    localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
     return of({ success: true, message: 'Lega creata con successo' }).pipe(delay(600));
   }
 
@@ -140,19 +142,57 @@ export class AuthService {
    * Simula la partecipazione a una lega esistente tramite codice.
    */
   partecipaLega(codiceLega: string) {
-    const user = this._currentUser();
-    if (user) {
-      const updatedUser = {
-        ...user,
-        legaId: 200, // ID fittizio per la lega a cui partecipa
-        nomeLega: 'Lega del Venerdì',
-        codiceLega: codiceLega,
-        ruoloLega: 'GIOCATORE'
+    let user = this._currentUser();
+    if (!user) {
+      // Fallback difensivo se l'utente dovesse essere null
+      user = {
+        id: 1,
+        nome: 'Mario (Mock)',
+        cognome: 'Cunsolo',
+        email: 'mario@test.com',
+        legaId: null,
+        leghe: []
       };
-      this._currentUser.set(updatedUser);
-      localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
     }
+    const nuovaLegaId = Date.now();
+    const nomeLega = 'Lega ' + codiceLega.toUpperCase();
+    const nuovaLega = { id: nuovaLegaId, nome: nomeLega, ruolo: 'GIOCATORE' };
+
+    // Prepariamo l'elenco includendo due leghe mock per testare lo switcher
+    const nuoveLeghe = [
+      nuovaLega,
+      { id: 1001, nome: 'Lega Calcio 8 (Mock)', ruolo: 'GIOCATORE' },
+      { id: 1002, nome: 'Champions Friday (Mock)', ruolo: 'GIOCATORE' }
+    ];
+
+    const updatedUser = {
+      ...user,
+      legaId: nuovaLegaId, // Imposta questa lega come attiva
+      nomeLega: nomeLega,
+      leghe: nuoveLeghe
+    };
+    this._currentUser.set(updatedUser);
+    localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
     return of({ success: true, message: 'Lega unita con successo' }).pipe(delay(600));
+  }
+
+  /**
+   * Cambia la lega attualmente attiva selezionata dall'utente.
+   */
+  cambiaLega(idLega: number) {
+    const user = this._currentUser();
+    if (user && user.leghe) {
+      const legaTrovata = user.leghe.find((l: any) => l.id === idLega);
+      if (legaTrovata) {
+        const updatedUser = {
+          ...user,
+          legaId: legaTrovata.id,
+          nomeLega: legaTrovata.nome
+        };
+        this._currentUser.set(updatedUser);
+        localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
+      }
+    }
   }
 
   /**

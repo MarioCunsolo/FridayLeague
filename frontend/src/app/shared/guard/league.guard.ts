@@ -21,9 +21,6 @@ export const leagueGuard = (route: any, state: any) => {
     }
     return true; // Permetti l'accesso alla rotta di selezione lega
   } else {
-    if (isTargetingSelectLeague) {
-      return router.parseUrl('/'); // Se ha già una lega, torna alla home
-    }
-    return true; // Permetti l'accesso alla rotta richiesta
+    return true; // Permetti l'accesso a tutte le rotte, inclusa seleziona-lega per aggiungere altre leghe
   }
 };

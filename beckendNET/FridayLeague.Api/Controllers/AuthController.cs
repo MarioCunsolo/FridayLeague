@@ -2,6 +2,7 @@ using System.Security.Claims;
 using FridayLeague.Api.Data;
 using FridayLeague.Api.DTOs;
 using FridayLeague.Api.Services;
+using FridayLeague.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -82,16 +83,8 @@ public class AuthController : ControllerBase
     [HttpGet("current-user")]
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
-        var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
-            ?? User.FindFirst("email")?.Value;
-
-        if (string.IsNullOrEmpty(emailClaim))
-        {
-            return Unauthorized();
-        }
-
-        var user = await _context.Users
-            .SingleOrDefaultAsync(x => x.Email == emailClaim);
+        var userId = User.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
 
         if (user == null)
         {
@@ -105,12 +98,8 @@ public class AuthController : ControllerBase
     [HttpPost("crea-lega")]
     public async Task<ActionResult<UserDto>> CreaLega(CreaLegaRequest request)
     {
-        var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
-            ?? User.FindFirst("email")?.Value;
-
-        if (string.IsNullOrEmpty(emailClaim)) return Unauthorized();
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == emailClaim);
+        var userId = User.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
         if (user == null) return NotFound("Utente non trovato.");
 
         var inviteCode = await GenerateUniqueInviteCode();
@@ -129,7 +118,7 @@ public class AuthController : ControllerBase
         {
             UserId = user.Id,
             LegaId = newLega.Id,
-            Ruolo = "AMMINISTRATORE"
+            RuoloId = LeagueRoles.AdminId
         };
 
         _context.UserLeghe.Add(userLega);
@@ -144,12 +133,8 @@ public class AuthController : ControllerBase
     [HttpPost("partecipa-lega")]
     public async Task<ActionResult<UserDto>> PartecipaLega(PartecipaLegaRequest request)
     {
-        var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
-            ?? User.FindFirst("email")?.Value;
-
-        if (string.IsNullOrEmpty(emailClaim)) return Unauthorized();
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == emailClaim);
+        var userId = User.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
         if (user == null) return NotFound("Utente non trovato.");
 
         var codeUpper = request.CodiceLega.ToUpper();
@@ -166,7 +151,7 @@ public class AuthController : ControllerBase
             {
                 UserId = user.Id,
                 LegaId = lega.Id,
-                Ruolo = "GIOCATORE"
+                RuoloId = LeagueRoles.GiocatoreId
             };
             _context.UserLeghe.Add(userLega);
         }
@@ -181,12 +166,8 @@ public class AuthController : ControllerBase
     [HttpPost("cambia-lega")]
     public async Task<ActionResult<UserDto>> CambiaLega(CambiaLegaRequest request)
     {
-        var emailClaim = User.FindFirst(ClaimTypes.Email)?.Value 
-            ?? User.FindFirst("email")?.Value;
-
-        if (string.IsNullOrEmpty(emailClaim)) return Unauthorized();
-
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == emailClaim);
+        var userId = User.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
         if (user == null) return NotFound("Utente non trovato.");
 
         var isMember = await _context.UserLeghe.AnyAsync(ul => ul.UserId == user.Id && ul.LegaId == request.IdLega);
@@ -201,6 +182,38 @@ public class AuthController : ControllerBase
         return Ok(await MapToUserDtoWithLegheAsync(user));
     }
 
+    [Authorize]
+    [HttpGet("lega/{legaId}/partecipanti")]
+    public async Task<ActionResult<List<ParticipantDto>>> GetLegaPartecipanti(int legaId)
+    {
+        var userId = User.GetUserId();
+
+        // Verify the requesting user belongs to the league
+        var isMember = await _context.UserLeghe
+            .AnyAsync(ul => ul.UserId == userId && ul.LegaId == legaId);
+
+        if (!isMember)
+        {
+            return Forbid();
+        }
+
+        var partecipanti = await _context.UserLeghe
+            .Where(ul => ul.LegaId == legaId)
+            .Include(ul => ul.User)
+            .Include(ul => ul.Ruolo)
+            .Select(ul => new ParticipantDto
+            {
+                UserId = ul.UserId,
+                Nome = ul.User.Nome,
+                Cognome = ul.User.Cognome,
+                Email = ul.User.Email,
+                Ruolo = ul.Ruolo.Nome
+            })
+            .ToListAsync();
+
+        return Ok(partecipanti);
+    }
+
     private async Task<bool> UserExists(string email)
     {
         return await _context.Users.AnyAsync(x => x.Email == email.ToLower());
@@ -211,11 +224,12 @@ public class AuthController : ControllerBase
         var userLeghe = await _context.UserLeghe
             .Where(ul => ul.UserId == user.Id)
             .Include(ul => ul.Lega)
+            .Include(ul => ul.Ruolo)
             .Select(ul => new LegaDto
             {
                 Id = ul.LegaId,
                 Nome = ul.Lega.Nome,
-                Ruolo = ul.Ruolo
+                Ruolo = ul.Ruolo.Nome
             })
             .ToListAsync();
 

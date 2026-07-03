@@ -16,6 +16,13 @@ export class AuthService {
 
   public isAuthenticated = computed(() => !!this.getToken());
 
+  public isAdminOrCoAdmin = computed(() => {
+    const user = this.currentUser();
+    if (!user || !user.legaId || !user.leghe) return false;
+    const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
+    return activeLega && (activeLega.ruolo === 'ADMIN' || activeLega.ruolo === 'CO_ADMIN');
+  });
+
   constructor() {
     const token = this.getToken();
     if (token) {
@@ -115,6 +122,13 @@ export class AuthService {
         console.error('Errore durante il cambio della lega', err);
       }
     });
+  }
+
+  /**
+   * Recupera la lista dei partecipanti di una lega.
+   */
+  getLegaPartecipanti(legaId: number) {
+    return this.http.get<any[]>(`${this.BASE_URL}/lega/${legaId}/partecipanti`);
   }
 
   /**

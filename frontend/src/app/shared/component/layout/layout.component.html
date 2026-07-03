@@ -44,17 +44,27 @@
         <i class="fa fa-trophy"></i>
         <span>Classifiche</span>
       </div>
+      @if (authService.isAdminOrCoAdmin()) {
+      <div class="nav-item-desktop" routerLink="/impostazioni" routerLinkActive="active">
+        <i class="fa fa-cog"></i>
+        <span>Impostazioni</span>
+      </div>
+      }
+    </nav>
+
+    <!-- Always visible bottom footer -->
+    <div class="sidebar-footer">
       <!-- Theme Toggle (Desktop) -->
-      <div class="nav-item-desktop mt-4" (click)="toggleTheme()">
+      <div class="nav-item-desktop" (click)="toggleTheme()">
         <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
         <span>{{ currentTheme() === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
       </div>
       <!-- Login (Desktop) -->
-      <div class="nav-item-desktop logout-item-desktop mt-4" (click)="logout()" style="cursor: pointer;">
+      <div class="nav-item-desktop" (click)="logout()" style="cursor: pointer;">
         <span nz-icon nzType="logout" nzTheme="outline"></span>
         <span>Esci</span>
       </div>
-    </nav>
+    </div>
   </aside>
 
   <!-- Main Content Wrapper -->
@@ -123,6 +133,12 @@
         <i class="fa fa-trophy"></i>
         <span>Classifiche</span>
       </div>
+      @if (authService.isAdminOrCoAdmin()) {
+      <div class="nav-item" routerLink="/impostazioni" routerLinkActive="active">
+        <i class="fa fa-cog"></i>
+        <span>Impostazioni</span>
+      </div>
+      }
     </nav>
   </div>
 </div>

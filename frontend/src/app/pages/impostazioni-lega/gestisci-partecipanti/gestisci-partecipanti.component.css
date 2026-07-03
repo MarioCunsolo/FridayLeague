@@ -1,0 +1,121 @@
+.partecipanti-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.back-btn {
+  border-radius: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Custom Table Wrapper */
+.table-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* custom table override styling to feel premium */
+::ng-deep .custom-nz-table {
+  background: transparent !important;
+}
+
+::ng-deep .custom-nz-table nz-table {
+  background: transparent !important;
+}
+
+::ng-deep .custom-nz-table .ant-table {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-thead > tr > th {
+  background: rgba(82, 113, 255, 0.05) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1rem 1.5rem !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1.15rem 1.5rem !important;
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-tbody > tr:hover > td {
+  background: rgba(82, 113, 255, 0.02) !important;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar-icon {
+  font-size: 1.15rem;
+  color: var(--primary-color);
+  background: rgba(82, 113, 255, 0.1);
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.user-name-text {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.email-cell {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.role-tag {
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border: none;
+  text-transform: uppercase;
+  color: #fff !important;
+}

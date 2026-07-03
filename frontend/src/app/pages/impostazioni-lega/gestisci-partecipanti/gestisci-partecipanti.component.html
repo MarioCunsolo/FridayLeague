@@ -1,0 +1,55 @@
+<div class="partecipanti-container">
+  <!-- Header con bottone Back -->
+  <div class="header-section mb-4 d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="title text-primary">Gestisci Partecipanti</h2>
+      <p class="subtitle text-secondary">
+        Visualizza ed esamina l'elenco degli utenti iscritti alla lega attiva.
+      </p>
+    </div>
+    <button nz-button nzType="default" class="back-btn" [routerLink]="['/impostazioni']">
+      <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+      <span>Indietro</span>
+    </button>
+  </div>
+
+  <!-- Caricamento -->
+  @if (loading()) {
+  <div class="loading-container">
+    <nz-spin nzSimple nzSize="large"></nz-spin>
+  </div>
+  } @else {
+  <!-- Tabella Partecipanti -->
+  <div class="table-container shadow-sm">
+    <nz-table #basicTable [nzData]="partecipanti()" [nzBordered]="false" [nzFrontPagination]="false" class="custom-nz-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Cognome</th>
+          <th>Email</th>
+          <th>Ruolo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of basicTable.data; track item.userId) {
+        <tr>
+          <td>
+            <div class="user-cell">
+              <span nz-icon nzType="user" nzTheme="outline" class="user-avatar-icon"></span>
+              <span class="user-name-text">{{ item.nome }}</span>
+            </div>
+          </td>
+          <td>{{ item.cognome }}</td>
+          <td class="email-cell">{{ item.email }}</td>
+          <td>
+            <nz-tag [nzColor]="getRoleColor(item.ruolo)" class="role-tag">
+              {{ item.ruolo }}
+            </nz-tag>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </nz-table>
+  </div>
+  }
+</div>

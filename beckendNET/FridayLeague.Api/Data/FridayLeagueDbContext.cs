@@ -14,6 +14,7 @@ public class FridayLeagueDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Lega> Leghe => Set<Lega>();
     public DbSet<UserLega> UserLeghe => Set<UserLega>();
+    public DbSet<RuoloLega> Ruoli => Set<RuoloLega>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,23 +27,22 @@ public class FridayLeagueDbContext : DbContext
         modelBuilder.Entity<UserLega>()
             .HasKey(ul => new { ul.UserId, ul.LegaId });
 
+        // Relationship between UserLega and RuoloLega
+        modelBuilder.Entity<UserLega>()
+            .HasOne(ul => ul.Ruolo)
+            .WithMany()
+            .HasForeignKey(ul => ul.RuoloId);
+
         // Unique index for invite code
         modelBuilder.Entity<Lega>()
             .HasIndex(l => l.CodiceInvito)
             .IsUnique();
 
-        // Seed data
-        modelBuilder.Entity<Team>().HasData(
-            new Team { Id = 1, Name = "Stella Rossa", FoundedYear = 2020 },
-            new Team { Id = 2, Name = "Real Madrink", FoundedYear = 2021 },
-            new Team { Id = 3, Name = "Atletico Ma Non Troppo", FoundedYear = 2022 }
-        );
-
-        modelBuilder.Entity<Player>().HasData(
-            new Player { Id = 1, Name = "Mario Rossi", Role = "Attaccante", TeamId = 1 },
-            new Player { Id = 2, Name = "Luigi Verdi", Role = "Portiere", TeamId = 1 },
-            new Player { Id = 3, Name = "Giovanni Bianchi", Role = "Difensore", TeamId = 2 },
-            new Player { Id = 4, Name = "Alessandro Neri", Role = "Centrocampista", TeamId = 3 }
+        // Seed roles data
+        modelBuilder.Entity<RuoloLega>().HasData(
+            new RuoloLega { Id = 1, Nome = "ADMIN" },
+            new RuoloLega { Id = 2, Nome = "CO_ADMIN" },
+            new RuoloLega { Id = 3, Nome = "GIOCATORE" }
         );
     }
 }

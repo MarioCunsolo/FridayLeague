@@ -11,6 +11,8 @@ import { StatsComponent } from './pages/stats/stats.component';
 import { SelezionaLegaComponent } from './pages/seleziona-lega/seleziona-lega.component';
 import { authGuard } from './shared/guard/auth.guard';
 import { leagueGuard } from './shared/guard/league.guard';
+import { ImpostazioniLegaComponent } from './pages/impostazioni-lega/impostazioni-lega.component';
+import { GestisciPartecipantiComponent } from './pages/impostazioni-lega/gestisci-partecipanti/gestisci-partecipanti.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -30,6 +32,13 @@ const routes: Routes = [
       { path: 'calendario', component: MatchComponent },
       { path: 'profilo', component: ProfileComponent },
       { path: 'classifiche', component: StatsComponent },
+      {
+        path: 'impostazioni',
+        children: [
+          { path: '', component: ImpostazioniLegaComponent },
+          { path: 'partecipanti', component: GestisciPartecipantiComponent }
+        ]
+      }
     ]
   },
   { path: '**', redirectTo: '' }

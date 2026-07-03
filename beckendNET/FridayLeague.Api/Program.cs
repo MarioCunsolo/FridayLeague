@@ -20,6 +20,7 @@ builder.Services.AddDbContext<FridayLeagueDbContext>(options =>
 
 // Register Services
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
 
 // Configure CORS
 builder.Services.AddCors(options =>

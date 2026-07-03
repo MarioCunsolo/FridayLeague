@@ -8,5 +8,6 @@ public class UserLega
     public int LegaId { get; set; }
     public Lega Lega { get; set; } = null!;
 
-    public string Ruolo { get; set; } = string.Empty; // "AMMINISTRATORE" or "GIOCATORE"
+    public int RuoloId { get; set; }
+    public RuoloLega Ruolo { get; set; } = null!;
 }

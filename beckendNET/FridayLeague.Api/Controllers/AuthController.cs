@@ -214,6 +214,26 @@ public class AuthController : ControllerBase
         return Ok(partecipanti);
     }
 
+    [Authorize]
+    [HttpPost("cambia-tema")]
+    public async Task<ActionResult<UserDto>> CambiaTema(CambiaTemaRequest request)
+    {
+        var userId = User.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound("Utente non trovato.");
+
+        var temaLower = request.Tema.ToLower();
+        if (temaLower != "light" && temaLower != "dark")
+        {
+            return BadRequest("Tema non valido. Deve essere 'light' o 'dark'.");
+        }
+
+        user.Tema = temaLower;
+        await _context.SaveChangesAsync();
+
+        return Ok(await MapToUserDtoWithLegheAsync(user));
+    }
+
     private async Task<bool> UserExists(string email)
     {
         return await _context.Users.AnyAsync(x => x.Email == email.ToLower());
@@ -240,6 +260,7 @@ public class AuthController : ControllerBase
             Cognome = user.Cognome,
             Email = user.Email,
             LegaId = user.LegaId,
+            Tema = user.Tema,
             Leghe = userLeghe
         };
     }

@@ -132,6 +132,15 @@ export class AuthService {
   }
 
   /**
+   * Salva la preferenza del tema (light/dark) per l'utente corrente.
+   */
+  cambiaTema(tema: 'dark' | 'light') {
+    return this.http.post<any>(`${this.BASE_URL}/cambia-tema`, { tema }).pipe(
+      tap(user => this._currentUser.set(user))
+    );
+  }
+
+  /**
    * Recupera il token salvato nel localStorage.
    */
   getToken(): string | null {

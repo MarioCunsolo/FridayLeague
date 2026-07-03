@@ -19,22 +19,33 @@ export class LayoutComponent {
   currentTheme = signal<'dark' | 'light'>('dark');
 
   constructor() {
-    // Apply theme whenever it changes
+    // Apply theme to the DOM whenever the signal changes
     effect(() => {
-      const theme = this.currentTheme();
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
+      document.documentElement.setAttribute('data-theme', this.currentTheme());
     });
 
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme') as 'dark' | 'light';
-    if (savedTheme) {
-      this.currentTheme.set(savedTheme);
-    }
+    // Sync theme from logged-in user profile (highest priority),
+    // then fall back to localStorage for guest/offline scenarios.
+    effect(() => {
+      const user = this.authService.currentUser();
+      if (user?.tema) {
+        this.currentTheme.set(user.tema as 'dark' | 'light');
+      } else {
+        const savedTheme = localStorage.getItem('theme') as 'dark' | 'light';
+        if (savedTheme) this.currentTheme.set(savedTheme);
+      }
+    });
   }
 
   toggleTheme() {
-    this.currentTheme.update(t => t === 'dark' ? 'light' : 'dark');
+    const newTheme = this.currentTheme() === 'dark' ? 'light' : 'dark';
+    this.currentTheme.set(newTheme);
+    // Persist to localStorage immediately for instant UI feel
+    localStorage.setItem('theme', newTheme);
+    // Persist to backend if user is logged in
+    if (this.authService.currentUser()) {
+      this.authService.cambiaTema(newTheme).subscribe();
+    }
   }
 
   onLeagueChange(idLega: number): void {

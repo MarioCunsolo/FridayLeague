@@ -7,6 +7,7 @@ public class UserDto
     public string Cognome { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public int? LegaId { get; set; }
+    public string Tema { get; set; } = "dark";
     public List<LegaDto> Leghe { get; set; } = new();
 }
 

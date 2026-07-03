@@ -8,15 +8,22 @@ import { LayoutComponent } from './shared/component/layout/layout.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { StatsComponent } from './pages/stats/stats.component';
+import { SelezionaLegaComponent } from './pages/seleziona-lega/seleziona-lega.component';
 import { authGuard } from './shared/guard/auth.guard';
+import { leagueGuard } from './shared/guard/league.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   {
+    path: 'seleziona-lega',
+    component: SelezionaLegaComponent,
+    canActivate: [authGuard, leagueGuard]
+  },
+  {
     path: '',
     component: LayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, leagueGuard],
     children: [
       { path: '', component: HomepageComponent },
       { path: 'prenotazioni', component: ReservationComponent },

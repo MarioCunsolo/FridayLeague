@@ -1,0 +1,291 @@
+.select-league-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--app-bg);
+    transition: background-color var(--transition-speed);
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.select-league-card {
+    width: 100%;
+    max-width: 45rem;
+    background-color: var(--card-bg);
+    border: 0.0625rem solid var(--border-main);
+    border-radius: 1.5rem;
+    padding: 3.5rem 2.5rem 3rem 2.5rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-speed);
+    animation: fadeIn 0.4s ease-out;
+    position: relative;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(1rem); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(0.5rem); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Header Top Actions */
+.card-top-nav {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.back-btn-link, .logout-btn-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.back-btn-link:hover, .logout-btn-link:hover {
+    color: var(--primary-green);
+}
+
+.back-btn-link:hover {
+    transform: translateX(-0.125rem);
+}
+
+/* Brand Section */
+.brand-section {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    margin-top: 0.5rem;
+}
+
+.brand-section h1 {
+    font-size: 2.25rem;
+    font-weight: 850;
+    background: linear-gradient(45deg, var(--primary-green), var(--text-primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    max-width: 32rem;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Visual Options Grid */
+.options-grid {
+    margin-top: 1rem;
+}
+
+.option-card {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 0.0625rem solid var(--border-main);
+    border-radius: 1.25rem;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.option-card:hover {
+    border-color: var(--primary-green);
+    transform: translateY(-0.25rem);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 204, 102, 0.1);
+    background-color: rgba(0, 204, 102, 0.02);
+}
+
+.option-icon-wrapper {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background-color: rgba(0, 204, 102, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.25s ease;
+}
+
+.option-card:hover .option-icon-wrapper {
+    background-color: var(--primary-green);
+    transform: scale(1.08);
+}
+
+.option-icon {
+    font-size: 1.75rem;
+    color: var(--primary-green);
+    transition: color 0.25s ease;
+}
+
+.option-card:hover .option-icon {
+    color: #000000;
+}
+
+.option-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.option-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Forms Style */
+.action-form {
+    max-width: 28rem;
+    margin: 0 auto;
+    animation: slideIn 0.3s ease-out;
+}
+
+.form-input-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+}
+
+.action-submit-btn {
+    width: 100%;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    font-weight: 800;
+    font-size: 1.125rem;
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+    color: #000000 !important;
+    transition: all 0.2s ease;
+    margin-top: 1rem;
+}
+
+.action-submit-btn:hover {
+    transform: translateY(-0.125rem);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 204, 102, 0.3);
+    opacity: 0.95;
+}
+
+.form-error-alert {
+    background-color: rgba(255, 68, 68, 0.1);
+    border: 0.0625rem solid var(--danger-red);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--danger-red);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* NG-ZORRO Overrides for consistency */
+:host ::ng-deep .ant-input-affix-wrapper {
+    background-color: var(--input-bg);
+    border-color: var(--border-sub);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+:host ::ng-deep .ant-input-affix-wrapper-focused,
+:host ::ng-deep .ant-input-affix-wrapper:focus,
+:host ::ng-deep .ant-input-affix-wrapper:hover {
+    background-color: var(--input-bg) !important;
+    border-color: var(--primary-green) !important;
+    box-shadow: 0 0 0 0.125rem rgba(0, 204, 102, 0.1) !important;
+}
+
+:host ::ng-deep .ant-input {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    font-size: 1rem;
+    box-shadow: none !important;
+}
+
+:host ::ng-deep textarea.ant-input {
+    padding: 0;
+    resize: none;
+}
+
+:host ::ng-deep .ant-input-prefix {
+    color: var(--text-tertiary);
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+:host ::ng-deep .ant-form-item {
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 991px) {
+    .select-league-card {
+        padding: 3rem 1.5rem 2.5rem 1.5rem;
+        max-width: 38rem;
+    }
+    .brand-section {
+        margin-bottom: 2rem;
+    }
+    .brand-section h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .select-league-container {
+        padding: 1rem;
+        align-items: flex-start;
+    }
+    .select-league-card {
+        border-radius: 0;
+        padding: 3.5rem 0.5rem 1.5rem 0.5rem;
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
+    }
+    .option-card {
+        padding: 2rem 1.25rem;
+    }
+    .option-icon-wrapper {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin-bottom: 1rem;
+    }
+    .option-icon {
+        font-size: 1.5rem;
+    }
+    .option-title {
+        font-size: 1.15rem;
+    }
+    .brand-section h1 {
+        font-size: 1.85rem;
+    }
+}

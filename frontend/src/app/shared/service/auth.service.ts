@@ -18,14 +18,19 @@ export class AuthService {
   public isAuthenticated = computed(() => true || !!this.getToken());
 
   constructor() {
-    // Se non c'è un utente loggato (es. al refresh o dopo logout in modalità mock), 
-    // impostiamo un utente di default per evitare errori nei componenti.
-    if (!this.getToken()) {
+    // Se c'è uno stato salvato dell'utente con la lega nel localStorage, lo carichiamo
+    const savedUserLega = localStorage.getItem('mock_user_lega');
+    if (savedUserLega) {
+      this._currentUser.set(JSON.parse(savedUserLega));
+    } else if (!this.getToken()) {
+      // Se non c'è un utente loggato, impostiamo l'utente di default
+      // Inizialmente NON appartiene a nessuna lega (legaId: null) per testare il reindirizzamento
       this._currentUser.set({
         id: 1,
         nome: 'Mario (Mock)',
         cognome: 'Cunsolo',
-        email: 'mario@test.com'
+        email: 'mario@test.com',
+        legaId: null
       });
     }
   }
@@ -46,13 +51,20 @@ export class AuthService {
     );
     */
 
-    // MOCK LOGIN SUCCESS
+    // MOCK LOGIN SUCCESS - Inizialmente senza lega per far spuntare la pagina
     const mockResponse = {
-      user: { id: 1, email: credentials.email || 'mario@test.com', nome: 'Mario (Mock)', cognome: 'Cunsolo' },
+      user: { 
+        id: 1, 
+        email: credentials.email || 'mario@test.com', 
+        nome: 'Mario (Mock)', 
+        cognome: 'Cunsolo',
+        legaId: null
+      },
       token: 'fake-jwt-token-development'
     };
 
     localStorage.setItem(this.TOKEN_KEY, mockResponse.token);
+    localStorage.removeItem('mock_user_lega'); // Rimuoviamo eventuale lega precedente
     this._currentUser.set(mockResponse.user);
     
     return of(mockResponse).pipe(delay(500));
@@ -73,13 +85,20 @@ export class AuthService {
     );
     */
 
-    // MOCK REGISTER SUCCESS
+    // MOCK REGISTER SUCCESS - Utente senza lega
     const mockResponse = {
-      user: { id: Date.now(), email: userData.email, nome: userData.nome, cognome: userData.cognome },
+      user: { 
+        id: Date.now(), 
+        email: userData.email, 
+        nome: userData.nome, 
+        cognome: userData.cognome,
+        legaId: null
+      },
       token: 'fake-jwt-token-development'
     };
 
     localStorage.setItem(this.TOKEN_KEY, mockResponse.token);
+    localStorage.removeItem('mock_user_lega');
     this._currentUser.set(mockResponse.user);
     
     return of(mockResponse).pipe(delay(500));
@@ -92,9 +111,48 @@ export class AuthService {
   logout() {
     this._currentUser.set(null);
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem('mock_user_lega');
     return this.http.post<void>(`${this.BASE_URL}/logout`, {}).pipe(
       catchError(() => of(void 0)) // Ignora errori di logout se il token è già scaduto
     );
+  }
+
+  /**
+   * Simula la creazione di una nuova lega da parte dell'utente.
+   */
+  creaLega(nomeLega: string, descrizione?: string) {
+    const user = this._currentUser();
+    if (user) {
+      const updatedUser = {
+        ...user,
+        legaId: 100, // ID fittizio per la nuova lega creata
+        nomeLega: nomeLega,
+        descrizioneLega: descrizione || '',
+        ruoloLega: 'AMMINISTRATORE'
+      };
+      this._currentUser.set(updatedUser);
+      localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
+    }
+    return of({ success: true, message: 'Lega creata con successo' }).pipe(delay(600));
+  }
+
+  /**
+   * Simula la partecipazione a una lega esistente tramite codice.
+   */
+  partecipaLega(codiceLega: string) {
+    const user = this._currentUser();
+    if (user) {
+      const updatedUser = {
+        ...user,
+        legaId: 200, // ID fittizio per la lega a cui partecipa
+        nomeLega: 'Lega del Venerdì',
+        codiceLega: codiceLega,
+        ruoloLega: 'GIOCATORE'
+      };
+      this._currentUser.set(updatedUser);
+      localStorage.setItem('mock_user_lega', JSON.stringify(updatedUser));
+    }
+    return of({ success: true, message: 'Lega unita con successo' }).pipe(delay(600));
   }
 
   /**

@@ -6,6 +6,13 @@
     </div>
 
     <form nz-form [formGroup]="loginForm" (ngSubmit)="submitForm()" class="login-form">
+      @if (successMessage()) {
+        <div class="form-success-alert mb-4">
+          <span nz-icon nzType="check-circle" nzTheme="fill"></span>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
       @if (errorMessage()) {
         <div class="form-error-alert mb-4">
           <span nz-icon nzType="close-circle" nzTheme="fill"></span>

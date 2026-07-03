@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -35,6 +35,8 @@ export class RegisterComponent {
     password: FormControl<string>;
   }>;
 
+  errorMessage = signal<string | null>(null);
+
   constructor() {
     this.registerForm = this.fb.nonNullable.group({
       nome: ['', [Validators.required]],
@@ -46,13 +48,21 @@ export class RegisterComponent {
 
   submitForm(): void {
     if (this.registerForm.valid) {
+      this.errorMessage.set(null);
       this.authService.register(this.registerForm.value).subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          // Reindirizza al login passando il parametro di successo
+          this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
         },
         error: (err) => {
           console.error('Registration failed', err);
-          // Qui si potrebbe aggiungere un messaggio di errore per l'utente
+          if (err.error && typeof err.error === 'string') {
+            this.errorMessage.set(err.error);
+          } else if (err.error && err.error.message) {
+            this.errorMessage.set(err.error.message);
+          } else {
+            this.errorMessage.set('Errore durante la registrazione. Riprova.');
+          }
         }
       });
     } else {

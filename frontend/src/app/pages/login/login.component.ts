@@ -6,7 +6,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/shared/service/auth.service';
 
 @Component({
@@ -33,9 +33,11 @@ export class LoginComponent {
   }>;
 
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
 
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
 
   constructor() {
@@ -43,6 +45,13 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       remember: [false]
+    });
+
+    // Mostra un messaggio di successo se l'utente proviene da una registrazione completata
+    this.route.queryParams.subscribe(params => {
+      if (params['registered'] === 'true') {
+        this.successMessage.set('Registrazione completata con successo! Accedi con il tuo account.');
+      }
     });
   }
 

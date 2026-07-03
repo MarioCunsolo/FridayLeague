@@ -6,6 +6,13 @@
     </div>
 
     <form nz-form [formGroup]="registerForm" (ngSubmit)="submitForm()" class="register-form">
+      @if (errorMessage()) {
+        <div class="form-error-alert mb-4">
+          <span nz-icon nzType="close-circle" nzTheme="fill"></span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
       <!-- Nome -->
       <nz-form-item>
         <nz-form-control nzErrorTip="Il nome è obbligatorio">

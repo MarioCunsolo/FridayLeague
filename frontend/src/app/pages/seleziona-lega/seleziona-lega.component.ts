@@ -7,6 +7,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/service/auth.service';
+import { LegaService } from 'src/app/shared/service/lega.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
@@ -27,6 +28,7 @@ export class SelezionaLegaComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   public authService = inject(AuthService);
+  private legaService = inject(LegaService);
   private message = inject(NzMessageService);
 
   // Stato per gestire quale vista visualizzare: 'none' | 'create' | 'join'
@@ -75,7 +77,7 @@ export class SelezionaLegaComponent {
     if (this.activeForm() === 'none') {
       const user = this.authService.currentUser();
       if (user && user.legaId) {
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       }
     } else {
       this.activeForm.set('none');
@@ -92,11 +94,11 @@ export class SelezionaLegaComponent {
       this.errorMessage.set(null);
       const { nome, descrizione } = this.createForm.value;
       
-      this.authService.creaLega(nome!, descrizione).subscribe({
+      this.legaService.creaLega(nome!, descrizione).subscribe({
         next: () => {
           this.loadingCreate.set(false);
           this.message.success('Lega creata con successo!');
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
         },
         error: (err) => {
           this.loadingCreate.set(false);
@@ -118,11 +120,11 @@ export class SelezionaLegaComponent {
       this.errorMessage.set(null);
       const { codice } = this.joinForm.value;
 
-      this.authService.partecipaLega(codice!).subscribe({
+      this.legaService.partecipaLega(codice!).subscribe({
         next: () => {
           this.loadingJoin.set(false);
           this.message.success('Sei entrato nella lega con successo!');
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
         },
         error: (err) => {
           this.loadingJoin.set(false);

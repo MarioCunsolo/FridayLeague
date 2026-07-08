@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { AuthService } from '../../service/auth.service';
+import { LegaService } from '../../service/lega.service';
 
 @Component({
   selector: 'app-layout',
@@ -14,6 +15,7 @@ import { AuthService } from '../../service/auth.service';
 })
 export class LayoutComponent {
   public authService = inject(AuthService);
+  private legaService = inject(LegaService);
   private router = inject(Router);
 
   currentTheme = signal<'dark' | 'light'>('dark');
@@ -49,9 +51,9 @@ export class LayoutComponent {
   }
 
   onLeagueChange(idLega: number): void {
-    this.authService.cambiaLega(idLega);
+    this.legaService.cambiaLega(idLega);
     // Reindirizziamo alla homepage per rinfrescare i dati della lega attiva
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
   }
 
   logout() {

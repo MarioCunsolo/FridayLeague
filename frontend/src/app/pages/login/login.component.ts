@@ -60,7 +60,7 @@ export class LoginComponent {
       this.errorMessage.set(null);
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
         },
         error: (err) => {
           console.error('Login failed', err);

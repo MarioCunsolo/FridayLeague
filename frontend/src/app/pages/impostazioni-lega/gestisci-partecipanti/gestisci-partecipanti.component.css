@@ -119,3 +119,94 @@
   text-transform: uppercase;
   color: #fff !important;
 }
+
+.action-buttons-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.action-btn {
+  border-radius: 20px !important;
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 6px 14px !important;
+  height: 32px !important;
+  border: 1px solid transparent !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+/* Rendi Co-Admin Button */
+.promote-btn {
+  border-color: rgba(82, 113, 255, 0.2) !important;
+  color: var(--primary-color) !important;
+  background: rgba(82, 113, 255, 0.06) !important;
+}
+
+.promote-btn:hover {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #5271ff 0%, #3a4bb0 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 16px rgba(82, 113, 255, 0.35) !important;
+}
+
+/* Rendi Giocatore Button */
+.demote-btn {
+  border-color: rgba(250, 173, 20, 0.25) !important;
+  color: #d48806 !important;
+  background: rgba(250, 173, 20, 0.06) !important;
+}
+
+.demote-btn:hover {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #ffc069 0%, #d48806 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 16px rgba(212, 136, 6, 0.3) !important;
+}
+
+/* Rimuovi Button */
+.delete-btn {
+  border-color: rgba(255, 77, 79, 0.25) !important;
+  color: #ff4d4f !important;
+  background: rgba(255, 77, 79, 0.06) !important;
+}
+
+.delete-btn:hover {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 16px rgba(255, 77, 79, 0.35) !important;
+}
+
+/* Hide button text on mobile screens to save space */
+@media (max-width: 992px) {
+  .btn-text {
+    display: none;
+  }
+  .action-btn {
+    padding: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+    justify-content: center;
+    border-radius: 50% !important;
+  }
+  .action-btn span[nz-icon] {
+    margin: 0 !important;
+    font-size: 1.05rem;
+  }
+}

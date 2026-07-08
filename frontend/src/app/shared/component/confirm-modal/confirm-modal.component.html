@@ -1,0 +1,24 @@
+@if (isVisible) {
+  <div class="confirm-modal-overlay" (click)="onCancel()">
+    <div class="confirm-modal-card animate-zoom" (click)="$event.stopPropagation()">
+      <!-- Icona in cima -->
+      <div class="confirm-modal-icon-container" [class.danger]="isDanger">
+        <span nz-icon [nzType]="isDanger ? 'exclamation-circle' : 'question-circle'" nzTheme="outline" class="modal-icon"></span>
+      </div>
+      
+      <!-- Titolo e Messaggio -->
+      <h3 class="confirm-modal-title">{{ title }}</h3>
+      <p class="confirm-modal-message">{{ message }}</p>
+      
+      <!-- Pulsanti d'azione -->
+      <div class="confirm-modal-footer">
+        <button class="modal-btn cancel-btn" (click)="onCancel()">
+          {{ cancelText }}
+        </button>
+        <button class="modal-btn confirm-btn" [class.confirm-danger]="isDanger" (click)="onConfirm()">
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

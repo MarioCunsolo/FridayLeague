@@ -24,29 +24,54 @@ export class AuthService {
   });
 
   constructor() {
+    this._currentUser.set(null);
+  }
+
+  /**
+   * Inizializza la sessione dell'utente caricando il suo profilo se è presente un token JWT.
+   * Viene richiamato dall'APP_INITIALIZER all'avvio dell'applicazione.
+   */
+  initSession(): Promise<void> {
     const token = this.getToken();
-    if (token) {
+    if (!token) {
+      return Promise.resolve();
+    }
+
+    return new Promise<void>((resolve) => {
       this.getCurrentUser().subscribe({
+        next: () => resolve(),
         error: (err) => {
-          console.error('Session load failed. Logging out.', err);
-          this.logout().subscribe();
+          console.error('Impossibile caricare la sessione utente:', err);
+          // Rimuove il token non valido per evitare tentativi futuri falliti
+          localStorage.removeItem(this.TOKEN_KEY);
+          sessionStorage.removeItem(this.TOKEN_KEY);
+          localStorage.removeItem('mock_user_lega');
+          sessionStorage.removeItem('mock_user_lega');
+          this._currentUser.set(null);
+          resolve();
         }
       });
-    } else {
-      this._currentUser.set(null);
-    }
+    });
   }
 
 
   /**
    * Effettua il login dell'utente chiamando le API reali del backend.
-   * @param credentials Oggetto contenente email e password.
+   * @param credentials Oggetto contenente email, password e il checkbox remember.
    */
   login(credentials: any) {
+    const remember = !!credentials.remember;
     return this.http.post<any>(`${this.BASE_URL}/login`, credentials).pipe(
       tap(response => {
-        localStorage.setItem(this.TOKEN_KEY, response.token);
-        localStorage.removeItem('mock_user_lega'); // Rimuoviamo eventuale lega precedente
+        const storage = remember ? localStorage : sessionStorage;
+        const otherStorage = remember ? sessionStorage : localStorage;
+
+        // Rimuove da un eventuale storage alternativo per evitare duplicazioni o conflitti
+        otherStorage.removeItem(this.TOKEN_KEY);
+        otherStorage.removeItem('mock_user_lega');
+
+        storage.setItem(this.TOKEN_KEY, response.token);
+        storage.removeItem('mock_user_lega'); // Rimuoviamo eventuale lega precedente
         this._currentUser.set(response.user);
       })
     );
@@ -59,6 +84,10 @@ export class AuthService {
   register(userData: any) {
     return this.http.post<any>(`${this.BASE_URL}/register`, userData).pipe(
       tap(response => {
+        // Registrazione di default memorizza su localStorage
+        sessionStorage.removeItem(this.TOKEN_KEY);
+        sessionStorage.removeItem('mock_user_lega');
+
         localStorage.setItem(this.TOKEN_KEY, response.token);
         localStorage.removeItem('mock_user_lega');
         this._currentUser.set(response.user);
@@ -68,67 +97,24 @@ export class AuthService {
 
 
   /**
-   * Effettua il logout dell'utente corrente e pulisce lo stato locale (Signal e LocalStorage).
+   * Effettua il logout dell'utente corrente e pulisce lo stato locale (Signal, LocalStorage e SessionStorage).
    */
   logout() {
     this._currentUser.set(null);
     localStorage.removeItem(this.TOKEN_KEY);
+    sessionStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem('mock_user_lega');
+    sessionStorage.removeItem('mock_user_lega');
     return this.http.post<void>(`${this.BASE_URL}/logout`, {}).pipe(
       catchError(() => of(void 0)) // Ignora errori di logout se il token è già scaduto
     );
   }
 
   /**
-   * Simula la creazione di una nuova lega da parte dell'utente.
+   * Aggiorna i dati dell'utente attualmente loggato.
    */
-  /**
-   * Crea una nuova lega nel backend.
-   */
-  creaLega(nomeLega: string, descrizione?: string) {
-    return this.http.post<any>(`${this.BASE_URL}/crea-lega`, { nomeLega, descrizione }).pipe(
-      tap(user => {
-        this._currentUser.set(user);
-      })
-    );
-  }
-
-  /**
-   * Simula la partecipazione a una lega esistente tramite codice.
-   */
-  /**
-   * Partecipa ad una lega esistente tramite codice.
-   */
-  partecipaLega(codiceLega: string) {
-    return this.http.post<any>(`${this.BASE_URL}/partecipa-lega`, { codiceLega }).pipe(
-      tap(user => {
-        this._currentUser.set(user);
-      })
-    );
-  }
-
-  /**
-   * Cambia la lega attualmente attiva selezionata dall'utente.
-   */
-  /**
-   * Cambia la lega attualmente attiva.
-   */
-  cambiaLega(idLega: number) {
-    this.http.post<any>(`${this.BASE_URL}/cambia-lega`, { idLega }).subscribe({
-      next: user => {
-        this._currentUser.set(user);
-      },
-      error: err => {
-        console.error('Errore durante il cambio della lega', err);
-      }
-    });
-  }
-
-  /**
-   * Recupera la lista dei partecipanti di una lega.
-   */
-  getLegaPartecipanti(legaId: number) {
-    return this.http.get<any[]>(`${this.BASE_URL}/lega/${legaId}/partecipanti`);
+  updateCurrentUser(user: any): void {
+    this._currentUser.set(user);
   }
 
   /**
@@ -141,10 +127,10 @@ export class AuthService {
   }
 
   /**
-   * Recupera il token salvato nel localStorage.
+   * Recupera il token salvato nel localStorage o sessionStorage.
    */
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return localStorage.getItem(this.TOKEN_KEY) || sessionStorage.getItem(this.TOKEN_KEY);
   }
 
   /**

@@ -215,6 +215,112 @@ public class AuthController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost("lega/cambia-ruolo-partecipante")]
+    public async Task<ActionResult> CambiaRuoloPartecipante(CambiaRuoloPartecipanteRequest request)
+    {
+        var userId = User.GetUserId();
+        
+        // Verifica se l'utente che fa la richiesta appartiene alla lega ed ha i permessi necessari
+        var requesterUserLega = await _context.UserLeghe
+            .SingleOrDefaultAsync(ul => ul.UserId == userId && ul.LegaId == request.LegaId);
+        
+        if (requesterUserLega == null || (requesterUserLega.RuoloId != LeagueRoles.AdminId && requesterUserLega.RuoloId != LeagueRoles.CoAdminId))
+        {
+            return StatusCode(403, "Non hai i permessi per eseguire questa azione.");
+        }
+
+        // Trova l'utente target nella lega
+        var targetUserLega = await _context.UserLeghe
+            .SingleOrDefaultAsync(ul => ul.UserId == request.TargetUserId && ul.LegaId == request.LegaId);
+
+        if (targetUserLega == null)
+        {
+            return NotFound("Partecipante non trovato nella lega.");
+        }
+
+        // Non si può modificare il proprio ruolo
+        if (request.TargetUserId == userId)
+        {
+            return BadRequest("Non puoi modificare il tuo stesso ruolo.");
+        }
+
+        // Se il richiedente è un Co-Admin, può agire solo su Giocatori semplici
+        if (requesterUserLega.RuoloId == LeagueRoles.CoAdminId && targetUserLega.RuoloId != LeagueRoles.GiocatoreId)
+        {
+            return StatusCode(403, "I Co-Admin possono modificare solo il ruolo dei giocatori semplici.");
+        }
+
+        // Determina il nuovo ruolo id
+        int nuovoRuoloId;
+        switch (request.NuovoRuolo.ToUpper())
+        {
+            case "CO_ADMIN":
+                nuovoRuoloId = LeagueRoles.CoAdminId;
+                break;
+            case "GIOCATORE":
+                nuovoRuoloId = LeagueRoles.GiocatoreId;
+                break;
+            default:
+                return BadRequest("Ruolo non valido. Può essere solo CO_ADMIN o GIOCATORE.");
+        }
+
+        targetUserLega.RuoloId = nuovoRuoloId;
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpPost("lega/rimuovi-partecipante")]
+    public async Task<ActionResult> RimuoviPartecipante(RimuoviPartecipanteRequest request)
+    {
+        var userId = User.GetUserId();
+
+        // Verifica se l'utente che fa la richiesta appartiene alla lega ed ha i permessi necessari
+        var requesterUserLega = await _context.UserLeghe
+            .SingleOrDefaultAsync(ul => ul.UserId == userId && ul.LegaId == request.LegaId);
+        
+        if (requesterUserLega == null || (requesterUserLega.RuoloId != LeagueRoles.AdminId && requesterUserLega.RuoloId != LeagueRoles.CoAdminId))
+        {
+            return StatusCode(403, "Non hai i permessi per eseguire questa azione.");
+        }
+
+        // Trova l'utente target nella lega
+        var targetUserLega = await _context.UserLeghe
+            .SingleOrDefaultAsync(ul => ul.UserId == request.TargetUserId && ul.LegaId == request.LegaId);
+
+        if (targetUserLega == null)
+        {
+            return NotFound("Partecipante non trovato nella lega.");
+        }
+
+        // Non si può rimuovere se stessi
+        if (request.TargetUserId == userId)
+        {
+            return BadRequest("Non puoi rimuovere te stesso dalla lega. Se vuoi abbandonare, devi farlo dalle tue impostazioni profilo.");
+        }
+
+        // Se il richiedente è un Co-Admin, può rimuovere solo Giocatori semplici
+        if (requesterUserLega.RuoloId == LeagueRoles.CoAdminId && targetUserLega.RuoloId != LeagueRoles.GiocatoreId)
+        {
+            return StatusCode(403, "I Co-Admin possono rimuovere solo i giocatori semplici.");
+        }
+
+        _context.UserLeghe.Remove(targetUserLega);
+
+        // Se la lega attiva dell'utente rimosso era questa, resettala a null
+        var targetUser = await _context.Users.FindAsync(request.TargetUserId);
+        if (targetUser != null && targetUser.LegaId == request.LegaId)
+        {
+            targetUser.LegaId = null;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    [Authorize]
     [HttpPost("cambia-tema")]
     public async Task<ActionResult<UserDto>> CambiaTema(CambiaTemaRequest request)
     {

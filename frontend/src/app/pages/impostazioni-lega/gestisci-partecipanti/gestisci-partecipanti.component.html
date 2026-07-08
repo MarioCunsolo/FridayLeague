@@ -21,35 +21,75 @@
   } @else {
   <!-- Tabella Partecipanti -->
   <div class="table-container shadow-sm">
-    <nz-table #basicTable [nzData]="partecipanti()" [nzBordered]="false" [nzFrontPagination]="false" class="custom-nz-table">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Cognome</th>
-          <th>Email</th>
-          <th>Ruolo</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of basicTable.data; track item.userId) {
-        <tr>
-          <td>
-            <div class="user-cell">
-              <span nz-icon nzType="user" nzTheme="outline" class="user-avatar-icon"></span>
-              <span class="user-name-text">{{ item.nome }}</span>
-            </div>
-          </td>
-          <td>{{ item.cognome }}</td>
-          <td class="email-cell">{{ item.email }}</td>
-          <td>
-            <nz-tag [nzColor]="getRoleColor(item.ruolo)" class="role-tag">
-              {{ item.ruolo }}
-            </nz-tag>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </nz-table>
+    <nz-spin [nzSpinning]="actionLoading()">
+      <nz-table #basicTable [nzData]="partecipanti()" [nzBordered]="false" [nzFrontPagination]="false" class="custom-nz-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cognome</th>
+            <th>Email</th>
+            <th>Ruolo</th>
+            <th class="actions-header text-end">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of basicTable.data; track item.userId) {
+          <tr>
+            <td>
+              <div class="user-cell">
+                <span nz-icon nzType="user" nzTheme="outline" class="user-avatar-icon"></span>
+                <span class="user-name-text">{{ item.nome }}</span>
+              </div>
+            </td>
+            <td>{{ item.cognome }}</td>
+            <td class="email-cell">{{ item.email }}</td>
+            <td>
+              <nz-tag [nzColor]="getRoleColor(item.ruolo)" class="role-tag">
+                {{ item.ruolo }}
+              </nz-tag>
+            </td>
+            <td class="text-end">
+              <div class="action-buttons-group">
+                @if (canManage(item)) {
+                  <!-- Bottone Cambia Ruolo (Promuovi / Declassa) -->
+                  @if (item.ruolo === 'GIOCATORE') {
+                    <button nz-button nzType="default" nzSize="small" class="action-btn promote-btn" (click)="chiediConfermaRuolo(item)" title="Promuovi a Co-Admin">
+                      <span nz-icon nzType="safety" nzTheme="outline"></span>
+                      <span class="btn-text">Rendi Co-Admin</span>
+                    </button>
+                  } @else if (item.ruolo === 'CO_ADMIN') {
+                    <button nz-button nzType="default" nzSize="small" class="action-btn demote-btn" (click)="chiediConfermaRuolo(item)" title="Declassa a Giocatore">
+                      <span nz-icon nzType="user" nzTheme="outline"></span>
+                      <span class="btn-text">Rendi Giocatore</span>
+                    </button>
+                  }
+
+                  <!-- Bottone Rimuovi Partecipante -->
+                  <button nz-button nzType="default" nzDanger nzSize="small" class="action-btn delete-btn" (click)="chiediConfermaRimozione(item)" title="Rimuovi della lega">
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                    <span class="btn-text">Rimuovi</span>
+                  </button>
+                } @else {
+                  <span class="text-muted text-sm italic">Nessuna azione consentita</span>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </nz-table>
+    </nz-spin>
   </div>
   }
+
+  <!-- Modale di conferma riutilizzabile -->
+  <app-confirm-modal
+    [isVisible]="isConfirmModalVisible()"
+    [title]="confirmModalTitle()"
+    [message]="confirmModalMessage()"
+    [confirmText]="confirmModalConfirmText()"
+    [isDanger]="confirmModalIsDanger()"
+    (confirm)="eseguiAzioneConfermata()"
+    (cancel)="chiudiModale()">
+  </app-confirm-modal>
 </div>

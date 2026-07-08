@@ -27,7 +27,8 @@ const routes: Routes = [
     component: LayoutComponent,
     canActivate: [authGuard, leagueGuard],
     children: [
-      { path: '', component: HomepageComponent },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: HomepageComponent },
       { path: 'prenotazioni', component: ReservationComponent },
       { path: 'calendario', component: MatchComponent },
       { path: 'profilo', component: ProfileComponent },

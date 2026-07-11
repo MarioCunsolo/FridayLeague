@@ -84,6 +84,73 @@ using (var scope = app.Services.CreateScope())
         {
             dbContext.Database.ExecuteSqlRaw("INSERT INTO Ruoli (Id, Nome) VALUES (4, 'SUPER_ADMIN') ON DUPLICATE KEY UPDATE Nome='SUPER_ADMIN';");
         }
+
+        // Seed "Friday League" if it doesn't exist
+        var league = dbContext.Leghe.FirstOrDefault(l => l.Nome == "Friday League");
+        if (league == null)
+        {
+            league = new Lega 
+            { 
+                Nome = "Friday League", 
+                CodiceInvito = "FRIDAY123", 
+                Descrizione = "Lega ufficiale del venerdì" 
+            };
+            dbContext.Leghe.Add(league);
+            dbContext.SaveChanges();
+        }
+
+        // Seed default users
+        var seedUsers = new List<(string Email, string Nome, string Cognome, int RuoloId)>
+        {
+            ("s@v.com", "Salvo", "Vitale", 4),      // SUPER_ADMIN
+            ("m@c.com", "Mario", "Cunsolo", 1),     // ADMIN
+            ("p@db.com", "Player", "Db", 3)         // GIOCATORE
+        };
+
+        foreach (var u in seedUsers)
+        {
+            var user = dbContext.Users.FirstOrDefault(x => x.Email == u.Email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    Email = u.Email,
+                    Nome = u.Nome,
+                    Cognome = u.Cognome,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
+                    LegaId = league.Id,
+                    Tema = "dark"
+                };
+                dbContext.Users.Add(user);
+                dbContext.SaveChanges();
+            }
+            else
+            {
+                if (user.LegaId == null)
+                {
+                    user.LegaId = league.Id;
+                    dbContext.SaveChanges();
+                }
+            }
+
+            var userLega = dbContext.UserLeghe.FirstOrDefault(ul => ul.UserId == user.Id && ul.LegaId == league.Id);
+            if (userLega == null)
+            {
+                userLega = new UserLega
+                {
+                    UserId = user.Id,
+                    LegaId = league.Id,
+                    RuoloId = u.RuoloId
+                };
+                dbContext.UserLeghe.Add(userLega);
+                dbContext.SaveChanges();
+            }
+            else if (userLega.RuoloId != u.RuoloId)
+            {
+                userLega.RuoloId = u.RuoloId;
+                dbContext.SaveChanges();
+            }
+        }
     }
     catch (Exception ex)
     {

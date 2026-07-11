@@ -245,3 +245,143 @@
     display: none; /* Hide text on small screens, keep only arrow */
   }
 }
+
+/* Premium Table Pagination Overrides */
+::ng-deep .custom-nz-table .ant-table-pagination.ant-pagination {
+  margin: 1.5rem 1rem !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--border-main) !important;
+  border-radius: 8px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item a {
+  color: var(--text-secondary) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  transition: color 0.3s ease !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item:hover {
+  border-color: var(--primary-green) !important;
+  background: rgba(0, 204, 102, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item:hover a {
+  color: var(--primary-green) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item-active {
+  background: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+  box-shadow: 0 4px 10px rgba(0, 204, 102, 0.2) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item-active a {
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item-active:hover {
+  background: var(--secondary-green, #00e673) !important;
+  border-color: var(--secondary-green, #00e673) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-item-active:hover a {
+  color: #000000 !important;
+}
+
+/* Prev and Next Buttons */
+::ng-deep .custom-nz-table .ant-pagination-prev,
+::ng-deep .custom-nz-table .ant-pagination-next {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-prev:hover,
+::ng-deep .custom-nz-table .ant-pagination-next:hover {
+  background: rgba(0, 204, 102, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-prev .ant-pagination-item-link,
+::ng-deep .custom-nz-table .ant-pagination-next .ant-pagination-item-link {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  transition: color 0.3s ease !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-prev:hover .ant-pagination-item-link,
+::ng-deep .custom-nz-table .ant-pagination-next:hover .ant-pagination-item-link {
+  color: var(--primary-green) !important;
+}
+
+/* Disabled State */
+::ng-deep .custom-nz-table .ant-pagination-disabled,
+::ng-deep .custom-nz-table .ant-pagination-disabled:hover {
+  background: transparent !important;
+  transform: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.4 !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-disabled .ant-pagination-item-link,
+::ng-deep .custom-nz-table .ant-pagination-disabled:hover .ant-pagination-item-link {
+  color: var(--text-tertiary) !important;
+}
+
+/* Ellipsis Jump Buttons */
+::ng-deep .custom-nz-table .ant-pagination-jump-prev,
+::ng-deep .custom-nz-table .ant-pagination-jump-next {
+  background: transparent !important;
+  border: none !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-link-icon,
+::ng-deep .custom-nz-table .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-link-icon {
+  color: var(--primary-green) !important;
+}
+
+::ng-deep .custom-nz-table .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+::ng-deep .custom-nz-table .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: var(--text-tertiary) !important;
+}

@@ -3,11 +3,11 @@ version: '3.8'
 services:
   mysql-db:
     image: mysql:8.0
-    container_name: fridayleague-mysql
+    container_name: lineup-mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: fridayleague
+      MYSQL_DATABASE: lineup
     ports:
       - '3306:3306'
     volumes:

@@ -18,7 +18,7 @@
 
     <!-- Brand Header -->
     <div class="brand-section">
-      <h1 class="navbar-brand">Friday League</h1>
+      <h1 class="navbar-brand">LineUp</h1>
       @if (activeForm() === 'none') {
         <p class="subtitle text-secondary">Crea la tua lega o unisciti a una esistente per scendere in campo!</p>
       } @else if (activeForm() === 'create') {
@@ -62,7 +62,7 @@
           <nz-form-control nzErrorTip="Il nome della lega deve contenere almeno 3 caratteri">
             <label class="form-input-label">Nome della Lega</label>
             <nz-input-group nzPrefixIcon="trophy">
-              <input nz-input formControlName="nome" placeholder="Es. Friday League Milano" />
+              <input nz-input formControlName="nome" placeholder="Es. LineUp Milano" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>

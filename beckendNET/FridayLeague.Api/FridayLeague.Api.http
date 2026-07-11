@@ -1,6 +1,0 @@
-@FridayLeague.Api_HostAddress = http://localhost:5243
-
-GET {{FridayLeague.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -1,6 +1,6 @@
-# Friday League - Developer Notes & Knowledge Base
+# LineUp - Developer Notes & Knowledge Base
 
-Questo file contiene gli appunti di sviluppo, l'architettura del progetto FridayLeague e le regole di business da consultare ad ogni richiesta e aggiornare nel tempo.
+Questo file contiene gli appunti di sviluppo, l'architettura del progetto LineUp e le regole di business da consultare ad ogni richiesta e aggiornare nel tempo.
 
 ---
 
@@ -8,8 +8,8 @@ Questo file contiene gli appunti di sviluppo, l'architettura del progetto Friday
 
 Il progetto è suddiviso in due componenti principali:
 * **Backend (.NET Core)**: Situato nella cartella `beckendNET`.
-  * **API Project**: [FridayLeague.Api](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/FridayLeague.Api)
-  * **Database**: MySQL 8.0 avviato tramite Docker Compose ([docker-compose.yml](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/docker-compose.yml)) sulla porta `3306`.
+  * **API Project**: [LineUp.Api](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api)
+  * **Database**: MySQL 8.0 avviato tramite Docker Compose ([docker-compose.yml](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/docker-compose.yml)) sulla porta `3306`.
   * **ORM**: Entity Framework Core con connessione MySQL.
 * **Frontend (Angular)**: Situato nella cartella `frontend`.
   * **Framework**: Angular 21 (standalone components, control flow syntax `@if`, `@for`, ecc.).
@@ -56,7 +56,7 @@ Le autorizzazioni all'interno di una lega seguono questa gerarchia:
 ### Regole Importanti:
 * Nessun utente può autogestirsi (es. non può modificare o eliminare se stesso).
 * Se un utente viene rimosso dalla sua lega attiva corrente, il suo `LegaId` nel database viene impostato a `null` in modo che debba selezionare o creare una nuova lega al successivo accesso.
-* **Sicurezza FE (Route Guard)**: La rotta `/impostazioni` (e i suoi figli) è protetta da **`adminOrCoAdminGuard`** ([admin-or-co-admin.guard.ts](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/shared/guard/admin-or-co-admin.guard.ts)), impedendo l'accesso diretto via URL a utenti con ruolo semplice `GIOCATORE` (la guardia autorizza `SUPER_ADMIN`, `ADMIN` e `CO_ADMIN`).
+* **Sicurezza FE (Route Guard)**: La rotta `/impostazioni` (e i suoi figli) è protetta da **`adminOrCoAdminGuard`** ([admin-or-co-admin.guard.ts](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/shared/guard/admin-or-co-admin.guard.ts)), impedendo l'accesso diretto via URL a utenti con ruolo semplice `GIOCATORE` (la guardia autorizza `SUPER_ADMIN`, `ADMIN` e `CO_ADMIN`).
 * **Sicurezza FE (Component Controller)**: All'interno di `GestisciPartecipantiComponent`, i metodi `eseguiCambioRuolo` e `rimuoviPartecipante` effettuano un ulteriore controllo di sicurezza preventivo sul ruolo dell'utente corrente (`getCurrentUserRole()`), bloccando la chiamata e mostrando un messaggio di errore se l'utente non è autorizzato (rispettivamente `SUPER_ADMIN`/`ADMIN` per il ruolo, e `SUPER_ADMIN`/`ADMIN`/`CO_ADMIN` per l'eliminazione).
 * **Sicurezza BE (API Controller)**: I controlli sui ruoli per le azioni amministrative (`cambia-ruolo-partecipante` e `rimuovi-partecipante`) sono validati a livello di controller in `AuthController.cs`.
   * `cambia-ruolo-partecipante` permette l'esecuzione a utenti `SUPER_ADMIN` e `ADMIN` (gli `ADMIN` non possono agire su `SUPER_ADMIN` o altri `ADMIN`).
@@ -66,19 +66,19 @@ Le autorizzazioni all'interno di una lega seguono questa gerarchia:
 
 ## 5. Componenti Condivisi ed Elementi UI Notevoli
 
-* **[ConfirmModalComponent](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/shared/component/confirm-modal/confirm-modal.component.ts)**:
+* **[ConfirmModalComponent](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/shared/component/confirm-modal/confirm-modal.component.ts)**:
   * Componente modale riutilizzabile per le richieste di conferma.
   * Supporta la visualizzazione adattiva per Light e Dark mode tramite le variabili CSS globali (es. `--card-bg`, `--text-primary`, `--input-bg`).
   * Supporta lo stato `isDanger` (pulsante e icona rossi pulsanti per le eliminazioni/declassamenti) o standard (blu).
   * Mostra testi personalizzabili ed emette eventi `confirm` e `cancel`.
   * **Invocazione Programmatica (TS)**: La modale non è configurata nel template HTML dei singoli componenti. Viene caricata in memoria dinamicamente da codice TypeScript (es. tramite `ViewContainerRef.createComponent()`), configurata con i parametri desiderati (`title`, `message`, `confirmText`, `isDanger`), sottoscritta agli eventi di output (confirm/cancel) e infine distrutta esplicitamente (`componentRef.destroy()`) una volta terminata l'azione, ottimizzando il DOM ed evitando di sporcare i template HTML.
 * **Rotta `/home`**:
-  * La homepage è configurata esplicitamente sul percorso `/home` in [app-routing.module.ts](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/app-routing.module.ts).
+  * La homepage è configurata esplicitamente sul percorso `/home` in [app-routing.module.ts](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/app-routing.module.ts).
   * La rotta vuota `""` esegue un redirect automatico a `/home`.
   * Tutti i reindirizzamenti di navigazione (post-login, post-seleziona lega, cambio lega attiva) puntano a `/home`.
 * **Codice Invito della Lega**:
-  * Esposto dal backend arricchendo `LegaDto` con i campi `CodiceInvito` e `Descrizione` in [UserDto.cs](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/FridayLeague.Api/DTOs/UserDto.cs).
-  * Mostrato nella dashboard di **[ImpostazioniLegaComponent](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/pages/impostazioni-lega/impostazioni-lega.component.ts)** tramite un banner informativo premium (`.league-info-banner`).
+  * Esposto dal backend arricchendo `LegaDto` con i campi `CodiceInvito` e `Descrizione` in [UserDto.cs](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api/DTOs/UserDto.cs).
+  * Mostrato nella dashboard di **[ImpostazioniLegaComponent](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/pages/impostazioni-lega/impostazioni-lega.component.ts)** tramite un banner informativo premium (`.league-info-banner`).
   * Include la funzionalità "Copia Codice" con riscontro visivo tramite toast message di successo (`NzMessageService`) sfruttando le Clipboard API del browser (`navigator.clipboard`).
 
 ---
@@ -86,13 +86,13 @@ Le autorizzazioni all'interno di una lega seguono questa gerarchia:
 ## 6. Registro Attività (Audit Logging)
 
 Il sistema di tracciamento e log di audit memorizza le azioni amministrative in modo indipendente per ciascuna lega:
-* **Entità nel Database (`ActivityLog`)**: [ActivityLog.cs](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/FridayLeague.Api/Data/ActivityLog.cs)
+* **Entità nel Database (`ActivityLog`)**: [ActivityLog.cs](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api/Data/ActivityLog.cs)
   * Campi: `Id`, `LegaId`, `EsecutoreId`, `EsecutoreNome`, `EsecutoreRuolo`, `Azione` (`CREAZIONE_LEGA`, `ACCESSO_LEGA`, `CAMBIO_RUOLO`, `RIMOZIONE_UTENTE`), `TargetUserId`, `TargetUserNome`, `Dettagli`, `Timestamp`.
 * **Tenant Isolation & Sicurezza (Separazione Log)**:
   * L'endpoint `GET /api/auth/lega/{legaId}/registri-attivita` è filtrato rigorosamente su `LegaId == legaId`.
   * Il backend convalida che l'utente appartenga alla lega `{legaId}` richiesta e abbia ruolo amministrativo di **`SUPER_ADMIN` o `ADMIN`** (escludendo quindi i Co-Admin). Altri ruoli ricevono `403 Forbidden`.
 * **Visualizzazione (FE)**:
-  * Pagina ad accesso riservato: **[RegistroAttivitaComponent](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/pages/impostazioni-lega/registro-attivita/registro-attivita.component.ts)**.
+  * Pagina ad accesso riservato: **[RegistroAttivitaComponent](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/pages/impostazioni-lega/registro-attivita/registro-attivita.component.ts)**.
   * Navigabile da `/impostazioni/registro-attivita`, protetta da **`adminOnlyGuard`** (che concede l'accesso solo a `SUPER_ADMIN` e `ADMIN`).
   * La card di navigazione in `ImpostazioniLegaComponent` è nascosta per i `CO_ADMIN` tramite direttiva `@if (isAdminOrSuperAdmin())`.
   * Tabella con badge per identificare i ruoli ed i tipi di azione con colori standardizzati coerenti sia in tema dark che light.

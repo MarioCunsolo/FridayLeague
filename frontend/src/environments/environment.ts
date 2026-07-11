@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.fridayleague.it/api'
+  apiUrl: 'https://api.lineup.it/api'
 };

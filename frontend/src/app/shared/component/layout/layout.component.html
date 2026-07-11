@@ -73,50 +73,114 @@
     </div>
   </aside>
 
+  <!-- Mobile Sidebar Drawer (Slides in from the left) -->
+  <div class="mobile-sidebar-backdrop" [class.open]="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
+  <aside class="mobile-sidebar-drawer" [class.open]="isMobileMenuOpen()">
+    <div class="drawer-header d-flex justify-content-between align-items-center mb-4">
+      <div class="sidebar-header d-flex align-items-center gap-2" style="padding-left: 0;">
+        <img src="assets/logo-icon.png" alt="LineUp Logo" class="sidebar-logo" style="max-height: 38px; margin-bottom: 0;" />
+        <span class="sidebar-brand-name" style="font-size: 1.4rem;">LineUp</span>
+      </div>
+      <button class="close-drawer-btn" (click)="closeMobileMenu()">
+        <span nz-icon nzType="close" nzTheme="outline"></span>
+      </button>
+    </div>
+
+    <!-- Active League selector inside drawer -->
+    @if (authService.currentUser()?.leghe?.length) {
+    <div class="sidebar-league-selector">
+      <span class="selector-label">Lega Attiva</span>
+      <nz-select [ngModel]="authService.currentUser()?.legaId" (ngModelChange)="onLeagueChange($event); closeMobileMenu()"
+        class="league-select-nz" nzPlaceHolder="Seleziona Lega" nzBordered="false">
+        @for (lega of authService.currentUser()?.leghe; track lega.id) {
+        <nz-option [nzValue]="lega.id" [nzLabel]="lega.nome"></nz-option>
+        }
+      </nz-select>
+
+      <button class="add-league-btn mt-3" routerLink="/seleziona-lega" (click)="closeMobileMenu()">
+        <span nz-icon nzType="plus" nzTheme="outline"></span>
+        <span>Aggiungi Lega</span>
+      </button>
+    </div>
+    }
+
+    <nav class="sidebar-nav">
+      <div class="nav-item-desktop" routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">
+        <i class="fa fa-home"></i>
+        <span>Home</span>
+      </div>
+      <div class="nav-item-desktop" routerLink="/prenotazioni" routerLinkActive="active" (click)="closeMobileMenu()">
+        <i class="fa fa-calendar"></i>
+        <span>Prenota</span>
+      </div>
+      <div class="nav-item-desktop" routerLink="/calendario" routerLinkActive="active" (click)="closeMobileMenu()">
+        <i class="fa fa-futbol-o"></i>
+        <span>Calendario</span>
+      </div>
+      <div class="nav-item-desktop" routerLink="/profilo" routerLinkActive="active" (click)="closeMobileMenu()">
+        <i class="fa fa-user"></i>
+        <span>Profilo</span>
+      </div>
+      <div class="nav-item-desktop" routerLink="/classifiche" routerLinkActive="active" (click)="closeMobileMenu()">
+        <i class="fa fa-trophy"></i>
+        <span>Classifiche</span>
+      </div>
+      @if (authService.isAdminOrCoAdmin()) {
+      <div class="nav-item-desktop" routerLink="/impostazioni" routerLinkActive="active" (click)="closeMobileMenu()">
+        <i class="fa fa-cog"></i>
+        <span>Impostazioni</span>
+      </div>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="nav-item-desktop" routerLink="/account" routerLinkActive="active" (click)="closeMobileMenu()">
+        <span nz-icon nzType="user" nzTheme="outline"></span>
+        <span>Account</span>
+      </div>
+      <div class="nav-item-desktop" (click)="toggleTheme(); closeMobileMenu()">
+        <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
+        <span>{{ currentTheme() === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
+      </div>
+      <div class="nav-item-desktop" (click)="logout(); closeMobileMenu()" style="cursor: pointer;">
+        <span nz-icon nzType="logout" nzTheme="outline"></span>
+        <span>Esci</span>
+      </div>
+    </div>
+  </aside>
+
   <!-- Main Content Wrapper -->
   <div class="content-wrapper">
     <!-- Top Navbar (Mobile/Tablet) -->
     <header class="top-navbar d-lg-none shadow-sm">
-      <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-4">
-        <!-- Logout (Mobile) -->
-        <div class="logout-mobile" (click)="logout()"
-          style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
-          <span nz-icon nzType="logout" nzTheme="outline"></span>
+      <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-4 position-relative">
+        
+        <!-- Hamburger Menu Button (Mobile) -->
+        <div class="hamburger-mobile" (click)="toggleMobileMenu()"
+          style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center; z-index: 10;">
+          <span nz-icon nzType="menu" nzTheme="outline"></span>
         </div>
 
-        <!-- Titolo / Selettore Mobile con Logo -->
-        <div class="mobile-header-brand d-flex align-items-center gap-1">
-          <img src="assets/logo-icon.png" alt="LineUp Logo" style="max-height: 28px; object-fit: contain;" />
-          @if (authService.currentUser()?.leghe?.length) {
-          <nz-select [ngModel]="authService.currentUser()?.legaId" (ngModelChange)="onLeagueChange($event)"
-            class="league-select-mobile" nzBordered="false">
-            @for (lega of authService.currentUser()?.leghe; track lega.id) {
-            <nz-option [nzValue]="lega.id" [nzLabel]="lega.nome"></nz-option>
-            }
-          </nz-select>
-          } @else {
-          <h1 class="navbar-brand m-0" style="font-size: 1.25rem;">LineUp</h1>
-          }
+        <!-- Centered Mobile Logo & Title -->
+        <div class="mobile-header-brand d-flex align-items-center gap-2 position-absolute start-50 translate-middle-x">
+          <img src="assets/logo-icon.png" alt="LineUp Logo" style="max-height: 26px; object-fit: contain;" />
+          <span class="sidebar-brand-name" style="font-size: 1.2rem;">LineUp</span>
         </div>
 
-        <!-- Actions (Destra) -->
-        <div class="d-flex align-items-center gap-3">
-          @if (authService.currentUser()?.legaId) {
-          <div class="add-league-mobile" routerLink="/seleziona-lega">
-            <span nz-icon nzType="plus" nzTheme="outline"></span>
-          </div>
-          }
+        <!-- Right Side Quick Actions (Mobile) -->
+        <div class="d-flex align-items-center gap-3 z-index-10">
           <!-- Account (Mobile) -->
           <div class="account-mobile" routerLink="/account"
-            style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
+            style="cursor: pointer; font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
             <span nz-icon nzType="user" nzTheme="outline"></span>
           </div>
           <!-- Theme Toggle (Mobile) -->
           <div class="theme-toggle-mobile" (click)="toggleTheme()"
-            style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
+            style="cursor: pointer; font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
             <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
           </div>
         </div>
+
       </div>
     </header>
 
@@ -124,35 +188,5 @@
     <main class="page-content">
       <router-outlet></router-outlet>
     </main>
-
-    <!-- Bottom Navbar (Mobile/Tablet) -->
-    <nav class="bottom-navbar d-lg-none shadow">
-      <div class="nav-item" routerLink="/home" routerLinkActive="active">
-        <i class="fa fa-home"></i>
-        <span>Home</span>
-      </div>
-      <div class="nav-item" routerLink="/prenotazioni" routerLinkActive="active">
-        <i class="fa fa-calendar"></i>
-        <span>Prenota</span>
-      </div>
-      <div class="nav-item" routerLink="/calendario" routerLinkActive="active">
-        <i class="fa fa-futbol-o"></i>
-        <span>Calendario</span>
-      </div>
-      <div class="nav-item" routerLink="/profilo" routerLinkActive="active">
-        <i class="fa fa-user"></i>
-        <span>Profilo</span>
-      </div>
-      <div class="nav-item" routerLink="/classifiche" routerLinkActive="active">
-        <i class="fa fa-trophy"></i>
-        <span>Classifiche</span>
-      </div>
-      @if (authService.isAdminOrCoAdmin()) {
-      <div class="nav-item" routerLink="/impostazioni" routerLinkActive="active">
-        <i class="fa fa-cog"></i>
-        <span>Impostazioni</span>
-      </div>
-      }
-    </nav>
   </div>
 </div>

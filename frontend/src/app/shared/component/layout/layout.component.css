@@ -115,10 +115,10 @@
     padding: 0;
 }
 
-/* On mobile, we keep the padding bottom for the nav */
+/* On mobile, we remove the padding bottom since the bottom nav is gone */
 @media (max-width: 991px) {
     .page-content {
-        padding-bottom: 4.375rem;
+        padding-bottom: 0;
     }
 }
 
@@ -234,4 +234,64 @@
 
 .add-league-mobile:hover {
     color: var(--primary-green);
+}
+
+/* Mobile Sidebar Drawer & Backdrop */
+.mobile-sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.55);
+    z-index: 1200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-sidebar-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.mobile-sidebar-drawer {
+    position: fixed;
+    top: 0;
+    left: -18rem;
+    width: 18rem;
+    height: 100vh;
+    background-color: var(--sidebar-bg);
+    border-right: 0.0625rem solid var(--border-sub);
+    z-index: 1210;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0.25rem 0 1.5rem rgba(0, 0, 0, 0.2);
+}
+
+.mobile-sidebar-drawer.open {
+    transform: translateX(18rem);
+}
+
+.close-drawer-btn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.close-drawer-btn:hover {
+    color: var(--text-primary);
+}
+
+.z-index-10 {
+    z-index: 10;
 }

@@ -14,7 +14,7 @@ export class AuthService {
   private _currentUser = signal<any>(null); // Sostituire any con l'interfaccia User
   public currentUser = this._currentUser.asReadonly();
 
-  public isAuthenticated = computed(() => !!this.getToken());
+  public isAuthenticated = computed(() => !!this.currentUser());
 
   public isAdminOrCoAdmin = computed(() => {
     const user = this.currentUser();

@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatchService } from 'src/app/shared/service/match.service';
 import { DatePipe, TitleCasePipe } from '@angular/common';
+import { AuthService } from 'src/app/shared/service/auth.service';
 
 @Component({
   selector: 'app-homepage',
@@ -13,6 +14,7 @@ import { DatePipe, TitleCasePipe } from '@angular/common';
 export class HomepageComponent {
   private matchService = inject(MatchService);
   private router = inject(Router);
+  public authService = inject(AuthService);
 
   lastMatch = signal(this.matchService.getLastMatch());
   nextMatch = signal(this.matchService.getNextMatch());

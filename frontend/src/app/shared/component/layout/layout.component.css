@@ -21,6 +21,26 @@
 
 .sidebar-header {
     padding-left: 0.5rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-logo {
+    max-height: 60px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.sidebar-brand-name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .sidebar-nav {

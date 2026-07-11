@@ -2,7 +2,8 @@
   <!-- Desktop Sidebar -->
   <aside class="desktop-sidebar d-none d-lg-flex">
     <div class="sidebar-header">
-      <h1 class="navbar-brand">LineUp</h1>
+      <img src="assets/logo-icon.png" alt="LineUp Logo" class="sidebar-logo" />
+      <span class="sidebar-brand-name">LineUp</span>
     </div>
 
     <!-- Selettore Lega (Sidebar) -->
@@ -83,17 +84,20 @@
           <span nz-icon nzType="logout" nzTheme="outline"></span>
         </div>
 
-        <!-- Titolo / Selettore Mobile -->
-        @if (authService.currentUser()?.leghe?.length) {
-        <nz-select [ngModel]="authService.currentUser()?.legaId" (ngModelChange)="onLeagueChange($event)"
-          class="league-select-mobile" nzBordered="false">
-          @for (lega of authService.currentUser()?.leghe; track lega.id) {
-          <nz-option [nzValue]="lega.id" [nzLabel]="lega.nome"></nz-option>
+        <!-- Titolo / Selettore Mobile con Logo -->
+        <div class="mobile-header-brand d-flex align-items-center gap-1">
+          <img src="assets/logo-icon.png" alt="LineUp Logo" style="max-height: 28px; object-fit: contain;" />
+          @if (authService.currentUser()?.leghe?.length) {
+          <nz-select [ngModel]="authService.currentUser()?.legaId" (ngModelChange)="onLeagueChange($event)"
+            class="league-select-mobile" nzBordered="false">
+            @for (lega of authService.currentUser()?.leghe; track lega.id) {
+            <nz-option [nzValue]="lega.id" [nzLabel]="lega.nome"></nz-option>
+            }
+          </nz-select>
+          } @else {
+          <h1 class="navbar-brand m-0" style="font-size: 1.25rem;">LineUp</h1>
           }
-        </nz-select>
-        } @else {
-        <h1 class="navbar-brand m-0">LineUp</h1>
-        }
+        </div>
 
         <!-- Actions (Destra) -->
         <div class="d-flex align-items-center gap-3">

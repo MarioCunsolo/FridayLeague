@@ -6,6 +6,30 @@
     </p>
   </div>
 
+  <!-- Info Lega Card con Codice Invito -->
+  @if (getActiveLega(); as activeLega) {
+    <div class="league-info-banner mb-4 shadow-sm">
+      <div class="banner-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="league-meta">
+          <div class="d-flex align-items-center gap-2">
+            <span nz-icon nzType="trophy" nzTheme="outline" class="trophy-icon text-primary"></span>
+            <h3 class="league-name m-0">{{ activeLega.nome }}</h3>
+          </div>
+          @if (activeLega.descrizione) {
+            <p class="league-desc text-secondary mt-1 mb-0">{{ activeLega.descrizione }}</p>
+          } @else {
+            <p class="league-desc text-secondary mt-1 mb-0 italic">Nessuna descrizione impostata.</p>
+          }
+        </div>
+        
+        <div class="invite-code-box d-flex align-items-center justify-content-md-end gap-2">
+          <span class="label text-secondary m-0">CODICE INVITO:</span>
+          <span class="code-value font-monospace">{{ activeLega.codiceInvito }}</span>
+        </div>
+      </div>
+    </div>
+  }
+
   <div class="row g-4">
     <!-- Card Gestione Partecipanti -->
     <div class="col-md-6 col-lg-4">
@@ -22,5 +46,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Card Registro Attività -->
+    @if (isAdminOrSuperAdmin()) {
+      <div class="col-md-6 col-lg-4">
+        <div class="settings-card shadow-sm" [routerLink]="['registro-attivita']">
+          <div class="icon-container">
+            <span nz-icon nzType="file-protect" nzTheme="outline" class="settings-icon"></span>
+          </div>
+          <div class="card-details">
+            <h4 class="card-title">Registro Attività</h4>
+            <p class="card-description">Traccia lo storico delle operazioni amministrative (creazione, cambi di ruolo, eliminazioni) della lega.</p>
+          </div>
+          <div class="arrow-container">
+            <span nz-icon nzType="arrow-right" nzTheme="outline" class="arrow-icon"></span>
+          </div>
+        </div>
+      </div>
+    }
   </div>
 </div>

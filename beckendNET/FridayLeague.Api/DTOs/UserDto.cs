@@ -16,4 +16,6 @@ public class LegaDto
     public int Id { get; set; }
     public string Nome { get; set; } = string.Empty;
     public string Ruolo { get; set; } = string.Empty;
+    public string CodiceInvito { get; set; } = string.Empty;
+    public string? Descrizione { get; set; }
 }

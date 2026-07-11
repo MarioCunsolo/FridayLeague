@@ -20,7 +20,7 @@ export class AuthService {
     const user = this.currentUser();
     if (!user || !user.legaId || !user.leghe) return false;
     const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
-    return activeLega && (activeLega.ruolo === 'ADMIN' || activeLega.ruolo === 'CO_ADMIN');
+    return activeLega && (activeLega.ruolo === 'SUPER_ADMIN' || activeLega.ruolo === 'ADMIN' || activeLega.ruolo === 'CO_ADMIN');
   });
 
   constructor() {
@@ -124,6 +124,22 @@ export class AuthService {
     return this.http.post<any>(`${this.BASE_URL}/cambia-tema`, { tema }).pipe(
       tap(user => this._currentUser.set(user))
     );
+  }
+
+  /**
+   * Aggiorna i dati del profilo dell'utente loggato.
+   */
+  aggiornaProfilo(userData: any) {
+    return this.http.post<any>(`${this.BASE_URL}/aggiorna-profilo`, userData).pipe(
+      tap(user => this._currentUser.set(user))
+    );
+  }
+
+  /**
+   * Modifica la password dell'utente loggato.
+   */
+  cambiaPassword(password: string) {
+    return this.http.post<any>(`${this.BASE_URL}/cambia-password`, { password });
   }
 
   /**

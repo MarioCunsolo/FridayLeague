@@ -13,6 +13,10 @@ import { authGuard } from './shared/guard/auth.guard';
 import { leagueGuard } from './shared/guard/league.guard';
 import { ImpostazioniLegaComponent } from './pages/impostazioni-lega/impostazioni-lega.component';
 import { GestisciPartecipantiComponent } from './pages/impostazioni-lega/gestisci-partecipanti/gestisci-partecipanti.component';
+import { RegistroAttivitaComponent } from './pages/impostazioni-lega/registro-attivita/registro-attivita.component';
+
+import { adminOrCoAdminGuard } from './shared/guard/admin-or-co-admin.guard';
+import { adminOnlyGuard } from './shared/guard/admin-only.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -34,10 +38,16 @@ const routes: Routes = [
       { path: 'profilo', component: ProfileComponent },
       { path: 'classifiche', component: StatsComponent },
       {
+        path: 'account',
+        loadComponent: () => import('./pages/account/account.component').then(m => m.AccountComponent)
+      },
+      {
         path: 'impostazioni',
+        canActivate: [adminOrCoAdminGuard],
         children: [
           { path: '', component: ImpostazioniLegaComponent },
-          { path: 'partecipanti', component: GestisciPartecipantiComponent }
+          { path: 'partecipanti', component: GestisciPartecipantiComponent },
+          { path: 'registro-attivita', component: RegistroAttivitaComponent, canActivate: [adminOnlyGuard] }
         ]
       }
     ]

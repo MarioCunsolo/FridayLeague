@@ -1,0 +1,173 @@
+/* Profile Header Bar styling */
+.profile-header-bar {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-green) 0%, var(--primary-color, #5271ff) 100%);
+}
+
+.profile-avatar {
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-color, #5271ff) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+[data-theme='dark'] .profile-avatar {
+    border-color: var(--border-color);
+}
+
+.avatar-letters {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.user-fullname {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.user-email {
+    font-size: 0.95rem;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.role-super_admin {
+    background-color: rgba(114, 46, 209, 0.15);
+    color: #722ed1;
+    border: 1px solid rgba(114, 46, 209, 0.25);
+}
+
+.role-admin {
+    background-color: rgba(245, 34, 45, 0.15);
+    color: #f5222d;
+    border: 1px solid rgba(245, 34, 45, 0.25);
+}
+
+.role-co_admin {
+    background-color: rgba(24, 144, 255, 0.15);
+    color: #1890ff;
+    border: 1px solid rgba(24, 144, 255, 0.25);
+}
+
+.role-giocatore {
+    background-color: rgba(82, 196, 26, 0.15);
+    color: #52c41a;
+    border: 1px solid rgba(82, 196, 26, 0.25);
+}
+
+/* Manage Profile tab styles */
+.profile-manage-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2.25rem;
+}
+
+.manage-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.custom-input {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--border-sub) !important;
+    color: var(--text-primary) !important;
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-input:focus {
+    border-color: var(--primary-green) !important;
+    box-shadow: 0 0 0 3px rgba(0, 204, 102, 0.15) !important;
+    outline: none;
+}
+
+.save-btn {
+    height: 44px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.save-btn:hover {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+}
+
+.password-btn {
+    height: 44px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-sub) !important;
+    color: var(--text-primary) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.password-btn:hover {
+    border-color: var(--primary-green) !important;
+    color: var(--primary-green) !important;
+}
+
+@media (max-width: 768px) {
+    .profile-header-bar {
+        padding: 1.5rem;
+    }
+    .profile-avatar {
+        width: 5rem;
+        height: 5rem;
+    }
+    .avatar-letters {
+        font-size: 2rem;
+    }
+    .user-fullname {
+        font-size: 1.5rem;
+    }
+    .profile-manage-card {
+        padding: 1.5rem;
+    }
+}

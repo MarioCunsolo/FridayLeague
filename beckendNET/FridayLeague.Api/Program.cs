@@ -58,6 +58,37 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<FridayLeagueDbContext>();
     dbContext.Database.EnsureCreated();
+
+    try
+    {
+        // Fail-safe: assicura che la tabella ActivityLogs esista nel database esistente
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS ActivityLogs (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                LegaId INT NOT NULL,
+                EsecutoreId INT NOT NULL,
+                EsecutoreNome VARCHAR(255) NOT NULL,
+                EsecutoreRuolo VARCHAR(50) NOT NULL,
+                Azione VARCHAR(50) NOT NULL,
+                TargetUserId INT NULL,
+                TargetUserNome VARCHAR(255) NOT NULL,
+                Dettagli TEXT NOT NULL,
+                Timestamp DATETIME NOT NULL,
+                CONSTRAINT FK_ActivityLogs_Leghe_LegaId FOREIGN KEY (LegaId) REFERENCES Leghe(Id) ON DELETE CASCADE
+            );
+        ");
+
+        // Fail-safe: assicura che il ruolo SUPER_ADMIN (4) sia presente in tabella Ruoli
+        var hasSuperAdmin = dbContext.Ruoli.Any(r => r.Id == 4);
+        if (!hasSuperAdmin)
+        {
+            dbContext.Database.ExecuteSqlRaw("INSERT INTO Ruoli (Id, Nome) VALUES (4, 'SUPER_ADMIN') ON DUPLICATE KEY UPDATE Nome='SUPER_ADMIN';");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Errore durante la migrazione fail-safe: {ex.Message}");
+    }
 }
 
 // Configure the HTTP request pipeline.

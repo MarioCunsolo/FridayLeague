@@ -1,22 +1,34 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
 import { UserStats } from 'src/app/models/interface/user-stats.interface';
 import { Match, MatchStatus } from 'src/app/models/interface/match.interface';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { AuthService } from 'src/app/shared/service/auth.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
   standalone: true,
-  imports: [MatchDetailComponent, NzSelectModule, FormsModule]
+  imports: [CommonModule, MatchDetailComponent, NzSelectModule, FormsModule]
 })
 export class ProfileComponent {
+  public authService = inject(AuthService);
+
   showMatchDetails = signal(false);
   
   availableSeasons = ['2024', '2025', '2026'];
   selectedSeason = signal('2026');
+
+  // Calcolo del ruolo attivo nella lega
+  userRuolo = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user || !user.legaId || !user.leghe) return 'GIOCATORE';
+    const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
+    return activeLega ? activeLega.ruolo : 'GIOCATORE';
+  });
 
   private seasonStats: Record<string, UserStats[]> = {
     '2026': [

@@ -15,6 +15,7 @@ public class FridayLeagueDbContext : DbContext
     public DbSet<Lega> Leghe => Set<Lega>();
     public DbSet<UserLega> UserLeghe => Set<UserLega>();
     public DbSet<RuoloLega> Ruoli => Set<RuoloLega>();
+    public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,7 +49,8 @@ public class FridayLeagueDbContext : DbContext
         modelBuilder.Entity<RuoloLega>().HasData(
             new RuoloLega { Id = 1, Nome = "ADMIN" },
             new RuoloLega { Id = 2, Nome = "CO_ADMIN" },
-            new RuoloLega { Id = 3, Nome = "GIOCATORE" }
+            new RuoloLega { Id = 3, Nome = "GIOCATORE" },
+            new RuoloLega { Id = 4, Nome = "SUPER_ADMIN" }
         );
     }
 }

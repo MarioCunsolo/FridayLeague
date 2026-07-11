@@ -1,0 +1,102 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <!-- Profile Header Bar -->
+    <div class="col-12 col-md-10 col-lg-9 mb-4">
+      <div class="profile-header-bar shadow-sm">
+        <div class="header-bar-body d-flex flex-column flex-md-row align-items-center gap-4">
+          <!-- Avatar con Iniziali -->
+          <div class="profile-avatar shadow">
+            <span class="avatar-letters">{{ userInitials() }}</span>
+          </div>
+          
+          <!-- Dettagli Utente e Ruolo -->
+          <div class="user-details-section text-center text-md-start">
+            <h2 class="user-fullname m-0">
+              {{ authService.currentUser()?.nome }} {{ authService.currentUser()?.cognome }}
+            </h2>
+            <p class="user-email text-secondary m-0">
+              {{ authService.currentUser()?.email }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modifica Profilo Form Card -->
+    <div class="col-12 col-md-10 col-lg-9">
+      <div class="profile-manage-card shadow-sm">
+        <h3 class="manage-title mb-4">Informazioni Account</h3>
+        
+        <form [formGroup]="profileForm" (ngSubmit)="salvaProfilo()">
+          <div class="row g-4">
+            <!-- Nome -->
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold text-uppercase">Nome</label>
+              <input 
+                type="text" 
+                formControlName="nome" 
+                class="form-control custom-input" 
+                placeholder="Inserisci il nome">
+              @if (profileForm.get('nome')?.touched && profileForm.get('nome')?.invalid) {
+                <div class="text-danger small mt-1">Il nome è obbligatorio.</div>
+              }
+            </div>
+            
+            <!-- Cognome -->
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold text-uppercase">Cognome</label>
+              <input 
+                type="text" 
+                formControlName="cognome" 
+                class="form-control custom-input" 
+                placeholder="Inserisci il cognome">
+              @if (profileForm.get('cognome')?.touched && profileForm.get('cognome')?.invalid) {
+                <div class="text-danger small mt-1">Il cognome è obbligatorio.</div>
+              }
+            </div>
+            
+            <!-- Email -->
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold text-uppercase">Email</label>
+              <input 
+                type="email" 
+                formControlName="email" 
+                class="form-control custom-input" 
+                placeholder="Inserisci l'indirizzo email">
+              @if (profileForm.get('email')?.touched && profileForm.get('email')?.invalid) {
+                <div class="text-danger small mt-1">Inserisci un indirizzo email valido.</div>
+              }
+            </div>
+            
+            <!-- Sicurezza Account (Modale Password) -->
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold text-uppercase d-block">Sicurezza Account</label>
+              <button 
+                nz-button 
+                nzType="default" 
+                type="button" 
+                class="password-btn" 
+                (click)="apriModificaPassword()">
+                <span nz-icon nzType="key" nzTheme="outline" class="me-1"></span>
+                Modifica Password...
+              </button>
+            </div>
+
+            <!-- Azioni di Invio -->
+            <div class="col-12 mt-5 text-end">
+              <button 
+                nz-button 
+                nzType="primary" 
+                class="save-btn" 
+                [nzLoading]="salvando()" 
+                type="submit">
+                <span nz-icon nzType="save" nzTheme="outline" class="me-1"></span>
+                Salva Modifiche
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -75,4 +75,11 @@ export class LegaService {
       targetUserId
     });
   }
+
+  /**
+   * Recupera il registro attività di una lega.
+   */
+  getRegistroAttivita(legaId: number) {
+    return this.http.get<any[]>(`${this.BASE_URL}/lega/${legaId}/registri-attivita`);
+  }
 }

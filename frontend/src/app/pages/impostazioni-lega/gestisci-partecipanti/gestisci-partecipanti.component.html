@@ -51,17 +51,36 @@
             <td class="text-end">
               <div class="action-buttons-group">
                 @if (canManage(item)) {
-                  <!-- Bottone Cambia Ruolo (Promuovi / Declassa) -->
-                  @if (item.ruolo === 'GIOCATORE') {
-                    <button nz-button nzType="default" nzSize="small" class="action-btn promote-btn" (click)="chiediConfermaRuolo(item)" title="Promuovi a Co-Admin">
-                      <span nz-icon nzType="safety" nzTheme="outline"></span>
-                      <span class="btn-text">Rendi Co-Admin</span>
-                    </button>
-                  } @else if (item.ruolo === 'CO_ADMIN') {
-                    <button nz-button nzType="default" nzSize="small" class="action-btn demote-btn" (click)="chiediConfermaRuolo(item)" title="Declassa a Giocatore">
-                      <span nz-icon nzType="user" nzTheme="outline"></span>
-                      <span class="btn-text">Rendi Giocatore</span>
-                    </button>
+                  <!-- Bottoni Cambia Ruolo (Solo per SUPER_ADMIN ed ADMIN) -->
+                  @if (getCurrentUserRole() === 'SUPER_ADMIN' || getCurrentUserRole() === 'ADMIN') {
+                    @if (item.ruolo === 'GIOCATORE') {
+                      <button nz-button nzType="default" nzSize="small" class="action-btn promote-btn" (click)="chiediConfermaCambioRuolo(item, 'CO_ADMIN')" title="Promuovi a Co-Admin">
+                        <span nz-icon nzType="safety" nzTheme="outline"></span>
+                        <span class="btn-text">Rendi Co-Admin</span>
+                      </button>
+                      <button nz-button nzType="default" nzSize="small" class="action-btn admin-btn" (click)="chiediConfermaCambioRuolo(item, 'ADMIN')" title="Promuovi a Admin">
+                        <span nz-icon nzType="crown" nzTheme="outline"></span>
+                        <span class="btn-text">Rendi Admin</span>
+                      </button>
+                    } @else if (item.ruolo === 'CO_ADMIN') {
+                      <button nz-button nzType="default" nzSize="small" class="action-btn demote-btn" (click)="chiediConfermaCambioRuolo(item, 'GIOCATORE')" title="Declassa a Giocatore">
+                        <span nz-icon nzType="user" nzTheme="outline"></span>
+                        <span class="btn-text">Rendi Giocatore</span>
+                      </button>
+                      <button nz-button nzType="default" nzSize="small" class="action-btn admin-btn" (click)="chiediConfermaCambioRuolo(item, 'ADMIN')" title="Promuovi a Admin">
+                        <span nz-icon nzType="crown" nzTheme="outline"></span>
+                        <span class="btn-text">Rendi Admin</span>
+                      </button>
+                    } @else if (item.ruolo === 'ADMIN') {
+                      <button nz-button nzType="default" nzSize="small" class="action-btn promote-btn" (click)="chiediConfermaCambioRuolo(item, 'CO_ADMIN')" title="Declassa a Co-Admin">
+                        <span nz-icon nzType="safety" nzTheme="outline"></span>
+                        <span class="btn-text">Rendi Co-Admin</span>
+                      </button>
+                      <button nz-button nzType="default" nzSize="small" class="action-btn demote-btn" (click)="chiediConfermaCambioRuolo(item, 'GIOCATORE')" title="Declassa a Giocatore">
+                        <span nz-icon nzType="user" nzTheme="outline"></span>
+                        <span class="btn-text">Rendi Giocatore</span>
+                      </button>
+                    }
                   }
 
                   <!-- Bottone Rimuovi Partecipante -->
@@ -81,15 +100,4 @@
     </nz-spin>
   </div>
   }
-
-  <!-- Modale di conferma riutilizzabile -->
-  <app-confirm-modal
-    [isVisible]="isConfirmModalVisible()"
-    [title]="confirmModalTitle()"
-    [message]="confirmModalMessage()"
-    [confirmText]="confirmModalConfirmText()"
-    [isDanger]="confirmModalIsDanger()"
-    (confirm)="eseguiAzioneConfermata()"
-    (cancel)="chiudiModale()">
-  </app-confirm-modal>
 </div>

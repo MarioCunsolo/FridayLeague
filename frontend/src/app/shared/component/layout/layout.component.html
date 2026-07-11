@@ -54,6 +54,11 @@
 
     <!-- Always visible bottom footer -->
     <div class="sidebar-footer">
+      <!-- Account (Desktop) -->
+      <div class="nav-item-desktop" routerLink="/account" routerLinkActive="active">
+        <span nz-icon nzType="user" nzTheme="outline"></span>
+        <span>Account</span>
+      </div>
       <!-- Theme Toggle (Desktop) -->
       <div class="nav-item-desktop" (click)="toggleTheme()">
         <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
@@ -97,6 +102,11 @@
             <span nz-icon nzType="plus" nzTheme="outline"></span>
           </div>
           }
+          <!-- Account (Mobile) -->
+          <div class="account-mobile" routerLink="/account"
+            style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">
+            <span nz-icon nzType="user" nzTheme="outline"></span>
+          </div>
           <!-- Theme Toggle (Mobile) -->
           <div class="theme-toggle-mobile" (click)="toggleTheme()"
             style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center;">

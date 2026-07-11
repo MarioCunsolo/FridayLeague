@@ -95,6 +95,53 @@ public class AuthController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost("aggiorna-profilo")]
+    public async Task<ActionResult<UserDto>> AggiornaProfilo(AggiornaProfiloRequest request)
+    {
+        var userId = User.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound("Utente non trovato.");
+        }
+
+        var normalizedEmail = request.Email.Trim().ToLower();
+        if (user.Email.ToLower() != normalizedEmail)
+        {
+            var emailExists = await _context.Users.AnyAsync(u => u.Email == normalizedEmail);
+            if (emailExists)
+            {
+                return BadRequest("L'indirizzo email inserito è già utilizzato da un altro utente.");
+            }
+            user.Email = normalizedEmail;
+        }
+
+        user.Nome = request.Nome.Trim();
+        user.Cognome = request.Cognome.Trim();
+
+        await _context.SaveChangesAsync();
+
+        return Ok(await MapToUserDtoWithLegheAsync(user));
+    }
+
+    [Authorize]
+    [HttpPost("cambia-password")]
+    public async Task<IActionResult> CambiaPassword(CambiaPasswordRequest request)
+    {
+        var userId = User.GetUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return NotFound("Utente non trovato.");
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Password modificata con successo!" });
+    }
+
+    [Authorize]
     [HttpPost("crea-lega")]
     public async Task<ActionResult<UserDto>> CreaLega(CreaLegaRequest request)
     {
@@ -118,12 +165,28 @@ public class AuthController : ControllerBase
         {
             UserId = user.Id,
             LegaId = newLega.Id,
-            RuoloId = LeagueRoles.AdminId
+            RuoloId = LeagueRoles.SuperAdminId
         };
 
         _context.UserLeghe.Add(userLega);
 
         user.LegaId = newLega.Id;
+
+        // Scrittura Log
+        var log = new ActivityLog
+        {
+            LegaId = newLega.Id,
+            EsecutoreId = user.Id,
+            EsecutoreNome = $"{user.Nome} {user.Cognome}",
+            EsecutoreRuolo = "SUPER_ADMIN",
+            Azione = "CREAZIONE_LEGA",
+            TargetUserId = user.Id,
+            TargetUserNome = $"{user.Nome} {user.Cognome}",
+            Dettagli = $"Ha creato la lega '{newLega.Nome}'.",
+            Timestamp = DateTime.UtcNow
+        };
+        _context.ActivityLogs.Add(log);
+
         await _context.SaveChangesAsync();
 
         return Ok(await MapToUserDtoWithLegheAsync(user));
@@ -154,6 +217,21 @@ public class AuthController : ControllerBase
                 RuoloId = LeagueRoles.GiocatoreId
             };
             _context.UserLeghe.Add(userLega);
+
+            // Scrittura Log
+            var log = new ActivityLog
+            {
+                LegaId = lega.Id,
+                EsecutoreId = user.Id,
+                EsecutoreNome = $"{user.Nome} {user.Cognome}",
+                EsecutoreRuolo = "GIOCATORE",
+                Azione = "ACCESSO_LEGA",
+                TargetUserId = user.Id,
+                TargetUserNome = $"{user.Nome} {user.Cognome}",
+                Dettagli = $"Si è unito alla lega '{lega.Nome}' tramite codice invito.",
+                Timestamp = DateTime.UtcNow
+            };
+            _context.ActivityLogs.Add(log);
         }
 
         user.LegaId = lega.Id;
@@ -215,22 +293,63 @@ public class AuthController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("lega/{legaId}/registri-attivita")]
+    public async Task<ActionResult<List<ActivityLogDto>>> GetLegaRegistriAttivita(int legaId)
+    {
+        var userId = User.GetUserId();
+
+        // Verifica se l'utente appartiene alla lega ed ha i permessi necessari (SUPER_ADMIN o ADMIN)
+        var userLega = await _context.UserLeghe
+            .SingleOrDefaultAsync(ul => ul.UserId == userId && ul.LegaId == legaId);
+
+        if (userLega == null || 
+            (userLega.RuoloId != LeagueRoles.SuperAdminId && 
+             userLega.RuoloId != LeagueRoles.AdminId))
+        {
+            return StatusCode(403, "Non hai i permessi per accedere ai registri delle attività della lega.");
+        }
+
+        var logs = await _context.ActivityLogs
+            .Where(al => al.LegaId == legaId)
+            .OrderByDescending(al => al.Timestamp)
+            .Select(al => new ActivityLogDto
+            {
+                Id = al.Id,
+                EsecutoreId = al.EsecutoreId,
+                EsecutoreNome = al.EsecutoreNome,
+                EsecutoreRuolo = al.EsecutoreRuolo,
+                Azione = al.Azione,
+                TargetUserId = al.TargetUserId,
+                TargetUserNome = al.TargetUserNome,
+                Dettagli = al.Dettagli,
+                Timestamp = al.Timestamp
+            })
+            .ToListAsync();
+
+        return Ok(logs);
+    }
+
+    [Authorize]
     [HttpPost("lega/cambia-ruolo-partecipante")]
     public async Task<ActionResult> CambiaRuoloPartecipante(CambiaRuoloPartecipanteRequest request)
     {
         var userId = User.GetUserId();
         
-        // Verifica se l'utente che fa la richiesta appartiene alla lega ed ha i permessi necessari
+        // Verifica se l'utente che fa la richiesta appartiene alla lega ed ha i permessi necessari (SUPER_ADMIN o ADMIN)
         var requesterUserLega = await _context.UserLeghe
+            .Include(ul => ul.User)
+            .Include(ul => ul.Ruolo)
             .SingleOrDefaultAsync(ul => ul.UserId == userId && ul.LegaId == request.LegaId);
         
-        if (requesterUserLega == null || (requesterUserLega.RuoloId != LeagueRoles.AdminId && requesterUserLega.RuoloId != LeagueRoles.CoAdminId))
+        if (requesterUserLega == null || (requesterUserLega.RuoloId != LeagueRoles.SuperAdminId && requesterUserLega.RuoloId != LeagueRoles.AdminId))
         {
-            return StatusCode(403, "Non hai i permessi per eseguire questa azione.");
+            return StatusCode(403, "Solo il super admin o gli admin possono modificare i ruoli.");
         }
 
         // Trova l'utente target nella lega
         var targetUserLega = await _context.UserLeghe
+            .Include(ul => ul.User)
+            .Include(ul => ul.Ruolo)
             .SingleOrDefaultAsync(ul => ul.UserId == request.TargetUserId && ul.LegaId == request.LegaId);
 
         if (targetUserLega == null)
@@ -244,16 +363,20 @@ public class AuthController : ControllerBase
             return BadRequest("Non puoi modificare il tuo stesso ruolo.");
         }
 
-        // Se il richiedente è un Co-Admin, può agire solo su Giocatori semplici
-        if (requesterUserLega.RuoloId == LeagueRoles.CoAdminId && targetUserLega.RuoloId != LeagueRoles.GiocatoreId)
+        // Se il richiedente è un ADMIN, può gestire solo Co-Admin e Giocatori (non può gestire Super Admin o altri Admin)
+        if (requesterUserLega.RuoloId == LeagueRoles.AdminId && 
+            (targetUserLega.RuoloId == LeagueRoles.SuperAdminId || targetUserLega.RuoloId == LeagueRoles.AdminId))
         {
-            return StatusCode(403, "I Co-Admin possono modificare solo il ruolo dei giocatori semplici.");
+            return StatusCode(403, "Gli admin non possono gestire i super admin o altri admin.");
         }
 
         // Determina il nuovo ruolo id
         int nuovoRuoloId;
         switch (request.NuovoRuolo.ToUpper())
         {
+            case "ADMIN":
+                nuovoRuoloId = LeagueRoles.AdminId;
+                break;
             case "CO_ADMIN":
                 nuovoRuoloId = LeagueRoles.CoAdminId;
                 break;
@@ -261,10 +384,29 @@ public class AuthController : ControllerBase
                 nuovoRuoloId = LeagueRoles.GiocatoreId;
                 break;
             default:
-                return BadRequest("Ruolo non valido. Può essere solo CO_ADMIN o GIOCATORE.");
+                return BadRequest("Ruolo non valido. Può essere solo ADMIN, CO_ADMIN o GIOCATORE.");
         }
 
+        // Memorizza il ruolo vecchio per il log
+        string vecchioRuoloNome = targetUserLega.Ruolo.Nome;
+
         targetUserLega.RuoloId = nuovoRuoloId;
+
+        // Scrittura Log
+        var log = new ActivityLog
+        {
+            LegaId = request.LegaId,
+            EsecutoreId = userId,
+            EsecutoreNome = $"{requesterUserLega.User.Nome} {requesterUserLega.User.Cognome}",
+            EsecutoreRuolo = requesterUserLega.Ruolo.Nome,
+            Azione = "CAMBIO_RUOLO",
+            TargetUserId = request.TargetUserId,
+            TargetUserNome = $"{targetUserLega.User.Nome} {targetUserLega.User.Cognome}",
+            Dettagli = $"Ha modificato il ruolo di {targetUserLega.User.Nome} {targetUserLega.User.Cognome} da {vecchioRuoloNome} a {request.NuovoRuolo.ToUpper()}.",
+            Timestamp = DateTime.UtcNow
+        };
+        _context.ActivityLogs.Add(log);
+
         await _context.SaveChangesAsync();
 
         return Ok();
@@ -278,15 +420,22 @@ public class AuthController : ControllerBase
 
         // Verifica se l'utente che fa la richiesta appartiene alla lega ed ha i permessi necessari
         var requesterUserLega = await _context.UserLeghe
+            .Include(ul => ul.User)
+            .Include(ul => ul.Ruolo)
             .SingleOrDefaultAsync(ul => ul.UserId == userId && ul.LegaId == request.LegaId);
         
-        if (requesterUserLega == null || (requesterUserLega.RuoloId != LeagueRoles.AdminId && requesterUserLega.RuoloId != LeagueRoles.CoAdminId))
+        if (requesterUserLega == null || 
+            (requesterUserLega.RuoloId != LeagueRoles.SuperAdminId && 
+             requesterUserLega.RuoloId != LeagueRoles.AdminId && 
+             requesterUserLega.RuoloId != LeagueRoles.CoAdminId))
         {
             return StatusCode(403, "Non hai i permessi per eseguire questa azione.");
         }
 
         // Trova l'utente target nella lega
         var targetUserLega = await _context.UserLeghe
+            .Include(ul => ul.User)
+            .Include(ul => ul.Ruolo)
             .SingleOrDefaultAsync(ul => ul.UserId == request.TargetUserId && ul.LegaId == request.LegaId);
 
         if (targetUserLega == null)
@@ -298,6 +447,13 @@ public class AuthController : ControllerBase
         if (request.TargetUserId == userId)
         {
             return BadRequest("Non puoi rimuovere te stesso dalla lega. Se vuoi abbandonare, devi farlo dalle tue impostazioni profilo.");
+        }
+
+        // Se il richiedente è un ADMIN, può rimuovere solo Co-Admin e Giocatori (non può rimuovere Super Admin o altri Admin)
+        if (requesterUserLega.RuoloId == LeagueRoles.AdminId && 
+            (targetUserLega.RuoloId == LeagueRoles.SuperAdminId || targetUserLega.RuoloId == LeagueRoles.AdminId))
+        {
+            return StatusCode(403, "Gli admin non possono rimuovere i super admin o altri admin.");
         }
 
         // Se il richiedente è un Co-Admin, può rimuovere solo Giocatori semplici
@@ -314,6 +470,21 @@ public class AuthController : ControllerBase
         {
             targetUser.LegaId = null;
         }
+
+        // Scrittura Log
+        var log = new ActivityLog
+        {
+            LegaId = request.LegaId,
+            EsecutoreId = userId,
+            EsecutoreNome = $"{requesterUserLega.User.Nome} {requesterUserLega.User.Cognome}",
+            EsecutoreRuolo = requesterUserLega.Ruolo.Nome,
+            Azione = "RIMOZIONE_UTENTE",
+            TargetUserId = request.TargetUserId,
+            TargetUserNome = $"{targetUserLega.User.Nome} {targetUserLega.User.Cognome}",
+            Dettagli = $"Ha rimosso {targetUserLega.User.Nome} {targetUserLega.User.Cognome} dalla lega.",
+            Timestamp = DateTime.UtcNow
+        };
+        _context.ActivityLogs.Add(log);
 
         await _context.SaveChangesAsync();
 
@@ -347,17 +518,41 @@ public class AuthController : ControllerBase
 
     private async Task<UserDto> MapToUserDtoWithLegheAsync(User user)
     {
-        var userLeghe = await _context.UserLeghe
+        var userLegheRaw = await _context.UserLeghe
             .Where(ul => ul.UserId == user.Id)
             .Include(ul => ul.Lega)
             .Include(ul => ul.Ruolo)
-            .Select(ul => new LegaDto
-            {
-                Id = ul.LegaId,
-                Nome = ul.Lega.Nome,
-                Ruolo = ul.Ruolo.Nome
-            })
             .ToListAsync();
+
+        bool hasChanges = false;
+        foreach (var ul in userLegheRaw)
+        {
+            if (ul.Lega != null && string.IsNullOrWhiteSpace(ul.Lega.CodiceInvito))
+            {
+                ul.Lega.CodiceInvito = await GenerateUniqueInviteCode();
+                hasChanges = true;
+            }
+        }
+
+        if (hasChanges)
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        var userLeghe = userLegheRaw.Select(ul => new LegaDto
+        {
+            Id = ul.LegaId,
+            Nome = ul.Lega.Nome,
+            Ruolo = ul.Ruolo.Nome,
+            CodiceInvito = ul.Lega.CodiceInvito,
+            Descrizione = ul.Lega.Descrizione
+        }).ToList();
+
+        Console.WriteLine($"DEBUG [MapToUserDto]: User {user.Email}, Active LegaId: {user.LegaId}");
+        foreach (var ul in userLeghe)
+        {
+            Console.WriteLine($"DEBUG [MapToUserDto]: Lega {ul.Id} ({ul.Nome}), CodiceInvito: '{ul.CodiceInvito}', Ruolo: {ul.Ruolo}");
+        }
 
         return new UserDto
         {

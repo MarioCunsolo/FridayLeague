@@ -1,0 +1,112 @@
+<div class="attivita-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="title">Registro Attività</h2>
+      <p class="subtitle text-secondary">
+        Traccia cronologica delle operazioni amministrative e dei movimenti dei partecipanti all'interno della lega.
+      </p>
+    </div>
+    <button nz-button nzType="default" class="back-btn" [routerLink]="['/impostazioni']">
+      <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+      <span class="btn-text">Torna a Impostazioni</span>
+    </button>
+  </div>
+
+  <div class="table-container d-none d-md-block">
+    <nz-spin [nzSpinning]="loading()">
+      <nz-table #basicTable [nzData]="logs()" nzSize="middle" [nzPageSize]="10" class="custom-nz-table">
+        <thead>
+          <tr>
+            <th nzWidth="220px">Esecutore</th>
+            <th nzWidth="170px">Azione</th>
+            <th nzWidth="200px">Destinatario</th>
+            <th>Dettagli</th>
+            <th nzWidth="180px">Data e Ora</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (log of basicTable.data; track log.id) {
+          <tr>
+            <td>
+              <div class="executor-cell">
+                <span class="executor-name">{{ log.esecutoreNome }}</span>
+                <nz-tag [nzColor]="getRoleBadgeColor(log.esecutoreRuolo)" class="role-tag-mini">
+                  {{ log.esecutoreRuolo }}
+                </nz-tag>
+              </div>
+            </td>
+            <td>
+              <nz-tag [nzColor]="getActionBadgeColor(log.azione)" class="action-tag">
+                {{ getActionText(log.azione) }}
+              </nz-tag>
+            </td>
+            <td>
+              @if (log.targetUserNome) {
+                <span class="target-name">{{ log.targetUserNome }}</span>
+              } @else {
+                <span class="text-muted italic">-</span>
+              }
+            </td>
+            <td class="details-cell">{{ log.dettagli }}</td>
+            <td class="time-cell">
+              <div class="time-wrapper">
+                <span nz-icon nzType="clock-circle" nzTheme="outline" class="time-icon"></span>
+                <span>{{ log.timestamp | date:'dd/MM/yyyy' }}</span>
+                <span class="text-muted font-sm">{{ log.timestamp | date:'HH:mm' }}</span>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </nz-table>
+    </nz-spin>
+  </div>
+
+  <!-- Vista Mobile (Card List) -->
+  <div class="mobile-logs-container d-block d-md-none">
+    <nz-spin [nzSpinning]="loading()">
+      @if (logs().length === 0 && !loading()) {
+        <div class="empty-state text-center py-5">
+          <span nz-icon nzType="info-circle" nzTheme="outline" class="empty-icon text-muted"></span>
+          <p class="text-muted mt-2">Nessuna attività registrata.</p>
+        </div>
+      }
+      
+      <div class="mobile-logs-list">
+        @for (log of logs(); track log.id) {
+          <div class="log-card shadow-sm">
+            <div class="log-card-header d-flex justify-content-between align-items-center mb-2">
+              <div class="executor-info">
+                <div class="executor-name">{{ log.esecutoreNome }}</div>
+                <nz-tag [nzColor]="getRoleBadgeColor(log.esecutoreRuolo)" class="role-tag-mini">
+                  {{ log.esecutoreRuolo }}
+                </nz-tag>
+              </div>
+              <div class="log-time text-end">
+                <span nz-icon nzType="clock-circle" nzTheme="outline" class="time-icon"></span>
+                <span class="time-text">{{ log.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </div>
+            
+            <div class="log-card-body">
+              <div class="log-action mb-2">
+                <nz-tag [nzColor]="getActionBadgeColor(log.azione)" class="action-tag">
+                  {{ getActionText(log.azione) }}
+                </nz-tag>
+              </div>
+              
+              @if (log.targetUserNome) {
+                <div class="log-target mb-2">
+                  <span class="label text-muted">Destinatario:</span>
+                  <span class="target-name ms-1">{{ log.targetUserNome }}</span>
+                </div>
+              }
+              
+              <p class="log-details m-0">{{ log.dettagli }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </nz-spin>
+  </div>
+</div>

@@ -10,6 +10,10 @@
     transition: background-color var(--transition-speed);
 }
 
+.letter-spacing-1 {
+    letter-spacing: 0.1rem;
+}
+
 .stat-card {
     background-color: var(--stat-card-bg);
     border: 0.0625rem solid var(--border-main);
@@ -47,8 +51,6 @@
     background: linear-gradient(135deg, #CD7F32, #A0522D) !important;
     color: #fff !important;
 }
-
-
 
 .stat-content {
     display: flex;
@@ -136,4 +138,107 @@
 
 ::ng-deep .ant-select-item:hover {
     background-color: var(--border-sub) !important;
+}
+
+/* Match card styling */
+.match-card {
+    background-color: var(--stat-card-bg);
+    border: 0.0625rem solid var(--border-main);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    width: 100%;
+}
+
+.match-title {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.match-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.team-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 30%;
+}
+
+.team-logo {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background-color: var(--input-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.team-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.score-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.score-text {
+    font-size: 2.25rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    letter-spacing: 0.15rem;
+}
+
+.match-status {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+
+/* Role badge styles inside League Profile */
+.role-badge {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.role-super_admin {
+    background-color: rgba(114, 46, 209, 0.15);
+    color: #722ed1;
+    border: 1px solid rgba(114, 46, 209, 0.25);
+}
+
+.role-admin {
+    background-color: rgba(245, 34, 45, 0.15);
+    color: #f5222d;
+    border: 1px solid rgba(245, 34, 45, 0.25);
+}
+
+.role-co_admin {
+    background-color: rgba(24, 144, 255, 0.15);
+    color: #1890ff;
+    border: 1px solid rgba(24, 144, 255, 0.25);
+}
+
+.role-giocatore {
+    background-color: rgba(82, 196, 26, 0.15);
+    color: #52c41a;
+    border: 1px solid rgba(82, 196, 26, 0.25);
 }

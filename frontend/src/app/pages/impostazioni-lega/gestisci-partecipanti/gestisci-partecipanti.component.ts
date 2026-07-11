@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -21,8 +21,7 @@ import { ConfirmModalComponent } from '../../../shared/component/confirm-modal/c
     NzTagModule, 
     NzIconModule, 
     NzButtonModule, 
-    NzSpinModule,
-    ConfirmModalComponent
+    NzSpinModule
   ],
   templateUrl: './gestisci-partecipanti.component.html',
   styleUrls: ['./gestisci-partecipanti.component.css']
@@ -31,18 +30,11 @@ export class GestisciPartecipantiComponent implements OnInit {
   private authService = inject(AuthService);
   private legaService = inject(LegaService);
   private message = inject(NzMessageService);
+  private viewContainerRef = inject(ViewContainerRef);
 
   public partecipanti = signal<any[]>([]);
   public loading = signal<boolean>(true);
   public actionLoading = signal<boolean>(false);
-
-  // Stato per la modale di conferma riutilizzabile
-  public isConfirmModalVisible = signal<boolean>(false);
-  public confirmModalTitle = signal<string>('');
-  public confirmModalMessage = signal<string>('');
-  public confirmModalConfirmText = signal<string>('');
-  public confirmModalIsDanger = signal<boolean>(false);
-  private activeConfirmAction: (() => void) | null = null;
 
   ngOnInit(): void {
     this.caricaPartecipanti();
@@ -86,11 +78,16 @@ export class GestisciPartecipantiComponent implements OnInit {
     // Non puoi autogestirti
     if (item.userId === currentUserId) return false;
     
-    // Nessuno può gestire l'ADMIN
-    if (item.ruolo === 'ADMIN') return false;
+    // Nessuno può gestire il SUPER_ADMIN
+    if (item.ruolo === 'SUPER_ADMIN') return false;
 
-    // Se l'utente corrente è ADMIN, può gestire chiunque altro (CO_ADMIN o GIOCATORE)
-    if (currentUserRole === 'ADMIN') return true;
+    // Se l'utente corrente è SUPER_ADMIN, può gestire chiunque altro (ADMIN, CO_ADMIN, GIOCATORE)
+    if (currentUserRole === 'SUPER_ADMIN') return true;
+
+    // Se l'utente corrente è ADMIN, può gestire solo i CO_ADMIN e i GIOCATORE semplici (non può gestire altri ADMIN o il SUPER_ADMIN)
+    if (currentUserRole === 'ADMIN') {
+      return item.ruolo === 'CO_ADMIN' || item.ruolo === 'GIOCATORE';
+    }
 
     // Se l'utente corrente è CO_ADMIN, può gestire solo i GIOCATORE semplici
     if (currentUserRole === 'CO_ADMIN') {
@@ -100,52 +97,99 @@ export class GestisciPartecipantiComponent implements OnInit {
     return false;
   }
 
-  chiediConfermaRuolo(item: any): void {
-    const isPromoting = item.ruolo === 'GIOCATORE';
-    this.confirmModalTitle.set(isPromoting ? 'Promuovi a Co-Admin' : 'Declassa a Giocatore');
-    this.confirmModalMessage.set(
-      isPromoting 
-        ? `Sei sicuro di voler promuovere ${item.nome} ${item.cognome} a Co-Admin della lega?` 
-        : `Sei sicuro di voler rimuovere i privilegi di Co-Admin a ${item.nome} ${item.cognome}?`
-    );
-    this.confirmModalConfirmText.set(isPromoting ? 'Promuovi' : 'Declassa');
-    this.confirmModalIsDanger.set(!isPromoting);
-    this.activeConfirmAction = () => this.toggleRuolo(item);
-    this.isConfirmModalVisible.set(true);
+  /**
+   * Crea ed apre la modale di conferma programmaticamente.
+   */
+  private openConfirmModal(options: {
+    title: string;
+    message: string;
+    confirmText: string;
+    isDanger: boolean;
+    onConfirm: () => void;
+  }): void {
+    const componentRef = this.viewContainerRef.createComponent(ConfirmModalComponent);
+    
+    componentRef.instance.isVisible = true;
+    componentRef.instance.title = options.title;
+    componentRef.instance.message = options.message;
+    componentRef.instance.confirmText = options.confirmText;
+    componentRef.instance.isDanger = options.isDanger;
+
+    // Sottoscrizione all'evento di conferma
+    const confirmSub = componentRef.instance.confirm.subscribe(() => {
+      options.onConfirm();
+      confirmSub.unsubscribe();
+      cancelSub.unsubscribe();
+      componentRef.destroy();
+    });
+
+    // Sottoscrizione all'evento di annullamento
+    const cancelSub = componentRef.instance.cancel.subscribe(() => {
+      confirmSub.unsubscribe();
+      cancelSub.unsubscribe();
+      componentRef.destroy();
+    });
+  }
+
+  chiediConfermaCambioRuolo(item: any, nuovoRuolo: string): void {
+    let title = '';
+    let message = '';
+    let confirmText = '';
+    let isDanger = false;
+
+    if (nuovoRuolo === 'ADMIN') {
+      title = 'Promuovi a Admin';
+      message = `Sei sicuro di voler promuovere ${item.nome} ${item.cognome} ad ADMIN della lega? Questa azione gli assegnerà i privilegi massimi.`;
+      confirmText = 'Rendi Admin';
+      isDanger = true;
+    } else if (nuovoRuolo === 'CO_ADMIN') {
+      title = 'Promuovi a Co-Admin';
+      message = `Sei sicuro di voler promuovere ${item.nome} ${item.cognome} a Co-Admin della lega?`;
+      confirmText = 'Rendi Co-Admin';
+      isDanger = false;
+    } else if (nuovoRuolo === 'GIOCATORE') {
+      title = 'Declassa a Giocatore';
+      message = `Sei sicuro di voler declassare ${item.nome} ${item.cognome} a Giocatore semplice?`;
+      confirmText = 'Rendi Giocatore';
+      isDanger = true;
+    }
+
+    this.openConfirmModal({
+      title,
+      message,
+      confirmText,
+      isDanger,
+      onConfirm: () => this.eseguiCambioRuolo(item, nuovoRuolo)
+    });
   }
 
   chiediConfermaRimozione(item: any): void {
-    this.confirmModalTitle.set('Rimuovi Partecipante');
-    this.confirmModalMessage.set(`Sei sicuro di voler rimuovere definitivamente ${item.nome} ${item.cognome} da questa lega?`);
-    this.confirmModalConfirmText.set('Rimuovi');
-    this.confirmModalIsDanger.set(true);
-    this.activeConfirmAction = () => this.rimuoviPartecipante(item);
-    this.isConfirmModalVisible.set(true);
+    this.openConfirmModal({
+      title: 'Rimuovi Partecipante',
+      message: `Sei sicuro di voler rimuovere definitivamente ${item.nome} ${item.cognome} da questa lega?`,
+      confirmText: 'Rimuovi',
+      isDanger: true,
+      onConfirm: () => this.rimuoviPartecipante(item)
+    });
   }
 
-  eseguiAzioneConfermata(): void {
-    if (this.activeConfirmAction) {
-      this.activeConfirmAction();
-    }
-    this.chiudiModale();
-  }
-
-  chiudiModale(): void {
-    this.isConfirmModalVisible.set(false);
-    this.activeConfirmAction = null;
-  }
-
-  toggleRuolo(item: any): void {
+  eseguiCambioRuolo(item: any, nuovoRuolo: string): void {
     const user = this.authService.currentUser();
     if (!user || !user.legaId || !this.canManage(item)) return;
 
-    const nuovoRuolo = item.ruolo === 'CO_ADMIN' ? 'GIOCATORE' : 'CO_ADMIN';
+    // Controllo di sicurezza client-side: Solo SUPER_ADMIN e ADMIN possono modificare i ruoli
+    const ruoloUtente = this.getCurrentUserRole();
+    if (ruoloUtente !== 'SUPER_ADMIN' && ruoloUtente !== 'ADMIN') {
+      this.message.error('Solo il super admin o gli admin della lega possono modificare i ruoli.');
+      return;
+    }
+
     this.actionLoading.set(true);
 
     this.legaService.cambiaRuoloPartecipante(user.legaId, item.userId, nuovoRuolo).subscribe({
       next: () => {
         this.actionLoading.set(false);
-        this.message.success(`Ruolo di ${item.nome} aggiornato con successo!`);
+        this.message.success(`Ruolo di ${item.nome} aggiornato in ${nuovoRuolo} con successo!`);
         this.caricaPartecipanti();
       },
       error: (err) => {
@@ -159,6 +203,13 @@ export class GestisciPartecipantiComponent implements OnInit {
   rimuoviPartecipante(item: any): void {
     const user = this.authService.currentUser();
     if (!user || !user.legaId || !this.canManage(item)) return;
+
+    // Controllo di sicurezza client-side: Solo SUPER_ADMIN, ADMIN e CO_ADMIN possono rimuovere
+    const ruoloUtente = this.getCurrentUserRole();
+    if (ruoloUtente !== 'SUPER_ADMIN' && ruoloUtente !== 'ADMIN' && ruoloUtente !== 'CO_ADMIN') {
+      this.message.error('Non hai i permessi per rimuovere partecipanti da questa lega.');
+      return;
+    }
 
     this.actionLoading.set(true);
     this.legaService.rimuoviPartecipante(user.legaId, item.userId).subscribe({
@@ -177,12 +228,14 @@ export class GestisciPartecipantiComponent implements OnInit {
 
   getRoleColor(ruolo: string): string {
     switch (ruolo) {
+      case 'SUPER_ADMIN':
+        return '#722ed1'; // Viola premium
       case 'ADMIN':
-        return '#f50'; // Red
+        return '#f50'; // Rosso
       case 'CO_ADMIN':
-        return '#2db7f5'; // Blue
+        return '#2db7f5'; // Azzurro
       default:
-        return '#87d068'; // Green
+        return '#87d068'; // Verde
     }
   }
 }

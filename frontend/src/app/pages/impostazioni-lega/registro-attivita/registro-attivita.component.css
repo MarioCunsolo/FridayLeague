@@ -1,0 +1,247 @@
+.attivita-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.back-btn {
+  border-radius: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-color: var(--border-main);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Custom Table Wrapper */
+.table-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-main);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .table-container {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+}
+
+/* Custom table override styling to feel premium */
+::ng-deep .custom-nz-table {
+  background: transparent !important;
+}
+
+::ng-deep .custom-nz-table nz-table {
+  background: transparent !important;
+}
+
+::ng-deep .custom-nz-table .ant-table {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-thead > tr > th {
+  background: rgba(82, 113, 255, 0.04) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--border-main) !important;
+  padding: 1.15rem 1.5rem !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--border-sub) !important;
+  padding: 1.15rem 1.5rem !important;
+  color: var(--text-secondary) !important;
+  vertical-align: middle !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+::ng-deep .custom-nz-table .ant-table-tbody > tr:hover > td {
+  background: rgba(82, 113, 255, 0.01) !important;
+}
+
+.executor-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.executor-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.role-tag-mini {
+  align-self: flex-start;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border: none;
+  text-transform: uppercase;
+  color: #fff !important;
+}
+
+.action-tag {
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 3px 9px;
+  border: none;
+  text-transform: uppercase;
+  color: #fff !important;
+}
+
+.target-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.details-cell {
+  font-size: 0.9rem;
+  color: var(--text-secondary) !important;
+  line-height: 1.4;
+}
+
+.time-cell {
+  font-size: 0.88rem;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  white-space: nowrap;
+}
+
+.time-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.font-sm {
+  font-size: 0.8rem;
+}
+
+.time-icon {
+  color: var(--text-tertiary);
+}
+
+.italic {
+  font-style: italic;
+}
+
+/* Responsiveness & Mobile Card List */
+.mobile-logs-container {
+  margin-top: 1rem;
+}
+
+.log-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-main);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.log-card:active {
+  transform: scale(0.98);
+}
+
+.log-card-header {
+  border-bottom: 1px solid var(--border-sub);
+  padding-bottom: 0.75rem;
+}
+
+.executor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.executor-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.log-time {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.log-card-body {
+  padding-top: 0.75rem;
+}
+
+.log-action {
+  display: inline-block;
+}
+
+.log-target {
+  font-size: 0.88rem;
+}
+
+.log-target .label {
+  font-weight: 500;
+}
+
+.log-details {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.empty-state {
+  background: var(--card-bg);
+  border: 1px solid var(--border-main);
+  border-radius: 16px;
+  padding: 3rem 1.5rem;
+}
+
+.empty-icon {
+  font-size: 2rem;
+}
+
+@media (max-width: 768px) {
+  .attivita-container {
+    padding: 1rem;
+  }
+  .title {
+    font-size: 1.6rem;
+  }
+  .back-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  .back-btn .btn-text {
+    display: none; /* Hide text on small screens, keep only arrow */
+  }
+}

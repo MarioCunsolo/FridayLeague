@@ -19,6 +19,6 @@ public class AuthorizationHelper : IAuthorizationHelper
 
         if (member == null) return false;
 
-        return member.RuoloId == LeagueRoles.AdminId || member.RuoloId == LeagueRoles.CoAdminId;
+        return member.RuoloId == LeagueRoles.SuperAdminId || member.RuoloId == LeagueRoles.AdminId || member.RuoloId == LeagueRoles.CoAdminId;
     }
 }

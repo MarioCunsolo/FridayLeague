@@ -48,13 +48,19 @@ Il progetto è suddiviso in due componenti principali:
 ## 4. Sistema dei Ruoli e Permessi della Lega
 
 Le autorizzazioni all'interno di una lega seguono questa gerarchia:
-1. **ADMIN** (ID = 1): Proprietario/Amministratore della lega. Ha accesso completo a tutte le impostazioni. Può promuovere utenti a `CO_ADMIN`, declassarli a `GIOCATORE`, o rimuoverli definitivamente dalla lega.
-2. **CO_ADMIN** (ID = 2): Co-Amministratore. Può accedere alle impostazioni e gestire i partecipanti, ma **solo quelli con ruolo `GIOCATORE`** (non può modificare o eliminare altri Co-Admin o l'Admin).
-3. **GIOCATORE** (ID = 3): Giocatore semplice. Non ha alcun accesso alle sezioni di amministrazione o impostazioni di lega.
+1. **SUPER_ADMIN** (ID = 4): Il creatore della lega. Ha accesso a tutte le impostazioni. Ha pieni poteri per modificare i ruoli di chiunque (promuovere/declassare ad `ADMIN`, `CO_ADMIN`, `GIOCATORE`) e per rimuovere qualsiasi partecipante (eccetto se stesso).
+2. **ADMIN** (ID = 1): Amministratore delegato. Ha accesso alle impostazioni. Può modificare i ruoli di Co-Admin e Giocatori (assegnando loro `ADMIN`, `CO_ADMIN` o `GIOCATORE`), ma **non può gestire il Super Admin o altri Admin**. Può anche rimuovere membri Co-Admin o Giocatori (ma non Super Admin o altri Admin).
+3. **CO_ADMIN** (ID = 2): Co-Amministratore. Può accedere alla sezione impostazioni di lega, ma nella gestione dei partecipanti **non ha i permessi per modificare i ruoli (non può promuovere/declassare nessuno)**. Può invece rimuovere i membri della lega, ma **solo ed esclusivamente se hanno il ruolo di `GIOCATORE`** (non può rimuovere Super Admin, Admin o altri Co-Admin).
+4. **GIOCATORE** (ID = 3): Giocatore semplice. Non ha alcun accesso alle sezioni di amministrazione o impostazioni di lega.
 
 ### Regole Importanti:
-* Nessun utente può autogestirsi (es. l'admin non può declassarsi o eliminarsi da solo da questo flusso).
+* Nessun utente può autogestirsi (es. non può modificare o eliminare se stesso).
 * Se un utente viene rimosso dalla sua lega attiva corrente, il suo `LegaId` nel database viene impostato a `null` in modo che debba selezionare o creare una nuova lega al successivo accesso.
+* **Sicurezza FE (Route Guard)**: La rotta `/impostazioni` (e i suoi figli) è protetta da **`adminOrCoAdminGuard`** ([admin-or-co-admin.guard.ts](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/shared/guard/admin-or-co-admin.guard.ts)), impedendo l'accesso diretto via URL a utenti con ruolo semplice `GIOCATORE` (la guardia autorizza `SUPER_ADMIN`, `ADMIN` e `CO_ADMIN`).
+* **Sicurezza FE (Component Controller)**: All'interno di `GestisciPartecipantiComponent`, i metodi `eseguiCambioRuolo` e `rimuoviPartecipante` effettuano un ulteriore controllo di sicurezza preventivo sul ruolo dell'utente corrente (`getCurrentUserRole()`), bloccando la chiamata e mostrando un messaggio di errore se l'utente non è autorizzato (rispettivamente `SUPER_ADMIN`/`ADMIN` per il ruolo, e `SUPER_ADMIN`/`ADMIN`/`CO_ADMIN` per l'eliminazione).
+* **Sicurezza BE (API Controller)**: I controlli sui ruoli per le azioni amministrative (`cambia-ruolo-partecipante` e `rimuovi-partecipante`) sono validati a livello di controller in `AuthController.cs`.
+  * `cambia-ruolo-partecipante` permette l'esecuzione a utenti `SUPER_ADMIN` e `ADMIN` (gli `ADMIN` non possono agire su `SUPER_ADMIN` o altri `ADMIN`).
+  * `rimuovi-partecipante` permette l'esecuzione a utenti `SUPER_ADMIN` (su chiunque), `ADMIN` (solo su `CO_ADMIN` e `GIOCATORE`), e `CO_ADMIN` (solo su target con ruolo `GIOCATORE`).
 
 ---
 
@@ -65,14 +71,35 @@ Le autorizzazioni all'interno di una lega seguono questa gerarchia:
   * Supporta la visualizzazione adattiva per Light e Dark mode tramite le variabili CSS globali (es. `--card-bg`, `--text-primary`, `--input-bg`).
   * Supporta lo stato `isDanger` (pulsante e icona rossi pulsanti per le eliminazioni/declassamenti) o standard (blu).
   * Mostra testi personalizzabili ed emette eventi `confirm` e `cancel`.
+  * **Invocazione Programmatica (TS)**: La modale non è configurata nel template HTML dei singoli componenti. Viene caricata in memoria dinamicamente da codice TypeScript (es. tramite `ViewContainerRef.createComponent()`), configurata con i parametri desiderati (`title`, `message`, `confirmText`, `isDanger`), sottoscritta agli eventi di output (confirm/cancel) e infine distrutta esplicitamente (`componentRef.destroy()`) una volta terminata l'azione, ottimizzando il DOM ed evitando di sporcare i template HTML.
 * **Rotta `/home`**:
   * La homepage è configurata esplicitamente sul percorso `/home` in [app-routing.module.ts](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/app-routing.module.ts).
   * La rotta vuota `""` esegue un redirect automatico a `/home`.
   * Tutti i reindirizzamenti di navigazione (post-login, post-seleziona lega, cambio lega attiva) puntano a `/home`.
+* **Codice Invito della Lega**:
+  * Esposto dal backend arricchendo `LegaDto` con i campi `CodiceInvito` e `Descrizione` in [UserDto.cs](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/FridayLeague.Api/DTOs/UserDto.cs).
+  * Mostrato nella dashboard di **[ImpostazioniLegaComponent](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/pages/impostazioni-lega/impostazioni-lega.component.ts)** tramite un banner informativo premium (`.league-info-banner`).
+  * Include la funzionalità "Copia Codice" con riscontro visivo tramite toast message di successo (`NzMessageService`) sfruttando le Clipboard API del browser (`navigator.clipboard`).
 
 ---
 
-## 6. Linee Guida per gli Aggiornamenti Futuri
+## 6. Registro Attività (Audit Logging)
+
+Il sistema di tracciamento e log di audit memorizza le azioni amministrative in modo indipendente per ciascuna lega:
+* **Entità nel Database (`ActivityLog`)**: [ActivityLog.cs](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/FridayLeague.Api/Data/ActivityLog.cs)
+  * Campi: `Id`, `LegaId`, `EsecutoreId`, `EsecutoreNome`, `EsecutoreRuolo`, `Azione` (`CREAZIONE_LEGA`, `ACCESSO_LEGA`, `CAMBIO_RUOLO`, `RIMOZIONE_UTENTE`), `TargetUserId`, `TargetUserNome`, `Dettagli`, `Timestamp`.
+* **Tenant Isolation & Sicurezza (Separazione Log)**:
+  * L'endpoint `GET /api/auth/lega/{legaId}/registri-attivita` è filtrato rigorosamente su `LegaId == legaId`.
+  * Il backend convalida che l'utente appartenga alla lega `{legaId}` richiesta e abbia ruolo amministrativo di **`SUPER_ADMIN` o `ADMIN`** (escludendo quindi i Co-Admin). Altri ruoli ricevono `403 Forbidden`.
+* **Visualizzazione (FE)**:
+  * Pagina ad accesso riservato: **[RegistroAttivitaComponent](file:///Users/salvovitale/Desktop/Prova/FridayLeague/frontend/src/app/pages/impostazioni-lega/registro-attivita/registro-attivita.component.ts)**.
+  * Navigabile da `/impostazioni/registro-attivita`, protetta da **`adminOnlyGuard`** (che concede l'accesso solo a `SUPER_ADMIN` e `ADMIN`).
+  * La card di navigazione in `ImpostazioniLegaComponent` è nascosta per i `CO_ADMIN` tramite direttiva `@if (isAdminOrSuperAdmin())`.
+  * Tabella con badge per identificare i ruoli ed i tipi di azione con colori standardizzati coerenti sia in tema dark che light.
+
+---
+
+## 7. Linee Guida per gli Aggiornamenti Futuri
 
 * **Controllo Preventivo**: Leggere e comprendere questo file all'inizio di ogni attività per mantenere intatta la coerenza dell'architettura e dei flussi.
 * **Manutenzione del File**: Se una richiesta introduce modifiche architetturali, aggiornamenti a endpoint chiave, nuovi ruoli o nuovi componenti condivisi, questo file deve essere aggiornato tempestivamente.

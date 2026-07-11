@@ -6,8 +6,14 @@
         <div class="profile-circle shadow">
           <i class="fa fa-user" style="font-size: 4.5rem; color: var(--text-grey);"></i>
         </div>
-        <h2 class="mt-4 mb-1">Mario Cunsolo</h2>
-        <p class="text-success fw-bold">Player Pro</p>
+        <h2 class="mt-4 mb-1">
+          {{ authService.currentUser()?.nome }} {{ authService.currentUser()?.cognome }}
+        </h2>
+        <div class="mt-2">
+          <span class="role-badge" [class]="'role-' + userRuolo().toLowerCase()">
+            {{ userRuolo() }}
+          </span>
+        </div>
       </div>
 
       <!-- Season Selector -->

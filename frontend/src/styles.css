@@ -388,6 +388,109 @@ body {
     background-color: rgba(0, 0, 0, 0.03) !important;
 }
 
+/* Ant Design Date Picker Overrides for Theme Consistency */
+.ant-picker-dropdown .ant-picker-panel-container {
+    background-color: var(--card-bg) !important;
+    border: 0.0625rem solid var(--border-main) !important;
+    border-radius: 0.75rem !important;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.4) !important;
+}
+
+.ant-picker-dropdown .ant-picker-panel {
+    border-color: var(--border-sub) !important;
+}
+
+.ant-picker-dropdown .ant-picker-header {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border-sub) !important;
+}
+
+.ant-picker-dropdown .ant-picker-header > button {
+    color: var(--text-tertiary) !important;
+}
+
+.ant-picker-dropdown .ant-picker-header > button:hover {
+    color: var(--primary-green) !important;
+}
+
+.ant-picker-dropdown .ant-picker-content th {
+    color: var(--text-secondary) !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell {
+    color: var(--text-tertiary) !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-in-view {
+    color: var(--text-primary) !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell:hover .ant-picker-cell-inner {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+    border-color: var(--primary-green) !important;
+}
+
+.ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: var(--primary-green) !important;
+    color: #000000 !important;
+}
+
+.ant-picker-dropdown .ant-picker-time-panel {
+    border-left-color: var(--border-sub) !important;
+}
+
+.ant-picker-dropdown .ant-picker-time-panel-column {
+    border-left-color: var(--border-sub) !important;
+}
+
+.ant-picker-dropdown .ant-picker-time-panel-cell-inner {
+    color: var(--text-primary) !important;
+}
+
+.ant-picker-dropdown .ant-picker-time-panel-cell:hover .ant-picker-time-panel-cell-inner {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.ant-picker-dropdown .ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+    background-color: var(--primary-green) !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+.ant-picker-dropdown .ant-picker-footer {
+    border-top-color: var(--border-sub) !important;
+}
+
+.ant-picker-dropdown .ant-picker-now-btn {
+    color: var(--primary-green) !important;
+}
+
+.ant-picker-dropdown .ant-picker-ok .ant-btn {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    color: #000000 !important;
+}
+
+.ant-picker-dropdown .ant-picker-ok .ant-btn[disabled] {
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-main) !important;
+    color: var(--text-tertiary) !important;
+    opacity: 0.7;
+}
+
+/* Light theme adjustments for the date picker dropdown */
+[data-theme='light'] .ant-picker-dropdown .ant-picker-panel-container {
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme='light'] .ant-picker-dropdown .ant-picker-cell:hover .ant-picker-cell-inner,
+[data-theme='light'] .ant-picker-dropdown .ant-picker-time-panel-cell:hover .ant-picker-time-panel-cell-inner {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
 /* Global Form Error Alert styling */
 .form-error-alert {
     background-color: rgba(255, 68, 68, 0.1);

@@ -1,0 +1,42 @@
+<!-- Backdrop with blur, consistent with AddGoalModalComponent -->
+<div class="modal-backdrop" (click)="handleCancel()"></div>
+
+<!-- Centered container with premium styling -->
+<div class="modal-container shadow-lg">
+  <header class="modal-header">
+    <button nz-button type="button" nzType="text" class="back-button" (click)="handleCancel()">
+      <nz-icon nzType="arrow-left" nzTheme="outline"></nz-icon>
+    </button>
+    <h2 class="modal-title m-0">Nuova Partita</h2>
+  </header>
+
+  <main class="modal-content-area">
+    <form nz-form [formGroup]="matchForm" nzLayout="vertical" class="match-form">
+      <nz-form-item>
+        <nz-form-label nzRequired>Squadra Casa</nz-form-label>
+        <nz-form-control nzErrorTip="Inserisci il nome della squadra di casa">
+          <input nz-input formControlName="homeTeam" placeholder="Es. Squali Rossi" class="custom-input" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Squadra Trasferta</nz-form-label>
+        <nz-form-control [nzErrorTip]="matchForm.get('awayTeam')?.hasError('squadreUguali') ? 'Le due squadre devono essere diverse' : 'Inserisci il nome della squadra in trasferta'">
+          <input nz-input formControlName="awayTeam" placeholder="Es. Leoni FC" class="custom-input" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Data e Ora</nz-form-label>
+        <nz-form-control nzErrorTip="Seleziona data e ora della partita">
+          <nz-date-picker formControlName="date" nzShowTime nzFormat="dd/MM/yyyy HH:mm" nzPlaceHolder="Seleziona data e ora" class="custom-date-picker"></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="modal-footer mt-4">
+        <button nz-button type="button" nzType="default" (click)="handleCancel()" class="footer-btn cancel-btn">Annulla</button>
+        <button nz-button type="button" nzType="primary" (click)="handleOk()" [nzLoading]="isConfirmLoading" [disabled]="matchForm.invalid" class="footer-btn save-btn">Crea Partita</button>
+      </div>
+    </form>
+  </main>
+</div>

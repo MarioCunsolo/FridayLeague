@@ -102,7 +102,7 @@ export class MatchService {
       awayTeam: 'Aquile Nere',
       homeScore: 3,
       awayScore: 1,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2026-03-20T21:00:00')
     },
     {
@@ -111,7 +111,7 @@ export class MatchService {
       awayTeam: 'Leoni FC',
       homeScore: 2,
       awayScore: 2,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2026-03-13T21:00:00')
     },
     {
@@ -120,7 +120,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 1,
       awayScore: 4,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2026-03-06T21:00:00')
     },
     {
@@ -138,7 +138,7 @@ export class MatchService {
       awayTeam: 'Leoni FC',
       homeScore: 2,
       awayScore: 4,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2026-02-20T21:00:00'),
       homePlayers: [
         { name: 'Mario Cunsolo', goals: 1, assists: 1 },
@@ -165,7 +165,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 1,
       awayScore: 1,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2026-02-13T20:30:00'),
       homePlayers: [
         { name: 'Alice Astri', goals: 1, assists: 0 },
@@ -192,7 +192,7 @@ export class MatchService {
       awayTeam: 'Pirati del Campo',
       homeScore: 3,
       awayScore: 0,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2026-02-12T19:00:00'),
       homePlayers: [
         { name: 'Ugo Ugolini', goals: 2, assists: 0 },
@@ -219,7 +219,7 @@ export class MatchService {
       awayTeam: 'Lupi Selvaggi',
       homeScore: 5,
       awayScore: 2,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2026-02-06T21:00:00'),
       homePlayers: [
         { name: 'Mario Cunsolo', goals: 3, assists: 0 },
@@ -247,7 +247,7 @@ export class MatchService {
       awayTeam: 'Leoni FC',
       homeScore: 3,
       awayScore: 3,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2025-11-15T21:00:00')
     },
     {
@@ -256,7 +256,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 0,
       awayScore: 2,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2025-05-10T21:00:00')
     },
     // Season 2024
@@ -266,7 +266,7 @@ export class MatchService {
       awayTeam: 'Lupi Selvaggi',
       homeScore: 4,
       awayScore: 1,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2024-12-20T21:00:00')
     },
     {
@@ -275,7 +275,7 @@ export class MatchService {
       awayTeam: 'Squali Rossi',
       homeScore: 2,
       awayScore: 2,
-      status: MatchStatus.TERMINATA,
+      status: MatchStatus.CONCLUSA,
       date: new Date('2024-06-15T21:00:00')
     }
   ]);
@@ -303,7 +303,7 @@ export class MatchService {
 
   pastMatches = computed(() => {
     return this.matches()
-      .filter(m => m.status === MatchStatus.TERMINATA)
+      .filter(m => m.status === MatchStatus.CONCLUSA)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
 
@@ -321,8 +321,9 @@ export class MatchService {
    * @returns La prossima partita o null se non ci sono partite in programma.
    */
   getNextMatch() {
+    const now = Date.now();
     const programmable = this.matches()
-      .filter(m => m.status === MatchStatus.PROGRAMMATA)
+      .filter(m => m.status === MatchStatus.PROGRAMMATA && m.date.getTime() > now)
       .sort((a, b) => a.date.getTime() - b.date.getTime());
     return programmable.length > 0 ? programmable[0] : null;
   }
@@ -334,7 +335,7 @@ export class MatchService {
   getLastMatch() {
     // Return the latest completed match for the home page card
     const completed = this.matches()
-      .filter(m => m.status === MatchStatus.TERMINATA)
+      .filter(m => m.status === MatchStatus.CONCLUSA)
       .sort((a, b) => b.date.getTime() - a.date.getTime());
     return completed.length > 0 ? completed[0] : this.getMatches()()[0];
   }
@@ -392,6 +393,20 @@ export class MatchService {
   deleteMatch(id: number) {
     return this.http.delete<void>(`${this.BASE_URL}/${id}`).pipe(
       tap(() => this.matches.update(prev => prev.filter(m => m.id !== id)))
+    );
+  }
+
+  /**
+   * Annulla una partita attualmente in corso.
+   * @param id L'ID della partita da annullare.
+   * @returns Un Observable con la partita aggiornata.
+   */
+  annullaMatch(id: number) {
+    return this.http.put<Match>(`${this.BASE_URL}/${id}/annulla`, {}).pipe(
+      map(updatedMatch => this.parseMatchDate(updatedMatch)),
+      tap(updatedMatch => this.matches.update(prev =>
+        prev.map(m => m.id === id ? updatedMatch : m)
+      ))
     );
   }
 

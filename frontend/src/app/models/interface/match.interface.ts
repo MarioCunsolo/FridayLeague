@@ -12,8 +12,9 @@ export interface GoalEvent {
 
 export enum MatchStatus {
   PROGRAMMATA = 'Programmata',
-  TERMINATA = 'Terminata',
-  IN_CORSO = 'In Corso'
+  CONCLUSA = 'Conclusa',
+  IN_CORSO = 'In Corso',
+  ANNULLATA = 'Annullata'
 }
 
 export interface Match {

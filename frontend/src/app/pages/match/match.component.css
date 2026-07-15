@@ -2,6 +2,23 @@
     padding-bottom: 2rem;
 }
 
+.add-match-btn {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    color: #000 !important;
+    height: 2.5rem;
+    font-weight: 600;
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 204, 102, 0.3);
+    transition: all 0.3s ease;
+}
+
+.add-match-btn:hover {
+    background-color: var(--secondary-green) !important;
+    border-color: var(--secondary-green) !important;
+    transform: translateY(-0.125rem) scale(1.02);
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 204, 102, 0.4);
+}
+
 .match-card {
     position: relative;
     overflow: hidden;

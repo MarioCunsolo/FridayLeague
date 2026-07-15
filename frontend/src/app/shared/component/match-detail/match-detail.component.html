@@ -8,6 +8,12 @@
       <nz-icon nzType="arrow-left" nzTheme="outline"></nz-icon>
     </button>
     <h2 class="details-title m-0">Dettagli Partita</h2>
+    @if (canDelete() && authService.isAdminOrCoAdmin()) {
+    <button nz-button nzType="text" class="delete-match-button" [nzLoading]="isDeleting()"
+      (click)="chiediConfermaEliminazione()">
+      <nz-icon nzType="delete" nzTheme="outline"></nz-icon>
+    </button>
+    }
   </header>
 
   @if (match(); as m) {
@@ -90,12 +96,20 @@
       </div>
     </div>
 
-    @if (m.status === MatchStatus.IN_CORSO) {
-    <div class="d-flex justify-content-center mt-3">
+    @if (m.status === MatchStatus.IN_CORSO || (canAnnulla() && authService.isAdminOrCoAdmin())) {
+    <div class="d-flex justify-content-center gap-2 mt-3">
+      @if (m.status === MatchStatus.IN_CORSO) {
       <button nz-button nzType="primary" nzShape="round" (click)="openAddGoalModal()" class="add-goal-btn">
         <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
         Aggiungi Goal
       </button>
+      }
+      @if (canAnnulla() && authService.isAdminOrCoAdmin()) {
+      <button nz-button nzType="default" nzShape="round" [nzLoading]="isAnnullando()" (click)="chiediConfermaAnnullamento()" class="annulla-match-btn">
+        <nz-icon nzType="stop" nzTheme="outline"></nz-icon>
+        Annulla Partita
+      </button>
+      }
     </div>
     }
     <div class="match-scorers-container mt-4">

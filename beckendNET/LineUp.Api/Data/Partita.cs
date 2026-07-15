@@ -4,7 +4,8 @@ public static class StatoPartita
 {
     public const string Programmata = "Programmata";
     public const string InCorso = "In Corso";
-    public const string Terminata = "Terminata";
+    public const string Conclusa = "Conclusa";
+    public const string Annullata = "Annullata";
 }
 
 public class Partita

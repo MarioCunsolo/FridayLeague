@@ -3,8 +3,14 @@
   <div class="row justify-content-center">
     <div class="col-12 col-md-10 col-lg-9">
       <!-- Section Header -->
-      <div class="d-flex align-items-center mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-4">
         <h2 class="section-title m-0">Calendario Partite</h2>
+        @if (authService.isAdminOrCoAdmin()) {
+        <button nz-button nzType="primary" nzShape="round" class="add-match-btn" (click)="openAddMatchModal()">
+          <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
+          Nuova Partita
+        </button>
+        }
       </div>
 
       <div class="matches-list">
@@ -31,6 +37,9 @@
                     @if (match.status === MatchStatus.PROGRAMMATA) {
                     <span class="score-text">VS</span>
                     <span class="match-status text-primary">{{ match.status }}</span>
+                    } @else if (match.status === MatchStatus.ANNULLATA) {
+                    <span class="score-text">VS</span>
+                    <span class="match-status text-danger">{{ match.status }}</span>
                     } @else {
                     <span class="score-text">{{ match.homeScore }} - {{ match.awayScore }}</span>
                     <span class="match-status text-success">{{ match.status }}</span>
@@ -58,5 +67,9 @@
       <app-match-detail [match]="selectedMatch()" [isModal]="false" (close)="closeMatchDetails()"></app-match-detail>
     </div>
   </div>
+  }
+
+  @if (isAddMatchModalVisible()) {
+  <app-add-match-modal (submit)="handleMatchSubmit($event)" (cancel)="handleMatchCancel()"></app-add-match-modal>
   }
 </div>

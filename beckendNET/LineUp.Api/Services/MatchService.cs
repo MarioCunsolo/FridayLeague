@@ -6,7 +6,11 @@ namespace LineUp.Api.Services;
 
 public class MatchService : IMatchService
 {
-    private static readonly string[] StatiValidi = { StatoPartita.Programmata, StatoPartita.InCorso, StatoPartita.Terminata };
+    private static readonly string[] StatiValidi = { StatoPartita.Programmata, StatoPartita.InCorso, StatoPartita.Conclusa, StatoPartita.Annullata };
+
+    // Una partita si considera conclusa 2 ore dopo il suo orario di inizio, indipendentemente
+    // dal fatto che qualcuno abbia registrato gol o aggiornato manualmente lo stato.
+    private static readonly TimeSpan DurataPartita = TimeSpan.FromHours(2);
 
     private readonly IMatchProxy _proxy;
     private readonly IAuthorizationHelper _authorizationHelper;
@@ -93,7 +97,31 @@ public class MatchService : IMatchService
         await RichiediAdminAsync(userId, legaId);
 
         var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
+
+        if (partita.DataOra <= DateTime.UtcNow)
+        {
+            throw new BadRequestException("Non è possibile eliminare una partita già disputata o in corso.");
+        }
+
         await _proxy.DeletePartitaAsync(partita);
+    }
+
+    public async Task<MatchDto> AnnullaMatchAsync(int userId, int matchId)
+    {
+        var legaId = await GetLegaAttivaAsync(userId);
+        await RichiediAdminAsync(userId, legaId);
+
+        var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
+
+        if (partita.Stato != StatoPartita.InCorso && partita.Stato != StatoPartita.Programmata)
+        {
+            throw new BadRequestException("Puoi annullare solo una partita programmata o in corso.");
+        }
+
+        partita.Stato = StatoPartita.Annullata;
+        await _proxy.SalvaPartitaAsync();
+
+        return await BuildMatchDtoAsync(partita);
     }
 
     public async Task<GoalEventDto> AddGoalAsync(int userId, int matchId, AddGoalRequest request)
@@ -186,7 +214,7 @@ public class MatchService : IMatchService
             AwayTeam = partita.SquadraTrasferta.Nome,
             HomeScore = partita.GolCasa,
             AwayScore = partita.GolTrasferta,
-            Status = partita.Stato,
+            Status = CalcolaStatoEffettivo(partita),
             Date = partita.DataOra,
             HomePlayers = partecipanti.Where(p => p.InCasa).Select(MappaGiocatore).ToList(),
             AwayPlayers = partecipanti.Where(p => !p.InCasa).Select(MappaGiocatore).ToList(),
@@ -230,5 +258,17 @@ public class MatchService : IMatchService
             throw new BadRequestException($"Stato non valido. Deve essere uno tra: {string.Join(", ", StatiValidi)}.");
         }
         return stato;
+    }
+
+    private static string CalcolaStatoEffettivo(Partita partita)
+    {
+        if (partita.Stato == StatoPartita.Conclusa || partita.Stato == StatoPartita.Annullata)
+        {
+            return partita.Stato;
+        }
+
+        return partita.DataOra + DurataPartita <= DateTime.UtcNow
+            ? StatoPartita.Conclusa
+            : partita.Stato;
     }
 }

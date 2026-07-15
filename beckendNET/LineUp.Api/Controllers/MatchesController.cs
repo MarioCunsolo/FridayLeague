@@ -34,6 +34,10 @@ public class MatchesController : ApiControllerBase
     public Task<IActionResult> Delete(int id) =>
         ExecuteAsync(() => _matchService.DeleteMatchAsync(User.GetUserId(), id));
 
+    [HttpPut("{id}/annulla")]
+    public Task<ActionResult<MatchDto>> Annulla(int id) =>
+        ExecuteAsync(() => _matchService.AnnullaMatchAsync(User.GetUserId(), id));
+
     [HttpPost("{id}/goals")]
     public Task<ActionResult<GoalEventDto>> AddGoal(int id, AddGoalRequest request) =>
         ExecuteAsync(() => _matchService.AddGoalAsync(User.GetUserId(), id, request));

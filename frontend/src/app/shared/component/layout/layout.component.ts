@@ -5,6 +5,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { AuthService } from '../../service/auth.service';
 import { LegaService } from '../../service/lega.service';
+import { MatchService } from '../../service/match.service';
 
 @Component({
   selector: 'app-layout',
@@ -16,6 +17,7 @@ import { LegaService } from '../../service/lega.service';
 export class LayoutComponent {
   public authService = inject(AuthService);
   private legaService = inject(LegaService);
+  private matchService = inject(MatchService);
   private router = inject(Router);
 
   currentTheme = signal<'dark' | 'light'>('dark');
@@ -44,6 +46,14 @@ export class LayoutComponent {
       } else {
         const savedTheme = localStorage.getItem('theme') as 'dark' | 'light';
         if (savedTheme) this.currentTheme.set(savedTheme);
+      }
+    });
+
+    // Ricarica le partite della lega attiva dal backend al login e ad ogni cambio lega
+    effect(() => {
+      const legaId = this.authService.currentUser()?.legaId;
+      if (legaId) {
+        this.matchService.loadMatches().subscribe();
       }
     });
   }

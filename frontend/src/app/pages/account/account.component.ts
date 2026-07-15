@@ -95,16 +95,8 @@ export class AccountComponent {
     // Sottoscrizione all'evento di conferma
     const confirmSub = componentRef.instance.confirm.subscribe((nuovaPassword: string) => {
       this.salvando.set(true);
-      const user = this.authService.currentUser();
-      
-      const payload = {
-        nome: user.nome,
-        cognome: user.cognome,
-        email: user.email,
-        password: nuovaPassword
-      };
 
-      this.authService.aggiornaProfilo(payload).subscribe({
+      this.authService.cambiaPassword(nuovaPassword).subscribe({
         next: () => {
           this.message.success('Password modificata con successo!');
           this.salvando.set(false);

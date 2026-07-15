@@ -1,11 +1,12 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
 import { UserStats } from 'src/app/models/interface/user-stats.interface';
-import { Match, MatchStatus } from 'src/app/models/interface/match.interface';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { AuthService } from 'src/app/shared/service/auth.service';
+import { PlayerService } from 'src/app/shared/service/player.service';
+import { MatchService } from 'src/app/shared/service/match.service';
 
 @Component({
   selector: 'app-profile',
@@ -16,9 +17,11 @@ import { AuthService } from 'src/app/shared/service/auth.service';
 })
 export class ProfileComponent {
   public authService = inject(AuthService);
+  private playerService = inject(PlayerService);
+  private matchService = inject(MatchService);
 
   showMatchDetails = signal(false);
-  
+
   availableSeasons = ['2024', '2025', '2026'];
   selectedSeason = signal('2026');
 
@@ -30,61 +33,26 @@ export class ProfileComponent {
     return activeLega ? activeLega.ruolo : 'GIOCATORE';
   });
 
-  private seasonStats: Record<string, UserStats[]> = {
-    '2026': [
-      { label: 'GOAL', value: 12, icon: 'fa-futbol-o', colorClass: 'text-success', rank: 2 },
-      { label: 'ASSIST', value: 8, icon: 'fa-handshake-o', colorClass: 'text-success', rank: 4 },
-      { label: 'MOTM', value: 3, icon: 'fa-trophy', colorClass: 'text-success', rank: 1 },
-      { label: 'PARTITE', value: 24, icon: 'fa-line-chart', colorClass: 'text-success' }
-    ],
-    '2025': [
-      { label: 'GOAL', value: 18, icon: 'fa-futbol-o', colorClass: 'text-success', rank: 1 },
-      { label: 'ASSIST', value: 12, icon: 'fa-handshake-o', colorClass: 'text-success', rank: 2 },
-      { label: 'MOTM', value: 5, icon: 'fa-trophy', colorClass: 'text-success', rank: 1 },
-      { label: 'PARTITE', value: 30, icon: 'fa-line-chart', colorClass: 'text-success' }
-    ],
-    '2024': [
-      { label: 'GOAL', value: 10, icon: 'fa-futbol-o', colorClass: 'text-success', rank: 5 },
-      { label: 'ASSIST', value: 5, icon: 'fa-handshake-o', colorClass: 'text-success', rank: 8 },
-      { label: 'MOTM', value: 2, icon: 'fa-trophy', colorClass: 'text-success', rank: 3 },
-      { label: 'PARTITE', value: 20, icon: 'fa-line-chart', colorClass: 'text-success' }
-    ]
-  };
+  userStats = signal<UserStats[]>([]);
 
-  userStats = computed(() => this.seasonStats[this.selectedSeason()]);
+  constructor() {
+    effect(() => {
+      const userId = this.authService.currentUser()?.id;
+      const season = this.selectedSeason();
+      if (!userId) return;
+
+      this.playerService.getPlayerStats(userId, season).subscribe(stats => {
+        this.userStats.set(stats);
+      });
+    });
+  }
 
   onSeasonChange(index: number | string) {
     const season = typeof index === 'number' ? this.availableSeasons[index] : index;
     this.selectedSeason.set(season);
   }
 
-  selectedMatch = signal<Match>({
-    id: 1,
-    homeTeam: 'Squali Rossi',
-    awayTeam: 'Leoni FC',
-    homeScore: 2,
-    awayScore: 4,
-    status: MatchStatus.TERMINATA,
-    date: new Date('2026-02-20T21:00:00'),
-    homePlayers: [
-      { name: 'Mario Cunsolo', goals: 1, assists: 1 },
-      { name: 'Salvatore Vitale', goals: 1, assists: 0 },
-      { name: 'Giuseppe Rossi', goals: 0, assists: 0 },
-      { name: 'Luca Bianchi', goals: 0, assists: 1 },
-      { name: 'Marco Neri', goals: 0, assists: 0 },
-      { name: 'Andrea Gialli', goals: 0, assists: 0 },
-      { name: 'Paolo Rossi', goals: 0, assists: 0 }
-    ],
-    awayPlayers: [
-      { name: 'Roberto Verdi', goals: 2, assists: 0 },
-      { name: 'Franco Nipotini', goals: 1, assists: 1 },
-      { name: 'Giorgio Vanni', goals: 1, assists: 1 },
-      { name: 'Stefano Sogni', goals: 0, assists: 2 },
-      { name: 'Davide Danni', goals: 0, assists: 0 },
-      { name: 'Claudio Canti', goals: 0, assists: 0 },
-      { name: 'Enzo Esposito', goals: 0, assists: 0 }
-    ]
-  });
+  selectedMatch = computed(() => this.matchService.getLastMatch());
 
   openMatchDetails() {
     this.showMatchDetails.set(true);

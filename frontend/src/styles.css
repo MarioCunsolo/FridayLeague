@@ -324,15 +324,39 @@ body {
     border-radius: 0.75rem !important;
     box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.4) !important;
     padding: 0.25rem !important;
+    /* Il contenuto virtualizzato (cdk-virtual-scroll) è posizionato in modo assoluto e non
+       determina la larghezza del pannello: senza un min-width esplicito il dropdown collassa. */
+    min-width: 16rem !important;
+    width: max-content !important;
+    max-width: 24rem !important;
+}
+
+.ant-select-item-option-content {
+    white-space: nowrap !important;
+}
+
+/* Scrollbar sottile per la lista virtualizzata delle opzioni, al posto di quella nativa del browser */
+.ant-select-dropdown .cdk-virtual-scroll-viewport::-webkit-scrollbar {
+    width: 0.3rem;
+}
+
+.ant-select-dropdown .cdk-virtual-scroll-viewport::-webkit-scrollbar-thumb {
+    background: var(--border-sub);
+    border-radius: 0.25rem;
+}
+
+.ant-select-dropdown .cdk-virtual-scroll-viewport::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .ant-select-item {
     color: var(--text-primary) !important;
     border-radius: 0.5rem !important;
     transition: all 0.15s ease !important;
-    margin: 0.125rem 0 !important;
-    padding: 0.5rem 0.75rem !important;
+    margin: 0 !important;
+    padding: 0.4rem 0.75rem !important;
     font-size: 0.9rem !important;
+    box-sizing: border-box !important;
 }
 
 .ant-select-item-option-selected {

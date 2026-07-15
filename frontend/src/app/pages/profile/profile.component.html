@@ -58,34 +58,36 @@
       </div>
 
       <!-- Recent Match Card -->
-      <div class="col-12 col-md-10 col-lg-9 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
-        <div class="match-card shadow-sm">
-          <h3 class="match-title">Ultima Partita Giocata</h3>
-          <div class="match-content">
-            <div class="team-container">
-              <div class="team-logo shadow-sm">
-                <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+      @if (selectedMatch(); as match) {
+        <div class="col-12 col-md-10 col-lg-9 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
+          <div class="match-card shadow-sm">
+            <h3 class="match-title">Ultima Partita Giocata</h3>
+            <div class="match-content">
+              <div class="team-container">
+                <div class="team-logo shadow-sm">
+                  <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+                </div>
+                <span class="team-name text-truncate w-100">{{ match.homeTeam }}</span>
               </div>
-              <span class="team-name text-truncate w-100">{{ selectedMatch().homeTeam }}</span>
-            </div>
-            <div class="score-container">
-              <span class="score-text">{{ selectedMatch().homeScore }} - {{ selectedMatch().awayScore }}</span>
-              <span class="match-status text-success">{{ selectedMatch().status }}</span>
-            </div>
-            <div class="team-container">
-              <div class="team-logo shadow-sm">
-                <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+              <div class="score-container">
+                <span class="score-text">{{ match.homeScore }} - {{ match.awayScore }}</span>
+                <span class="match-status text-success">{{ match.status }}</span>
               </div>
-              <span class="team-name text-truncate w-100">{{ selectedMatch().awayTeam }}</span>
+              <div class="team-container">
+                <div class="team-logo shadow-sm">
+                  <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+                </div>
+                <span class="team-name text-truncate w-100">{{ match.awayTeam }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
     </div>
-  } @else {
+  } @else if (selectedMatch(); as match) {
     <div class="row justify-content-center">
       <div class="col-12 col-md-10 col-lg-9">
-        <app-match-detail [match]="selectedMatch()" [isModal]="false" (close)="closeMatchDetails()"></app-match-detail>
+        <app-match-detail [match]="match" [isModal]="false" (close)="closeMatchDetails()"></app-match-detail>
       </div>
     </div>
   }

@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { PlayerStats } from '../../models/interface/player-stats.interface';
+import { StatsService } from '../../shared/service/stats.service';
 
 import { trigger, transition, style, animate, keyframes } from '@angular/animations';
 
@@ -28,39 +29,21 @@ import { trigger, transition, style, animate, keyframes } from '@angular/animati
     ])
   ]
 })
-export class StatsComponent {
+export class StatsComponent implements OnInit {
+  private statsService = inject(StatsService);
+
   options = ['GOL', 'ASSIST', 'MOTM'];
   activeOption = signal('GOL');
 
-  scorers = signal<PlayerStats[]>([
-    { name: 'Mario Cunsolo', team: 'Squali Rossi', value: 12, avatar: 'MC', color: '#00cc66' },
-    { name: 'Luigi Verdi', team: 'Leoni FC', value: 9, avatar: 'LV', color: '#3399ff' },
-    { name: 'Francesco Rossi', team: 'Aquile Nere', value: 8, avatar: 'FR', color: '#ffcc00' },
-    { name: 'Andrea Blu', team: 'Squali Rossi', value: 6, avatar: 'AB', color: '#ff4444' },
-    { name: 'Simone Neri', team: 'Lupi Selvaggi', value: 5, avatar: 'SN', color: '#9933ff' },
-    { name: 'Carlo Gialli', team: 'Tigri Bianche', value: 4, avatar: 'CG', color: '#ff9933' },
-    { name: 'Giuseppe Bianchi', team: 'Pirati del Campo', value: 3, avatar: 'GB', color: '#33cccc' },
-  ]);
+  scorers = signal<PlayerStats[]>([]);
+  assists = signal<PlayerStats[]>([]);
+  motm = signal<PlayerStats[]>([]);
 
-  assists = signal<PlayerStats[]>([
-    { name: 'Andrea Blu', team: 'Squali Rossi', value: 8, avatar: 'AB', color: '#ff4444' },
-    { name: 'Mario Cunsolo', team: 'Squali Rossi', value: 7, avatar: 'MC', color: '#00cc66' },
-    { name: 'Carlo Gialli', team: 'Tigri Bianche', value: 6, avatar: 'CG', color: '#ff9933' },
-    { name: 'Luigi Verdi', team: 'Leoni FC', value: 5, avatar: 'LV', color: '#3399ff' },
-    { name: 'Francesco Rossi', team: 'Aquile Nere', value: 4, avatar: 'FR', color: '#ffcc00' },
-    { name: 'Simone Neri', team: 'Lupi Selvaggi', value: 3, avatar: 'SN', color: '#9933ff' },
-    { name: 'Giuseppe Bianchi', team: 'Pirati del Campo', value: 2, avatar: 'GB', color: '#33cccc' },
-  ]);
-
-  motm = signal<PlayerStats[]>([
-    { name: 'Mario Cunsolo', team: 'Squali Rossi', value: 3, avatar: 'MC', color: '#00cc66' },
-    { name: 'Francesco Rossi', team: 'Aquile Nere', value: 2, avatar: 'FR', color: '#ffcc00' },
-    { name: 'Luigi Verdi', team: 'Leoni FC', value: 2, avatar: 'LV', color: '#3399ff' },
-    { name: 'Simone Neri', team: 'Lupi Selvaggi', value: 1, avatar: 'SN', color: '#9933ff' },
-    { name: 'Carlo Gialli', team: 'Tigri Bianche', value: 1, avatar: 'CG', color: '#ff9933' },
-    { name: 'Giuseppe Bianchi', team: 'Pirati del Campo', value: 1, avatar: 'GB', color: '#33cccc' },
-    { name: 'Andrea Blu', team: 'Squali Rossi', value: 1, avatar: 'AB', color: '#ff4444' },
-  ]);
+  ngOnInit() {
+    this.statsService.getScorers().subscribe(data => this.scorers.set(data));
+    this.statsService.getAssists().subscribe(data => this.assists.set(data));
+    this.statsService.getMOTM().subscribe(data => this.motm.set(data));
+  }
 
   handleIndexChange(value: string | number): void {
     const selected = typeof value === 'number' ? this.options[value] : value;

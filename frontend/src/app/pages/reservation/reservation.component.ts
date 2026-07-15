@@ -1,6 +1,6 @@
-import { Component, signal, computed, inject, TemplateRef } from '@angular/core';
+import { Component, computed, inject, TemplateRef, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Reservation } from '../../models/interface/reservation.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -9,6 +9,10 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { ReservationService } from '../../shared/service/reservation.service';
+import { LegaService } from '../../shared/service/lega.service';
+import { AuthService } from '../../shared/service/auth.service';
 
 @Component({
   selector: 'app-reservation',
@@ -27,62 +31,63 @@ import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
     NzAutocompleteModule
   ]
 })
-export class ReservationComponent {
+export class ReservationComponent implements OnInit {
   private modal = inject(NzModalService);
   private fb = inject(FormBuilder);
+  private message = inject(NzMessageService);
+  private reservationService = inject(ReservationService);
+  private legaService = inject(LegaService);
+  private authService = inject(AuthService);
 
   validateForm = this.fb.group({
     nomeCognome: ['', [Validators.required]]
   });
 
-  // Mocked list of registered users with IDs
-  registeredUsers: { id: number, nomeCognome: string }[] = [
-    { id: 1, nomeCognome: 'Mario Rossi' },
-    { id: 2, nomeCognome: 'Luigi Bianchi' },
-    { id: 3, nomeCognome: 'Giuseppe Verdi' },
-    { id: 4, nomeCognome: 'Francesco Neri' },
-    { id: 5, nomeCognome: 'Andrea Gialli' },
-    { id: 6, nomeCognome: 'Simone Nipotini' },
-    { id: 7, nomeCognome: 'Carlo Magno' },
-    { id: 8, nomeCognome: 'Luca Romano' },
-    { id: 9, nomeCognome: 'Paolo Rossi' },
-    { id: 10, nomeCognome: 'Giorgio Neri' }
-  ];
-
+  // Elenco dei membri della lega attiva, usato per l'autocomplete "Prenota altra persona"
+  registeredUsers: { id: number, nomeCognome: string }[] = [];
   filteredOptions: { id: number, nomeCognome: string }[] = [];
 
-  // Dati di esempio per le prenotazioni come Signal
-  reservations = signal<Reservation[]>([
-    { nomeCognome: 'Mario Rossi', dataOra: new Date('2026-03-25T17:00:15') },
-    { nomeCognome: 'Luigi Bianchi', dataOra: new Date('2026-03-25T17:05:42') },
-    { nomeCognome: 'Giuseppe Verdi', dataOra: new Date('2026-03-25T17:08:05') },
-    { nomeCognome: 'Francesco Neri', dataOra: new Date('2026-03-25T17:10:22') },
-    { nomeCognome: 'Andrea Gialli', dataOra: new Date('2026-03-25T17:12:58') },
-    { nomeCognome: 'Simone Nipotini', dataOra: new Date('2026-03-25T17:15:11') },
-    { nomeCognome: 'Carlo Magno', dataOra: new Date('2026-03-25T17:18:34') },
-    { nomeCognome: 'Luca Romano', dataOra: new Date('2026-03-25T17:20:15') },
-    { nomeCognome: 'Paolo Rossi', dataOra: new Date('2026-03-25T17:22:42') },
-    { nomeCognome: 'Giorgio Neri', dataOra: new Date('2026-03-25T17:25:05') },
-    { nomeCognome: 'Marco Polo', dataOra: new Date('2026-03-25T17:28:22') },
-    { nomeCognome: 'Roberto Bossi', dataOra: new Date('2026-03-25T17:30:58') },
-    { nomeCognome: 'Federico Fellini', dataOra: new Date('2026-03-25T17:32:11') },
-    { nomeCognome: 'Dante Alighieri', dataOra: new Date('2026-03-25T17:35:34') },
-    { nomeCognome: 'Sostituto 1', dataOra: new Date('2026-03-25T17:40:15') },
-    { nomeCognome: 'Sostituto 2', dataOra: new Date('2026-03-25T17:42:42') },
-    { nomeCognome: 'Sostituto 3', dataOra: new Date('2026-03-25T17:45:05') },
-  ]);
+  reservations = this.reservationService.reservations;
 
   starters = computed(() => this.reservations().slice(0, 14));
   substitutes = computed(() => this.reservations().slice(14));
 
+  ngOnInit(): void {
+    this.reservationService.loadReservations().subscribe();
+
+    const legaId = this.authService.currentUser()?.legaId;
+    if (legaId) {
+      this.legaService.getLegaPartecipanti(legaId).subscribe((partecipanti: any[]) => {
+        this.registeredUsers = partecipanti.map(p => ({ id: p.userId, nomeCognome: `${p.nome} ${p.cognome}` }));
+      });
+    }
+  }
+
+  prenotaMe(): void {
+    const user = this.authService.currentUser();
+    if (!user) return;
+
+    this.reservationService.addReservation({ nomeCognome: `${user.nome} ${user.cognome}`, dataOra: new Date() }).subscribe({
+      next: () => this.message.success('Prenotazione effettuata con successo!'),
+      error: (err) => this.message.error(err.error || 'Errore durante la prenotazione.')
+    });
+  }
+
   deleteReservation(player: Reservation): void {
+    if (!player.playerId) {
+      this.message.error('Non è possibile eliminare una prenotazione non collegata a un utente registrato.');
+      return;
+    }
+
     this.modal.confirm({
       nzTitle: 'Sei sicuro di voler eliminare questa prenotazione?',
       nzContent: `<b style="color: #ff4d4f;">L'operazione è irreversibile.</b><br>Perderai la tua posizione attuale nella lista (Titolare/Sostituto).`,
       nzOkText: 'Sì, elimina',
       nzOkDanger: true,
       nzOnOk: () => {
-        this.reservations.update(res => res.filter(r => r !== player));
+        this.reservationService.deleteReservation(player.playerId!).subscribe({
+          error: (err) => this.message.error(err.error || "Errore durante l'eliminazione della prenotazione.")
+        });
       },
       nzCancelText: 'Annulla'
     });
@@ -117,19 +122,11 @@ export class ReservationComponent {
       nzOnOk: () => {
         if (this.validateForm.valid) {
           const typedName = this.validateForm.value.nomeCognome as string;
-          
-          // Check if the typed name matches a registered user (case insensitive)
-          const matchedUser = this.registeredUsers.find(u => 
-            u.nomeCognome.toLowerCase() === typedName.trim().toLowerCase()
-          );
 
-          const newReservation: Reservation = {
-            nomeCognome: typedName,
-            dataOra: new Date(),
-            playerId: matchedUser?.id // Set the ID if it's a registered user
-          };
-
-          this.reservations.update(res => [...res, newReservation]);
+          this.reservationService.addReservation({ nomeCognome: typedName, dataOra: new Date() }).subscribe({
+            next: () => this.message.success('Prenotazione effettuata con successo!'),
+            error: (err) => this.message.error(err.error || 'Errore durante la prenotazione.')
+          });
           return true;
         } else {
           return false;

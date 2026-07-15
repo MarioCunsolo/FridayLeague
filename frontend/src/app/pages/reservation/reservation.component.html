@@ -5,7 +5,8 @@
       <h2 class="section-title mb-4">Prenotazioni</h2>
 
       <div class="mb-4">
-        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow" [disabled]="isReservationDisabled()">
+        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow" [disabled]="isReservationDisabled()"
+          (click)="prenotaMe()">
           PRENOTATI
         </button>
         <button nz-button nzType="primary" nzBlock class="btn-prenota shadow mt-2" [disabled]="isReservationDisabled()"

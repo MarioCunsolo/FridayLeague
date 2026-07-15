@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using LineUp.Api.Data;
 using LineUp.Api.Services;
+using LineUp.Api.Proxies;
+using LineUp.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,24 @@ builder.Services.AddDbContext<LineUpDbContext>(options =>
 // Register Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
+
+// Repository Pattern: Controller -> Service -> Proxy -> Repository (vedi ARCHITECTURE.md)
+builder.Services.AddScoped<ISquadraRepository, SquadraRepository>();
+builder.Services.AddScoped<IPartitaRepository, PartitaRepository>();
+builder.Services.AddScoped<IPartecipantePartitaRepository, PartecipantePartitaRepository>();
+builder.Services.AddScoped<IEventoGolRepository, EventoGolRepository>();
+builder.Services.AddScoped<IPrenotazioneRepository, PrenotazioneRepository>();
+builder.Services.AddScoped<IUserLegaRepository, UserLegaRepository>();
+
+builder.Services.AddScoped<IMatchProxy, MatchProxy>();
+builder.Services.AddScoped<IPlayerProxy, PlayerProxy>();
+builder.Services.AddScoped<IStatsProxy, StatsProxy>();
+builder.Services.AddScoped<IReservationProxy, ReservationProxy>();
+
+builder.Services.AddScoped<IMatchService, MatchService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IStatsService, StatsService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -75,6 +95,77 @@ using (var scope = app.Services.CreateScope())
                 Dettagli TEXT NOT NULL,
                 Timestamp DATETIME NOT NULL,
                 CONSTRAINT FK_ActivityLogs_Leghe_LegaId FOREIGN KEY (LegaId) REFERENCES Leghe(Id) ON DELETE CASCADE
+            );
+        ");
+
+        // Fail-safe: rimuove le vecchie tabelle Teams/Players (modello legacy scollegato dalla Lega, mai popolato)
+        dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Players;");
+        dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Teams;");
+
+        // Fail-safe: assicura che le tabelle del dominio Partite/Prenotazioni esistano nel database esistente
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS Squadre (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                LegaId INT NOT NULL,
+                Nome VARCHAR(255) NOT NULL,
+                CONSTRAINT FK_Squadre_Leghe_LegaId FOREIGN KEY (LegaId) REFERENCES Leghe(Id) ON DELETE CASCADE
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS Partite (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                LegaId INT NOT NULL,
+                SquadraCasaId INT NOT NULL,
+                SquadraTrasfertaId INT NOT NULL,
+                DataOra DATETIME NOT NULL,
+                Stato VARCHAR(20) NOT NULL,
+                GolCasa INT NOT NULL DEFAULT 0,
+                GolTrasferta INT NOT NULL DEFAULT 0,
+                Stagione VARCHAR(10) NOT NULL,
+                CONSTRAINT FK_Partite_Leghe_LegaId FOREIGN KEY (LegaId) REFERENCES Leghe(Id) ON DELETE CASCADE,
+                CONSTRAINT FK_Partite_Squadre_SquadraCasaId FOREIGN KEY (SquadraCasaId) REFERENCES Squadre(Id),
+                CONSTRAINT FK_Partite_Squadre_SquadraTrasfertaId FOREIGN KEY (SquadraTrasfertaId) REFERENCES Squadre(Id)
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS PartecipantiPartita (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                PartitaId INT NOT NULL,
+                UserId INT NOT NULL,
+                InCasa TINYINT(1) NOT NULL,
+                Motm TINYINT(1) NOT NULL DEFAULT 0,
+                CONSTRAINT FK_PartecipantiPartita_Partite_PartitaId FOREIGN KEY (PartitaId) REFERENCES Partite(Id) ON DELETE CASCADE,
+                CONSTRAINT FK_PartecipantiPartita_Users_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
+                CONSTRAINT UQ_PartecipantiPartita_Partita_User UNIQUE (PartitaId, UserId)
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS EventiGol (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                PartitaId INT NOT NULL,
+                MarcatoreUserId INT NOT NULL,
+                InCasa TINYINT(1) NOT NULL,
+                AssistUserId INT NULL,
+                CONSTRAINT FK_EventiGol_Partite_PartitaId FOREIGN KEY (PartitaId) REFERENCES Partite(Id) ON DELETE CASCADE,
+                CONSTRAINT FK_EventiGol_Users_MarcatoreUserId FOREIGN KEY (MarcatoreUserId) REFERENCES Users(Id),
+                CONSTRAINT FK_EventiGol_Users_AssistUserId FOREIGN KEY (AssistUserId) REFERENCES Users(Id)
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS Prenotazioni (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                PartitaId INT NOT NULL,
+                UserId INT NULL,
+                PrenotatoDaUserId INT NOT NULL,
+                NomeCognome VARCHAR(255) NOT NULL,
+                DataOra DATETIME NOT NULL,
+                CONSTRAINT FK_Prenotazioni_Partite_PartitaId FOREIGN KEY (PartitaId) REFERENCES Partite(Id) ON DELETE CASCADE,
+                CONSTRAINT FK_Prenotazioni_Users_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
+                CONSTRAINT FK_Prenotazioni_Users_PrenotatoDaUserId FOREIGN KEY (PrenotatoDaUserId) REFERENCES Users(Id)
             );
         ");
 
@@ -173,16 +264,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-// Keep minimal API endpoints for backward compatibility / testing
-app.MapGet("/api/teams", async (LineUpDbContext db) =>
-    await db.Teams.Include(t => t.Players).ToListAsync())
-    .WithName("GetTeams")
-    .WithOpenApi();
-
-app.MapGet("/api/players", async (LineUpDbContext db) =>
-    await db.Players.Include(p => p.Team).ToListAsync())
-    .WithName("GetPlayers")
-    .WithOpenApi();
 
 app.Run();

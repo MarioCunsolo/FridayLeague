@@ -9,13 +9,16 @@ public class LineUpDbContext : DbContext
     {
     }
 
-    public DbSet<Team> Teams => Set<Team>();
-    public DbSet<Player> Players => Set<Player>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Lega> Leghe => Set<Lega>();
     public DbSet<UserLega> UserLeghe => Set<UserLega>();
     public DbSet<RuoloLega> Ruoli => Set<RuoloLega>();
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
+    public DbSet<Squadra> Squadre => Set<Squadra>();
+    public DbSet<Partita> Partite => Set<Partita>();
+    public DbSet<PartecipantePartita> PartecipantiPartita => Set<PartecipantePartita>();
+    public DbSet<EventoGol> EventiGol => Set<EventoGol>();
+    public DbSet<Prenotazione> Prenotazioni => Set<Prenotazione>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,6 +47,50 @@ public class LineUpDbContext : DbContext
         modelBuilder.Entity<Lega>()
             .HasIndex(l => l.CodiceInvito)
             .IsUnique();
+
+        // Un utente compare al più una volta come partecipante in una partita
+        modelBuilder.Entity<PartecipantePartita>()
+            .HasIndex(pp => new { pp.PartitaId, pp.UserId })
+            .IsUnique();
+
+        // Evita cascade path multipli su Partita -> Squadra (SquadraCasa/SquadraTrasferta)
+        modelBuilder.Entity<Partita>()
+            .HasOne(p => p.SquadraCasa)
+            .WithMany()
+            .HasForeignKey(p => p.SquadraCasaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Partita>()
+            .HasOne(p => p.SquadraTrasferta)
+            .WithMany()
+            .HasForeignKey(p => p.SquadraTrasfertaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Evita cascade path multipli su EventoGol -> User (Marcatore/Assist)
+        modelBuilder.Entity<EventoGol>()
+            .HasOne(g => g.Marcatore)
+            .WithMany()
+            .HasForeignKey(g => g.MarcatoreUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<EventoGol>()
+            .HasOne(g => g.Assist)
+            .WithMany()
+            .HasForeignKey(g => g.AssistUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Evita cascade path multipli su Prenotazione -> User (Utente prenotato/Prenotato da)
+        modelBuilder.Entity<Prenotazione>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Prenotazione>()
+            .HasOne(r => r.PrenotatoDa)
+            .WithMany()
+            .HasForeignKey(r => r.PrenotatoDaUserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Seed roles data
         modelBuilder.Entity<RuoloLega>().HasData(

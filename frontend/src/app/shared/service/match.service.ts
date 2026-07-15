@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GoalEvent, Match, MatchStatus, Player } from '../../models/interface/match.interface';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -347,8 +347,14 @@ export class MatchService {
    */
   loadMatches() {
     return this.http.get<Match[]>(this.BASE_URL).pipe(
+      map(matches => matches.map(m => this.parseMatchDate(m))),
       tap(matches => this.matches.set(matches))
     );
+  }
+
+  // Il backend serializza le date come stringhe ISO: HttpClient non le converte automaticamente in Date.
+  private parseMatchDate(match: Match): Match {
+    return { ...match, date: new Date(match.date) };
   }
 
   /**
@@ -358,6 +364,7 @@ export class MatchService {
    */
   createMatch(match: Omit<Match, 'id'>) {
     return this.http.post<Match>(this.BASE_URL, match).pipe(
+      map(newMatch => this.parseMatchDate(newMatch)),
       tap(newMatch => this.matches.update(prev => [...prev, newMatch]))
     );
   }
@@ -370,7 +377,8 @@ export class MatchService {
    */
   updateMatch(id: number, match: Partial<Match>) {
     return this.http.put<Match>(`${this.BASE_URL}/${id}`, match).pipe(
-      tap(updatedMatch => this.matches.update(prev => 
+      map(updatedMatch => this.parseMatchDate(updatedMatch)),
+      tap(updatedMatch => this.matches.update(prev =>
         prev.map(m => m.id === id ? updatedMatch : m)
       ))
     );

@@ -100,7 +100,27 @@ Il sistema di tracciamento e log di audit memorizza le azioni amministrative in 
 
 ---
 
-## 7. Linee Guida per gli Aggiornamenti Futuri
+## 7. Dominio Partite, Giocatori, Prenotazioni e Classifiche
+
+Introdotto seguendo il Repository Pattern descritto in [ARCHITECTURE.md](beckendNET/ARCHITECTURE.md). Tutte le entità sono scoped per Lega.
+
+* **Entità (`Data/`)**: `Squadra` (nome squadra per lega, creata automaticamente al primo utilizzo), `Partita` (Stato: `Programmata`/`In Corso`/`Terminata`, punteggio, stagione), `PartecipantePartita` (formazione di una partita + flag MOTM), `EventoGol` (marcatore/assist per partita), `Prenotazione` (per la prossima partita programmata della lega).
+* **Giocatori**: non esiste un'anagrafica separata — un "giocatore" è semplicemente uno `User` iscritto alla Lega (tabella `UserLeghe`).
+* **Risoluzione automatica dei partecipanti**: quando viene registrato un gol (`POST /api/matches/{id}/goals`) con un nome che non è ancora nella formazione della partita, il sistema cerca un membro della lega con quel nome e lo aggiunge automaticamente come partecipante (lato marcatore/assist). Non esiste quindi un passaggio esplicito "crea formazione" prima della partita.
+* **Prenotazioni**: sempre riferite alla prossima partita con Stato `Programmata` della lega attiva (risolta lato server, il client non specifica l'ID partita). Finestra di prenotazione (sabato intero + domenica fino alle 17:00) validata sia FE (`isReservationDisabled`) che BE (`ReservationService.ValidaFinestraPrenotazione`).
+* **MOTM**: un solo Man of the Match per partita (`PUT /api/matches/{id}/motm`, riservato ad ADMIN/CO_ADMIN). Endpoint predisposto ma non ancora collegato a un pulsante nel frontend.
+* **Classifiche/Statistiche**: calcolate on-the-fly (nessuna tabella aggregata) da `EventoGol`/`PartecipantePartita`, filtrabili per stagione. Colore e iniziali avatar sono generati deterministicamente lato BE (`PlayerDisplayExtensions`), non persistiti.
+* **Nota migrazione DB**: non essendo in uso EF Core Migrations, le nuove tabelle vengono create in `Program.cs` con `CREATE TABLE IF NOT EXISTS` (stesso pattern già usato per `ActivityLogs`). Se si aggiungono nuove entità, aggiornare sia `OnModelCreating` che questo blocco fail-safe.
+
+---
+
+## 8. Cambio Password
+
+Il flusso di cambio password (`account.component.ts` → `apriModificaPassword()`) usa l'endpoint dedicato `POST /auth/cambia-password` (`AuthService.cambiaPassword`). Non riutilizzare `aggiorna-profilo` per la password: il DTO `AggiornaProfiloRequest` ha un campo `Password` legacy che il backend ignora silenziosamente.
+
+---
+
+## 9. Linee Guida per gli Aggiornamenti Futuri
 
 * **Controllo Preventivo**: Leggere e comprendere questo file all'inizio di ogni attività per mantenere intatta la coerenza dell'architettura e dei flussi.
 * **Manutenzione del File**: Se una richiesta introduce modifiche architetturali, aggiornamenti a endpoint chiave, nuovi ruoli o nuovi componenti condivisi, questo file deve essere aggiornato tempestivamente.

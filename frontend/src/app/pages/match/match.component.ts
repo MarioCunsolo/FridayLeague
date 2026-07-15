@@ -24,9 +24,15 @@ export class MatchComponent implements OnInit, AfterViewInit {
   MatchStatus = MatchStatus;
 
   showMatchDetails = signal(false);
-  selectedMatch = signal<Match | null>(null);
+  selectedMatchId = signal<number | null>(null);
 
   matches = this.matchService.getMatches();
+
+  // Derivato da matches(): si aggiorna automaticamente dopo un goal, senza restare legato allo snapshot aperto nel modale
+  selectedMatch = computed(() => {
+    const id = this.selectedMatchId();
+    return id !== null ? this.matches().find(m => m.id === id) ?? null : null;
+  });
 
   groupedMatches = computed(() => {
     const currentYear = 2026;
@@ -78,13 +84,13 @@ export class MatchComponent implements OnInit, AfterViewInit {
   }
 
   openMatchDetails(match: Match) {
-    this.selectedMatch.set(match);
+    this.selectedMatchId.set(match.id);
     this.showMatchDetails.set(true);
   }
 
   closeMatchDetails() {
     this.showMatchDetails.set(false);
-    this.selectedMatch.set(null);
+    this.selectedMatchId.set(null);
   }
 
   ngAfterViewInit() {

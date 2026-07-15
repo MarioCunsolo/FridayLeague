@@ -25,6 +25,7 @@ Il progetto è suddiviso in due componenti principali:
   * **HTTP**: `http://localhost:8080/swagger`
   * **HTTPS**: `https://localhost:7059/swagger`
 * **Frontend Default URL**: `http://localhost:4200` (CORS configurato per questa origine sul BE).
+* **Nota su conflitti di porta locali**: se sulla propria macchina le porte `8080` o `3306` risultano già occupate (es. da un antivirus o da un'installazione MySQL di sistema), è sufficiente cambiare le porte solo in locale in `launchSettings.json`, `appsettings.json` e `docker-compose.yml` (aggiornando anche `environment.development.ts` nel frontend) e marcare questi file con `git update-index --skip-worktree` per evitare di propagare la modifica agli altri sviluppatori (`--no-skip-worktree` per annullare).
 
 ---
 

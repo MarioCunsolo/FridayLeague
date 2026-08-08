@@ -98,6 +98,26 @@
     table-layout: fixed;
 }
 
+/* Table Column Proportions */
+.custom-table th:nth-child(1),
+.custom-table tr:not(.section-header-row) td:nth-child(1) {
+    width: 55%;
+}
+
+.custom-table th:nth-child(2),
+.custom-table tr:not(.section-header-row) td:nth-child(2) {
+    width: 30%;
+}
+
+.custom-table th:nth-child(3),
+.custom-table tr:not(.section-header-row) td:nth-child(3) {
+    width: 15%;
+}
+
+.player-name {
+    vertical-align: middle;
+}
+
 /* Override Bootstrap striped rows */
 .table-striped>tbody>tr:nth-of-type(odd)>* {
     --bs-table-accent-bg: var(--table-striped-bg);
@@ -226,4 +246,53 @@
 ::ng-deep .ant-modal-footer .ant-btn:hover {
     opacity: 0.9;
     transform: translateY(-0.125rem);
+}
+
+/* Mobile Responsiveness for Reservation Table */
+@media (max-width: 576px) {
+    .reservation-card {
+        padding: 1rem 0.5rem;
+    }
+
+    .custom-table th {
+        padding: 0.625rem 0.25rem;
+        font-size: 0.75rem;
+    }
+
+    .custom-table td {
+        padding: 0.75rem 0.25rem;
+        font-size: 0.85rem;
+    }
+
+    .custom-table th:nth-child(1),
+    .custom-table tr:not(.section-header-row) td:nth-child(1) {
+        width: 58%;
+    }
+
+    .custom-table th:nth-child(2),
+    .custom-table tr:not(.section-header-row) td:nth-child(2) {
+        width: 27%;
+        font-size: 0.8rem;
+    }
+
+    .custom-table th:nth-child(3),
+    .custom-table tr:not(.section-header-row) td:nth-child(3) {
+        width: 15%;
+    }
+
+    .position-badge {
+        width: 1.35rem;
+        height: 1.35rem;
+        font-size: 0.65rem;
+        margin-right: 0.35rem;
+    }
+
+    .player-name {
+        display: inline-block;
+        max-width: calc(100% - 3.2rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
 }

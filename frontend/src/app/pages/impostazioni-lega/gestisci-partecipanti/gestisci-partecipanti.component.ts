@@ -1,3 +1,5 @@
+import { FormsModule } from '@angular/forms';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { Component, OnInit, inject, signal, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -17,6 +19,8 @@ import { ConfirmModalComponent } from '../../../shared/component/confirm-modal/c
   imports: [
     CommonModule, 
     RouterLink, 
+    FormsModule,
+    NzSelectModule,
     NzTableModule, 
     NzTagModule, 
     NzIconModule, 
@@ -97,6 +101,17 @@ export class GestisciPartecipantiComponent implements OnInit {
     return false;
   }
 
+  canChangeRole(item: any): boolean {
+    if (!this.canManage(item)) return false;
+    const userRole = this.getCurrentUserRole();
+    return userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
+  }
+
+  onRoleSelectChange(item: any, newRole: string): void {
+    if (newRole === item.ruolo) return;
+    this.chiediConfermaCambioRuolo(item, newRole);
+  }
+
   /**
    * Crea ed apre la modale di conferma programmaticamente.
    */
@@ -128,6 +143,7 @@ export class GestisciPartecipantiComponent implements OnInit {
       confirmSub.unsubscribe();
       cancelSub.unsubscribe();
       componentRef.destroy();
+      this.caricaPartecipanti();
     });
   }
 

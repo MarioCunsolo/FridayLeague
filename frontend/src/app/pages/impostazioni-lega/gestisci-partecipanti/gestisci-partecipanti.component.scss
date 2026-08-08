@@ -19,21 +19,24 @@
   margin: 0;
 }
 
-.back-btn {
-  border-radius: 10px;
-  font-weight: 500;
-  display: flex;
+.back-btn-link {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-color: var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  transition: all 0.3s ease;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary) !important;
+  background-color: var(--input-bg) !important;
+  border: 0.0625rem solid var(--border-main) !important;
+  transition: all 0.2s ease;
 }
 
-.back-btn:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+.back-btn-link:hover {
+  color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+  transform: translateX(-0.125rem);
 }
 
 .loading-container {
@@ -45,8 +48,8 @@
 
 /* Custom Table Wrapper */
 .table-container {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  border: 1px solid var(--border-main);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -54,6 +57,38 @@
 /* custom table override styling to feel premium */
 ::ng-deep .custom-nz-table {
   background: transparent !important;
+  
+  .ant-table-content {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Sticky first column styling (Nome) */
+  .ant-table-thead > tr > th:first-child,
+  .ant-table-thead > tr > th.ant-table-cell-fix-left,
+  .ant-table-tbody > tr > td:first-child,
+  .ant-table-tbody > tr > td.ant-table-cell-fix-left {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 2 !important;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .ant-table-thead > tr > th:first-child,
+  .ant-table-thead > tr > th.ant-table-cell-fix-left {
+    z-index: 3 !important;
+    background: var(--input-bg) !important;
+  }
+
+  .ant-table-tbody > tr > td:first-child,
+  .ant-table-tbody > tr > td.ant-table-cell-fix-left {
+    background: var(--card-bg) !important;
+  }
+
+  .ant-table-tbody > tr:hover > td:first-child,
+  .ant-table-tbody > tr:hover > td.ant-table-cell-fix-left {
+    background: var(--card-bg) !important;
+  }
 }
 
 ::ng-deep .custom-nz-table nz-table {
@@ -69,12 +104,12 @@
   background: rgba(82, 113, 255, 0.05) !important;
   color: var(--text-primary) !important;
   font-weight: 600 !important;
-  border-bottom: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-main) !important;
   padding: 1rem 1.5rem !important;
 }
 
 ::ng-deep .custom-nz-table .ant-table-tbody > tr > td {
-  border-bottom: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-main) !important;
   padding: 1.15rem 1.5rem !important;
   color: var(--text-secondary) !important;
 }
@@ -111,6 +146,78 @@
   font-size: 0.85rem;
 }
 
+.role-select {
+  width: 135px;
+  height: 2.1rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  position: relative !important;
+
+  &.ant-select {
+    height: 2.1rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    position: relative !important;
+  }
+  
+  ::ng-deep .ant-select-selector {
+    background-color: var(--input-bg) !important;
+    border: 0.0625rem solid var(--border-main) !important;
+    border-radius: 0.625rem !important;
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    font-size: 0.78rem !important;
+    height: 100% !important;
+    min-height: 2.1rem !important;
+    padding: 0 1.75rem 0 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+  }
+
+  &:hover ::ng-deep .ant-select-selector,
+  &.ant-select-focused ::ng-deep .ant-select-selector {
+    border-color: var(--primary-green) !important;
+    box-shadow: 0 0 0 0.125rem rgba(0, 204, 102, 0.15) !important;
+  }
+
+  ::ng-deep .ant-select-selection-item {
+    font-weight: 700 !important;
+    font-size: 0.78rem !important;
+    color: var(--text-primary) !important;
+    line-height: 2.1rem !important;
+    letter-spacing: 0.02rem;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  ::ng-deep .ant-select-arrow {
+    color: var(--text-secondary) !important;
+    position: absolute !important;
+    top: 50% !important;
+    right: 0.65rem !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.75rem !important;
+    height: auto !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    pointer-events: none;
+  }
+
+  ::ng-deep .ant-select-arrow .anticon,
+  ::ng-deep .ant-select-arrow span[nz-icon] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+  }
+}
+
 .role-tag {
   border-radius: 6px;
   font-weight: 600;
@@ -119,6 +226,8 @@
   border: none;
   text-transform: uppercase;
   color: #fff !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
 }
 
 .action-buttons-group {
@@ -126,6 +235,8 @@
   justify-content: flex-end;
   gap: 0.65rem;
   align-items: center;
+  white-space: nowrap !important;
+  flex-wrap: nowrap !important;
 }
 
 .action-btn {
@@ -208,20 +319,32 @@
   box-shadow: 0 6px 16px rgba(255, 77, 79, 0.35) !important;
 }
 
-/* Hide button text on mobile screens to save space */
+/* Hide button text on mobile screens to save space and display perfect circles */
 @media (max-width: 992px) {
   .btn-text {
-    display: none;
+    display: none !important;
   }
   .action-btn {
     padding: 0 !important;
-    width: 32px !important;
-    height: 32px !important;
-    justify-content: center;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
+    flex-shrink: 0 !important;
     border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
   }
   .action-btn span[nz-icon] {
     margin: 0 !important;
-    font-size: 1.05rem;
+    font-size: 1.05rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 }

@@ -62,7 +62,7 @@
               <tr>
                 <td class="fw-bold text-nowrap">
                   <span class="position-badge starter-badge">{{ $index + 1 }}</span>
-                  {{ res.nomeCognome }}
+                  <span class="player-name">{{ res.nomeCognome }}</span>
                   @if (res.playerId) {
                   <span nz-icon nzType="check-circle" nzTheme="fill" class="ms-1 text-primary small"
                     style="font-size: 12px; vertical-align: middle;"
@@ -88,7 +88,7 @@
               <tr class="substitute-row">
                 <td class="fw-bold text-nowrap">
                   <span class="position-badge substitute-badge">{{ $index + 15 }}</span>
-                  {{ res.nomeCognome }}
+                  <span class="player-name">{{ res.nomeCognome }}</span>
                   @if (res.playerId) {
                   <span nz-icon nzType="check-circle" nzTheme="fill" class="ms-1 text-primary small"
                     style="font-size: 12px; vertical-align: middle;"

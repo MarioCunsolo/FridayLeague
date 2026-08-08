@@ -19,21 +19,24 @@
   margin: 0;
 }
 
-.back-btn {
-  border-radius: 10px;
-  font-weight: 500;
-  display: flex;
+.back-btn-link {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border-color: var(--border-main);
-  background: var(--card-bg);
-  color: var(--text-primary);
-  transition: all 0.3s ease;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary) !important;
+  background-color: var(--input-bg) !important;
+  border: 0.0625rem solid var(--border-main) !important;
+  transition: all 0.2s ease;
 }
 
-.back-btn:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
+.back-btn-link:hover {
+  color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+  transform: translateX(-0.125rem);
 }
 
 /* Custom Table Wrapper */

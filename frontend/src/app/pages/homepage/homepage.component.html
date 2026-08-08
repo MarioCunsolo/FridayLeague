@@ -13,52 +13,49 @@
     </div>
   </div>
 
-  <!-- KPI League Overview Strip -->
-  <!-- KPI League Overview Strip -->
+  <!-- KPI Personal Overview Strip -->
   <div class="row justify-content-center mb-4 g-2 g-md-3">
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm h-100">
+      <div class="kpi-card shadow-sm h-100" routerLink="/profilo" style="cursor: pointer;" title="Vai al tuo profilo">
         <div class="kpi-icon-wrapper bg-success-subtle text-success">
-          <i class="fa fa-futbol-o"></i>
+          <i class="fa fa-calendar"></i>
         </div>
         <div class="kpi-info">
           <span class="kpi-label text-truncate">Partite Giocate</span>
-          <span class="kpi-value text-truncate">{{ totalMatchesPlayed() }}</span>
+          <span class="kpi-value text-truncate">{{ userMatchesPlayed() }}</span>
         </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm h-100">
+      <div class="kpi-card shadow-sm h-100" routerLink="/profilo" style="cursor: pointer;" title="Vai al tuo profilo">
         <div class="kpi-icon-wrapper bg-primary-subtle text-primary">
-          <i class="fa fa-bullseye"></i>
+          <i class="fa fa-futbol-o"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label text-truncate">Gol Totali</span>
-          <span class="kpi-value text-truncate">{{ totalGoalsScored() }}</span>
+          <span class="kpi-label text-truncate">I Tuoi Gol</span>
+          <span class="kpi-value text-truncate">{{ userGoals() }}</span>
         </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm h-100">
+      <div class="kpi-card shadow-sm h-100" routerLink="/profilo" style="cursor: pointer;" title="Vai al tuo profilo">
         <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
-          <i class="fa fa-trophy"></i>
+          <i class="fa fa-handshake-o"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label text-truncate">Capocannoniere</span>
-          <span class="kpi-value text-truncate">
-            {{ topScorer() ? topScorer()!.name : '-' }}
-          </span>
+          <span class="kpi-label text-truncate">I Tuoi Assist</span>
+          <span class="kpi-value text-truncate">{{ userAssists() }}</span>
         </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm h-100">
+      <div class="kpi-card shadow-sm h-100" routerLink="/profilo" style="cursor: pointer;" title="Vai al tuo profilo">
         <div class="kpi-icon-wrapper bg-info-subtle text-info">
           <i class="fa fa-line-chart"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label text-truncate">Media Gol/Match</span>
-          <span class="kpi-value text-truncate">{{ avgGoalsPerMatch() }}</span>
+          <span class="kpi-label text-truncate">La Tua Media Gol</span>
+          <span class="kpi-value text-truncate">{{ userAvgGoals() }}</span>
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     background-color: var(--app-bg);
     position: fixed;
     top: 0;
@@ -50,6 +51,7 @@
         top: 0;
         left: 0;
         height: 100vh;
+        height: 100dvh;
         z-index: 2000;
         border-radius: 0;
     }
@@ -99,8 +101,15 @@
 .details-content-area {
     flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 1.5rem;
     background-color: var(--card-bg);
+}
+
+@media (max-width: 991px) {
+    .details-content-area {
+        padding: 1rem 1rem calc(5.5rem + env(safe-area-inset-bottom, 0px)) 1rem;
+    }
 }
 
 /* Hero Scoreboard Card */
@@ -111,6 +120,36 @@
     padding: 1.25rem 1.5rem;
     position: relative;
     overflow: hidden;
+}
+
+.scoreboard-meta-row {
+    gap: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .hero-scoreboard-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .scoreboard-meta-row {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .date-badge {
+        font-size: 0.78rem;
+        padding: 0.35rem 0.75rem;
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.75rem;
+    }
 }
 
 .date-badge {
@@ -166,6 +205,23 @@
     }
 }
 
+.scoreboard-teams-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.team-block {
+    flex: 1 1 0px !important;
+    min-width: 0 !important;
+    width: 0 !important;
+}
+
+.score-display-block {
+    flex: 0 0 auto !important;
+}
+
 .crest-wrapper {
     width: 4rem;
     height: 4rem;
@@ -194,6 +250,10 @@
     color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.03rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
 }
 
 .vs-badge {

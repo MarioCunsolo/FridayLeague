@@ -128,6 +128,8 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 0;
+    position: relative;
+    z-index: 1100;
 }
 
 /* On mobile, we remove the padding bottom since the bottom nav is gone */

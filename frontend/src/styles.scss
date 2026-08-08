@@ -344,6 +344,13 @@ html, body {
     max-width: 24rem !important;
 }
 
+/* Compact role select dropdown override */
+.role-select-dropdown {
+    min-width: 130px !important;
+    max-width: 160px !important;
+    padding: 0.25rem !important;
+}
+
 .ant-select-item-option-content {
     white-space: nowrap !important;
 }
@@ -528,4 +535,19 @@ html, body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* Prevent automatic page zoom on input focus on mobile devices (iOS Safari / WebKit auto-zooms when input font-size < 16px) */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  .ant-input,
+  .ant-input-affix-wrapper input,
+  .ant-picker-input > input,
+  .ant-select-selection-search-input,
+  .form-control,
+  .custom-input {
+    font-size: 16px !important;
+  }
 }

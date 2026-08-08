@@ -26,17 +26,17 @@
         </nz-form-control>
       </nz-form-item>
 
-      <nz-form-item>
+      <nz-form-item class="mb-0">
         <nz-form-label nzRequired>Data e Ora</nz-form-label>
         <nz-form-control nzErrorTip="Seleziona data e ora della partita">
           <nz-date-picker formControlName="date" [nzShowTime]="{ nzFormat: 'HH:mm' }" nzFormat="dd/MM/yyyy HH:mm" nzPlaceHolder="Seleziona data e ora" class="custom-date-picker"></nz-date-picker>
         </nz-form-control>
       </nz-form-item>
-
-      <div class="modal-footer mt-4">
-        <button nz-button type="button" nzType="default" (click)="handleCancel()" class="footer-btn cancel-btn">Annulla</button>
-        <button nz-button type="button" nzType="primary" (click)="handleOk()" [nzLoading]="isConfirmLoading" [disabled]="matchForm.invalid" class="footer-btn save-btn">Crea Partita</button>
-      </div>
     </form>
   </main>
+
+  <footer class="modal-footer">
+    <button nz-button type="button" nzType="default" (click)="handleCancel()" class="footer-btn cancel-btn">Annulla</button>
+    <button nz-button type="button" nzType="primary" (click)="handleOk()" [nzLoading]="isConfirmLoading" [disabled]="matchForm.invalid" class="footer-btn save-btn">Crea Partita</button>
+  </footer>
 </div>

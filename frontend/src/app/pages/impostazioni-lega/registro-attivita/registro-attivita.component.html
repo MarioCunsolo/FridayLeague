@@ -1,15 +1,17 @@
 <div class="attivita-container">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="title">Registro Attività</h2>
-      <p class="subtitle text-secondary">
-        Traccia cronologica delle operazioni amministrative e dei movimenti dei partecipanti all'interno della lega.
-      </p>
-    </div>
-    <button nz-button nzType="default" class="back-btn" [routerLink]="['/impostazioni']">
+  <!-- Bottone Back in alto a sinistra -->
+  <div class="mb-3">
+    <button nz-button nzType="text" class="back-btn-link" [routerLink]="['/impostazioni']">
       <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
-      <span class="btn-text">Torna a Impostazioni</span>
+      <span>Indietro</span>
     </button>
+  </div>
+
+  <div class="header-section mb-4">
+    <h2 class="title">Registro Attività</h2>
+    <p class="subtitle text-secondary">
+      Traccia cronologica delle operazioni amministrative e dei movimenti dei partecipanti all'interno della lega.
+    </p>
   </div>
 
   <div class="table-container d-none d-md-block">

@@ -5,10 +5,10 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background-color: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(0.25rem);
-    z-index: 2100;
-    /* Higher than match detail (2000) */
+    z-index: 9998;
 }
 
 /* Modal Container (Premium Central Design) */
@@ -26,23 +26,32 @@
     border-radius: 1.5rem;
     border: 0.0625rem solid var(--border-sub);
     box-shadow: 0 0 3rem rgba(0, 0, 0, 0.4), 0 0 1rem rgba(0, 204, 102, 0.3);
-    z-index: 2200;
+    z-index: 9999;
     overflow: hidden;
     transition: all var(--transition-speed);
 }
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
     .modal-container {
-        width: 100%;
+        width: 100vw;
         height: 100vh;
+        height: 100dvh;
         max-height: 100vh;
+        max-height: 100dvh;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform: none;
         border-radius: 0;
+        border: none;
     }
 }
 
 /* Modal Header (Integrated Back Button + Centered Title) */
 .modal-header {
     height: 3.75rem;
+    flex-shrink: 0;
     background-color: var(--app-bg);
     display: flex;
     align-items: center;

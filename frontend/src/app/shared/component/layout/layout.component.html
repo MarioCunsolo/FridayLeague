@@ -170,14 +170,19 @@
         <!-- Right Side Quick Actions (Mobile) -->
         <div class="d-flex align-items-center gap-3 z-index-10">
           <!-- Account (Mobile) -->
-          <div class="account-mobile" routerLink="/account"
+          <div class="account-mobile" routerLink="/account" title="Account"
             style="cursor: pointer; font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
             <span nz-icon nzType="user" nzTheme="outline"></span>
           </div>
           <!-- Theme Toggle (Mobile) -->
-          <div class="theme-toggle-mobile" (click)="toggleTheme()"
+          <div class="theme-toggle-mobile" (click)="toggleTheme()" title="Cambia Tema"
             style="cursor: pointer; font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
             <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
+          </div>
+          <!-- Logout (Mobile) -->
+          <div class="logout-mobile" (click)="logout()" title="Esci"
+            style="cursor: pointer; font-size: 1.4rem; color: var(--danger-red); display: flex; align-items: center;">
+            <span nz-icon nzType="logout" nzTheme="outline"></span>
           </div>
         </div>
 

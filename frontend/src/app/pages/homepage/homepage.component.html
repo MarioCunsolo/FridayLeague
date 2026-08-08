@@ -1,87 +1,253 @@
 <div class="container py-4">
-  <div class="row justify-content-center">
-    <!-- Welcome Section -->
-    <div class="col-12 text-center mb-5">
-      <h2 class="welcome-text mb-2">
+  <!-- Welcome Hero Header -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-12 col-lg-10 text-center">
+      <h1 class="welcome-text mb-2">
         @if (authService.currentUser()?.nome) {
-          Benvenuto {{ authService.currentUser()?.nome | titlecase }}!
+          Benvenuto, {{ authService.currentUser()?.nome | titlecase }}!
         } @else {
-          Benvenuto!
+          Benvenuto nella Friday League!
         }
-      </h2>
-      <p class="text-muted">Pronto per la prossima sfida?</p>
+      </h1>
+      <p class="welcome-subtitle">Pronto a scendere in campo? Controlla i prossimi match e le statistiche aggiornate.</p>
     </div>
+  </div>
 
-    <!-- Quick Action Dashboard -->
-    <div class="col-12 col-md-10 col-lg-8">
-      <div class="row g-4 justify-content-center">
-        <div class="col-6 col-sm-5 col-md-4" routerLink="/prenotazioni">
+  <!-- KPI League Overview Strip -->
+  <div class="row justify-content-center mb-5 g-3">
+    <div class="col-6 col-md-3">
+      <div class="kpi-card shadow-sm">
+        <div class="kpi-icon-wrapper bg-success-subtle text-success">
+          <i class="fa fa-futbol-o"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Partite Giocate</span>
+          <span class="kpi-value">{{ totalMatchesPlayed() }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="kpi-card shadow-sm">
+        <div class="kpi-icon-wrapper bg-primary-subtle text-primary">
+          <i class="fa fa-bullseye"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Gol Totali</span>
+          <span class="kpi-value">{{ totalGoalsScored() }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="kpi-card shadow-sm">
+        <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
+          <i class="fa fa-trophy"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Capocannoniere</span>
+          <span class="kpi-value text-truncate d-block" style="max-width: 130px;">
+            {{ topScorer() ? topScorer()!.name : '-' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="kpi-card shadow-sm">
+        <div class="kpi-icon-wrapper bg-info-subtle text-info">
+          <i class="fa fa-line-chart"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Media Gol/Match</span>
+          <span class="kpi-value">{{ avgGoalsPerMatch() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Action Dashboard -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-12 col-lg-10">
+      <h3 class="section-title mb-3"><i class="fa fa-bolt me-2 text-warning"></i>Azioni Rapide</h3>
+      <div class="row g-3">
+        <div class="col-6 col-md-3" routerLink="/prenotazioni">
           <div class="action-card shadow-sm">
             <i class="fa fa-calendar action-icon text-success"></i>
             <span>Prenota</span>
           </div>
         </div>
-        <div class="col-6 col-sm-5 col-md-4" routerLink="/calendario">
+        <div class="col-6 col-md-3" routerLink="/calendario">
           <div class="action-card shadow-sm">
-            <i class="fa fa-futbol-o action-icon text-success"></i>
+            <i class="fa fa-futbol-o action-icon text-primary"></i>
             <span>Calendario</span>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Next Match Card -->
-    @if (nextMatch()) {
-    <div class="col-12 col-md-10 col-lg-8 mt-4" (click)="goToMatchDetails(nextMatch()!.id)" style="cursor: pointer;">
-      <div class="match-card shadow-sm next-match">
-        <h3 class="match-title">Prossima Partita</h3>
-        <div class="match-content">
-          <div class="team-container">
-            <div class="team-logo shadow-sm">
-              <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
-            </div>
-            <span class="team-name text-truncate w-100">{{ nextMatch()!.homeTeam }}</span>
+        <div class="col-6 col-md-3" routerLink="/statistiche">
+          <div class="action-card shadow-sm">
+            <i class="fa fa-bar-chart action-icon text-warning"></i>
+            <span>Statistiche</span>
           </div>
-          <div class="score-container">
-            <span class="score-text">VS</span>
-            <span class="match-date text-primary">{{ nextMatch()!.date | date:'d MMMM' | titlecase }}</span>
-          </div>
-          <div class="team-container">
-            <div class="team-logo shadow-sm">
-              <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
-            </div>
-            <span class="team-name text-truncate w-100">{{ nextMatch()!.awayTeam }}</span>
+        </div>
+        <div class="col-6 col-md-3" routerLink="/account">
+          <div class="action-card shadow-sm">
+            <i class="fa fa-user-circle action-icon text-info"></i>
+            <span>Profilo</span>
           </div>
         </div>
       </div>
     </div>
-    }
+  </div>
 
-    <!-- Recent Match Card -->
-    @if (lastMatch()) {
-    <div class="col-12 col-md-10 col-lg-8 mt-4" (click)="goToMatchDetails(lastMatch()!.id)" style="cursor: pointer;">
-      <div class="match-card shadow-sm">
-        <h3 class="match-title">Ultima Partita</h3>
-        <div class="match-content">
-          <div class="team-container">
-            <div class="team-logo shadow-sm">
-              <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+  <!-- Main Content Dashboard Layout (2 Columns) -->
+  <div class="row justify-content-center g-4">
+    <!-- Left Column: Match Cards -->
+    <div class="col-12 col-lg-6">
+      <h3 class="section-title mb-3"><i class="fa fa-calendar-check-o me-2 text-primary"></i>Stato Partite</h3>
+
+      <!-- Prossima Partita Card -->
+      @if (nextMatch()) {
+        <div class="mb-4" (click)="goToMatchDetails(nextMatch()!.id)" style="cursor: pointer;">
+          <div class="match-card shadow-sm next-match">
+            <div class="match-card-header d-flex justify-content-between align-items-center mb-2">
+              <span class="badge bg-success-subtle text-success border border-success-subtle">PROSSIMA PARTITA</span>
+              <span class="match-date text-primary"><i class="fa fa-clock-o me-1"></i>{{ nextMatch()!.date | date:'d MMMM HH:mm' | titlecase }}</span>
             </div>
-            <span class="team-name text-truncate w-100">{{ lastMatch()!.homeTeam }}</span>
-          </div>
-          <div class="score-container">
-            <span class="score-text">{{ lastMatch()!.homeScore }} - {{ lastMatch()!.awayScore }}</span>
-            <span class="match-status text-success">{{ lastMatch()!.status }}</span>
-          </div>
-          <div class="team-container">
-            <div class="team-logo shadow-sm">
-              <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+            <div class="match-content">
+              <div class="team-container">
+                <div class="team-logo shadow-sm">
+                  <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+                </div>
+                <span class="team-name text-truncate w-100">{{ nextMatch()!.homeTeam }}</span>
+              </div>
+              <div class="score-container">
+                <span class="score-text">VS</span>
+              </div>
+              <div class="team-container">
+                <div class="team-logo shadow-sm">
+                  <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+                </div>
+                <span class="team-name text-truncate w-100">{{ nextMatch()!.awayTeam }}</span>
+              </div>
             </div>
-            <span class="team-name text-truncate w-100">{{ lastMatch()!.awayTeam }}</span>
           </div>
         </div>
+      } @else {
+        <div class="no-match-card shadow-sm mb-4">
+          <i class="fa fa-calendar-o no-match-icon text-muted"></i>
+          <h5>Nessuna partita in programma</h5>
+          <p class="text-muted small m-0">Organizza o prenota il prossimo match con la tua lega!</p>
+          <button routerLink="/prenotazioni" class="btn btn-sm btn-outline-success mt-3">Prenota Ora</button>
+        </div>
+      }
+
+      <!-- Ultima Partita Giocata Card -->
+      @if (lastMatch()) {
+        <div class="mb-4" (click)="goToMatchDetails(lastMatch()!.id)" style="cursor: pointer;">
+          <div class="match-card shadow-sm">
+            <div class="match-card-header d-flex justify-content-between align-items-center mb-2">
+              <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">ULTIMA GIOCATA</span>
+              <span class="match-status text-success font-weight-bold"><i class="fa fa-check-circle me-1"></i>{{ lastMatch()!.status }}</span>
+            </div>
+            <div class="match-content">
+              <div class="team-container">
+                <div class="team-logo shadow-sm">
+                  <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
+                </div>
+                <span class="team-name text-truncate w-100">{{ lastMatch()!.homeTeam }}</span>
+              </div>
+              <div class="score-container">
+                <span class="score-text">{{ lastMatch()!.homeScore }} - {{ lastMatch()!.awayScore }}</span>
+              </div>
+              <div class="team-container">
+                <div class="team-logo shadow-sm">
+                  <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
+                </div>
+                <span class="team-name text-truncate w-100">{{ lastMatch()!.awayTeam }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right Column: Top Scorers & Personal Stats -->
+    <div class="col-12 col-lg-5">
+      <h3 class="section-title mb-3"><i class="fa fa-trophy me-2 text-warning"></i>Leaderboard & Stats</h3>
+
+      <!-- Mini Top 3 Marcatori Widget -->
+      <div class="top-scorers-widget shadow-sm mb-4">
+        <div class="widget-header d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+          <h5 class="m-0 fw-bold fs-6 text-uppercase tracking-wider">Top 3 Marcatori</h5>
+          <button (click)="goToStats()" class="btn btn-link btn-sm p-0 text-decoration-none text-success fw-bold">
+            Vedi Tutti <i class="fa fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+
+        @if (top3Scorers().length > 0) {
+          <div class="scorers-list">
+            @for (player of top3Scorers(); track player.name; let index = $index) {
+              <div class="scorer-item d-flex align-items-center justify-content-between py-2">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rank-badge" [class.rank-1]="index === 0" [class.rank-2]="index === 1" [class.rank-3]="index === 2">
+                    @if (index === 0) { 🥇 }
+                    @else if (index === 1) { 🥈 }
+                    @else if (index === 2) { 🥉 }
+                    @else { #{{ index + 1 }} }
+                  </div>
+                  <div>
+                    <div class="fw-bold text-dark player-name">{{ player.name }}</div>
+                    <div class="text-muted small team-name">{{ player.team }}</div>
+                  </div>
+                </div>
+                <div class="goals-badge bg-success text-white px-3 py-1 rounded-pill fw-bold shadow-sm">
+                  {{ player.value }} <span class="small fw-normal">gol</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="text-center text-muted py-3">
+            <i class="fa fa-soccer-ball-o me-1"></i> Nessuna statistica marcatore disponibile.
+          </div>
+        }
+      </div>
+
+      <!-- Mini Top 3 Assistman Widget -->
+      <div class="top-scorers-widget shadow-sm mb-4">
+        <div class="widget-header d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+          <h5 class="m-0 fw-bold fs-6 text-uppercase tracking-wider">Top 3 Assistman</h5>
+          <button (click)="goToStats()" class="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-bold">
+            Vedi Tutti <i class="fa fa-arrow-right ms-1"></i>
+          </button>
+        </div>
+
+        @if (top3Assists().length > 0) {
+          <div class="scorers-list">
+            @for (player of top3Assists(); track player.name; let index = $index) {
+              <div class="scorer-item d-flex align-items-center justify-content-between py-2">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rank-badge" [class.rank-1]="index === 0" [class.rank-2]="index === 1" [class.rank-3]="index === 2">
+                    @if (index === 0) { 🥇 }
+                    @else if (index === 1) { 🥈 }
+                    @else if (index === 2) { 🥉 }
+                    @else { #{{ index + 1 }} }
+                  </div>
+                  <div>
+                    <div class="fw-bold text-dark player-name">{{ player.name }}</div>
+                    <div class="text-muted small team-name">{{ player.team }}</div>
+                  </div>
+                </div>
+                <div class="goals-badge bg-primary text-white px-3 py-1 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-1">
+                  <img src="assets/icon/shoes.svg" alt="Assist" style="width: 14px; height: 14px; filter: brightness(0) invert(1);" />
+                  {{ player.value }} <span class="small fw-normal">assist</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="text-center text-muted py-3">
+            <img src="assets/icon/shoes.svg" alt="Assist" style="width: 28px; height: 28px; opacity: 0.65; margin-right: 8px; vertical-align: middle;" /> Nessuna statistica assist disponibile.
+          </div>
+        }
       </div>
     </div>
-    }
   </div>
 </div>

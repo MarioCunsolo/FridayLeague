@@ -1,50 +1,196 @@
 .welcome-text {
-    font-weight: 800;
-    font-size: 2.5rem;
-    background: linear-gradient(45deg, var(--primary-green), var(--text-primary));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    transition: background var(--transition-speed);
+  font-weight: 800;
+  font-size: 2.25rem;
+  background: linear-gradient(135deg, var(--primary-green) 0%, #1b4d3e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: background var(--transition-speed);
 }
 
+.welcome-subtitle {
+  color: var(--text-grey, #6c757d);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+/* KPI Cards */
+.kpi-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-main);
+  border-radius: 1rem;
+  padding: 1rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-green);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+.kpi-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.kpi-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.kpi-label {
+  font-size: 0.725rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-grey, #8c8c8c);
+}
+
+.kpi-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+/* Action Cards */
 .action-card {
-    background-color: var(--card-bg);
-    border: 0.0625rem solid var(--border-main);
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease, background-color var(--transition-speed), border-color var(--transition-speed);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-main);
+  border-radius: 1rem;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
 }
 
 .action-card:hover {
-    border-color: var(--primary-green);
-    transform: translateY(-0.25rem);
+  border-color: var(--primary-green);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 204, 102, 0.12) !important;
 }
 
 .action-icon {
-    font-size: 2rem;
+  font-size: 1.85rem;
 }
 
-/* Match Cards on Homepage */
+/* Match Cards */
+.match-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-main);
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.match-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
 .next-match {
-    border: 0.125rem solid rgba(0, 204, 102, 0.4) !important;
-    background: linear-gradient(to bottom right, var(--stat-card-bg), rgba(0, 204, 102, 0.05)) !important;
+  border: 2px solid rgba(0, 204, 102, 0.4) !important;
+  background: linear-gradient(135deg, var(--stat-card-bg, #ffffff), rgba(0, 204, 102, 0.05)) !important;
 }
 
 .next-match:hover {
-    border-color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+}
+
+.match-card-header {
+  font-size: 0.85rem;
 }
 
 .match-date {
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05rem;
-    margin-top: 0.25rem;
+  font-size: 0.825rem;
+  font-weight: 700;
+}
+
+/* No Match State Card */
+.no-match-card {
+  background-color: var(--card-bg);
+  border: 2px dashed var(--border-main);
+  border-radius: 1.25rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.no-match-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.6;
+}
+
+/* Top Scorers Widget */
+.top-scorers-widget {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-main);
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.rank-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-hover, #f0f0f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, #ffe066, #ffd700);
+  color: #5c4900;
+  box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #e6e6e6, #c0c0c0);
+  color: #333333;
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #f4a460, #cd7f32);
+  color: #ffffff;
+}
+
+.player-name {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.team-name {
+  font-size: 0.775rem;
+}
+
+.goals-badge {
+  font-size: 0.85rem;
 }

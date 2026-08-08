@@ -1,6 +1,6 @@
 import { Component, input, output, computed, signal, inject, ViewContainerRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { GoalEvent, Match, MatchStatus } from '../../../models/interface/match.interface';
-
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { AddGoalModalComponent } from './add-goal-modal/add-goal-modal.component';
@@ -15,7 +15,7 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
     templateUrl: './match-detail.component.html',
     styleUrls: ['./match-detail.component.scss'],
     standalone: true,
-    imports: [NzButtonModule, NzIconModule, AddGoalModalComponent, SetupMatchModalComponent]
+    imports: [CommonModule, NzButtonModule, NzIconModule, AddGoalModalComponent, SetupMatchModalComponent]
 })
 export class MatchDetailComponent {
     private matchService = inject(MatchService);
@@ -38,6 +38,35 @@ export class MatchDetailComponent {
     isConcludendo = signal(false);
 
     goalTimeline = computed<GoalEvent[]>(() => this.match()?.goalTimeline || []);
+
+    formattedDate = computed<string>(() => {
+        const m = this.match();
+        if (!m) return '';
+        const d = new Date(m.date);
+        return d.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    });
+
+    statusLabel = computed<string>(() => {
+        const status = this.match()?.status;
+        switch (status) {
+            case MatchStatus.PROGRAMMATA: return 'PROGRAMMATA';
+            case MatchStatus.IN_CORSO: return 'IN CORSO';
+            case MatchStatus.CONCLUSA: return 'CONCLUSA';
+            case MatchStatus.ANNULLATA: return 'ANNULLATA';
+            default: return status || '';
+        }
+    });
+
+    statusBadgeClass = computed<string>(() => {
+        const status = this.match()?.status;
+        switch (status) {
+            case MatchStatus.PROGRAMMATA: return 'badge-programmata';
+            case MatchStatus.IN_CORSO: return 'badge-in-corso';
+            case MatchStatus.CONCLUSA: return 'badge-conclusa';
+            case MatchStatus.ANNULLATA: return 'badge-annullata';
+            default: return '';
+        }
+    });
 
     canDelete = computed<boolean>(() => {
         const m = this.match();

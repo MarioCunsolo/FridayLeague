@@ -10,7 +10,7 @@
     <h2 class="details-title m-0">Dettagli Partita</h2>
     @if (canDelete()) {
     <button nz-button nzType="text" class="delete-match-button" [nzLoading]="isDeleting()"
-      (click)="chiediConfermaEliminazione()">
+      (click)="chiediConfermaEliminazione()" title="Elimina Partita">
       <nz-icon nzType="delete" nzTheme="outline"></nz-icon>
     </button>
     }
@@ -18,153 +18,245 @@
 
   @if (match(); as m) {
   <main class="details-content-area">
-    <div class="match-score-header">
-      <div class="team-info">
-        <div class="team-logo mb-2">
-          <i class="fa fa-shield" style="font-size: 2rem; color: #ff4444;"></i>
-        </div>
-        <span class="team-name">{{ m.homeTeam }}</span>
-        <span class="team-score mb-3">{{ m.homeScore }}</span>
+    <!-- Hero Scoreboard Card -->
+    <div class="hero-scoreboard-card mb-4 shadow-sm">
+      <!-- Meta Information Row: Date & Status Badge -->
+      <div class="scoreboard-meta-row d-flex align-items-center justify-content-between mb-3">
+        <span class="date-badge d-flex align-items-center gap-1">
+          <i class="fa fa-calendar text-success"></i>
+          <span>{{ formattedDate() }}</span>
+        </span>
+        <span class="status-badge" [ngClass]="statusBadgeClass()">
+          @if (m.status === MatchStatus.IN_CORSO) {
+            <span class="live-dot me-1"></span>
+          }
+          {{ statusLabel() }}
+        </span>
+      </div>
 
-        <!-- Lineup Home -->
-        @if (m.homePlayers) {
-        <div class="player-list-header text-start w-100">
-          @for (player of m.homePlayers; track player.name) {
-          <div class="player-item-header d-flex align-items-center mb-1">
-            <span class="player-dot home-dot mr-1"></span>
-            <span class="player-name-header">{{ player.name }}</span>
-
-            <!-- Bonus Goals -->
-            @if (player.goals > 0) {
-            <div class="bonus-icons ml-1">
-              @for (i of [].constructor(player.goals); track $index) {
-              <i class="fa fa-soccer-ball-o bonus-icon-goal"></i>
-              }
-            </div>
-            }
-            <!-- Bonus Assists -->
-            @if (player.assists > 0) {
-            <div class="bonus-icons ml-1">
-              @for (i of [].constructor(player.assists); track $index) {
-              <i class="fa fa-handshake-o bonus-icon-assist" title="Assist"></i>
-              }
-            </div>
-            }
+      <!-- Main Scoreboard Grid -->
+      <div class="scoreboard-teams-row d-flex align-items-center justify-content-between py-2">
+        <!-- Home Team -->
+        <div class="team-block home-team-block text-center flex-1">
+          <div class="crest-wrapper home-crest mb-2 mx-auto shadow-sm">
+            <i class="fa fa-shield"></i>
           </div>
+          <h3 class="team-title m-0 text-truncate">{{ m.homeTeam }}</h3>
+        </div>
+
+        <!-- Center Score / VS Display -->
+        <div class="score-display-block text-center px-3">
+          @if (m.status === MatchStatus.PROGRAMMATA) {
+            <div class="vs-badge shadow-sm">VS</div>
+          } @else {
+            <div class="live-score-wrapper d-flex align-items-center justify-content-center gap-2">
+              <span class="score-num home-num">{{ m.homeScore }}</span>
+              <span class="score-colon">:</span>
+              <span class="score-num away-num">{{ m.awayScore }}</span>
+            </div>
           }
         </div>
-        }
-      </div>
-      <div class="vs-divider align-self-start mt-5">
-        <span>-</span>
-      </div>
-      <div class="team-info">
-        <div class="team-logo mb-2">
-          <i class="fa fa-star" style="font-size: 2rem; color: #ffcc00;"></i>
-        </div>
-        <span class="team-name">{{ m.awayTeam }}</span>
-        <span class="team-score mb-3">{{ m.awayScore }}</span>
 
-        <!-- Lineup Away -->
-        @if (m.awayPlayers) {
-        <div class="player-list-header text-end w-100">
-          @for (player of m.awayPlayers; track player.name) {
-          <div class="player-item-header d-flex flex-row-reverse align-items-center mb-1">
-            <span class="player-dot away-dot ml-1"></span>
-            <span class="player-name-header">{{ player.name }}</span>
-
-            <!-- Bonus Goals -->
-            @if (player.goals > 0) {
-            <div class="bonus-icons mr-1">
-              @for (i of [].constructor(player.goals); track $index) {
-              <i class="fa fa-soccer-ball-o bonus-icon-goal"></i>
-              }
-            </div>
-            }
-            <!-- Bonus Assists -->
-            @if (player.assists > 0) {
-            <div class="bonus-icons mr-1">
-              @for (i of [].constructor(player.assists); track $index) {
-              <i class="fa fa-handshake-o bonus-icon-assist" title="Assist"></i>
-              }
-            </div>
-            }
+        <!-- Away Team -->
+        <div class="team-block away-team-block text-center flex-1">
+          <div class="crest-wrapper away-crest mb-2 mx-auto shadow-sm">
+            <i class="fa fa-shield"></i>
           </div>
-          }
+          <h3 class="team-title m-0 text-truncate">{{ m.awayTeam }}</h3>
         </div>
-        }
       </div>
     </div>
 
+    <!-- Admin Action Bar -->
     @if (canSetupLineup() || canInizia() || m.status === MatchStatus.IN_CORSO || canAnnulla()) {
-    <div class="d-flex justify-content-center flex-wrap gap-2 mt-3">
+    <div class="admin-actions-bar d-flex justify-content-center flex-wrap gap-2 mb-4 p-2 rounded-pill shadow-xs">
       @if (canSetupLineup()) {
-      <button nz-button nzType="primary" nzShape="round" (click)="openSetupModal()" class="setup-match-btn">
+      <button nz-button nzType="primary" nzShape="round" (click)="openSetupModal()" class="action-btn setup-btn">
         <nz-icon nzType="setting" nzTheme="outline"></nz-icon>
         Imposta Partita
       </button>
       }
       @if (canInizia()) {
-      <button nz-button nzType="primary" nzShape="round" [nzLoading]="isIniziando()" (click)="iniziaPartita()" class="inizia-match-btn">
+      <button nz-button nzType="primary" nzShape="round" [nzLoading]="isIniziando()" (click)="iniziaPartita()" class="action-btn inizia-btn">
         <nz-icon nzType="play-circle" nzTheme="outline"></nz-icon>
         Inizia Partita
       </button>
       }
       @if (m.status === MatchStatus.IN_CORSO) {
-      <button nz-button nzType="primary" nzShape="round" (click)="openAddGoalModal()" class="add-goal-btn">
+      <button nz-button nzType="primary" nzShape="round" (click)="openAddGoalModal()" class="action-btn goal-btn">
         <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
         Aggiungi Goal
       </button>
       }
       @if (canConcludere()) {
-      <button nz-button nzType="primary" nzShape="round" [nzLoading]="isConcludendo()" (click)="chiediConfermaConclusione()" class="concludi-match-btn">
+      <button nz-button nzType="primary" nzShape="round" [nzLoading]="isConcludendo()" (click)="chiediConfermaConclusione()" class="action-btn concludi-btn">
         <nz-icon nzType="check-circle" nzTheme="outline"></nz-icon>
         Concludi Partita
       </button>
       }
       @if (canAnnulla()) {
-      <button nz-button nzType="default" nzShape="round" [nzLoading]="isAnnullando()" (click)="chiediConfermaAnnullamento()" class="annulla-match-btn">
+      <button nz-button nzType="default" nzShape="round" [nzLoading]="isAnnullando()" (click)="chiediConfermaAnnullamento()" class="action-btn annulla-btn">
         <nz-icon nzType="stop" nzTheme="outline"></nz-icon>
         Annulla Partita
       </button>
       }
     </div>
     }
-    <div class="match-scorers-container mt-4">
-      <!-- Riga Centrale Bianca -->
-      <div class="center-divider"></div>
-      <div class="timeline-container w-100">
-        @for (goal of goalTimeline(); track goal) {
-        <div class="timeline-row">
-          <!-- Lato Casa -->
-          <div class="timeline-half left-half text-end pe-3 d-flex flex-column align-items-end">
-            @if (goal.isHome) {
-            <div>
-              {{ goal.scorerName }} <i class="fa fa-soccer-ball-o ms-1"></i>
+
+    <!-- Team Lineups Section -->
+    <div class="lineups-section mb-4">
+      <h4 class="section-title mb-3 d-flex align-items-center gap-2">
+        <i class="fa fa-users text-success"></i> Formazioni Squadre
+      </h4>
+
+      <div class="row g-3">
+        <!-- Home Team Lineup -->
+        <div class="col-12 col-md-6">
+          <div class="lineup-card home-lineup-card p-3 rounded shadow-sm h-100">
+            <div class="lineup-header d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+              <span class="fw-bold text-danger d-flex align-items-center gap-2">
+                <i class="fa fa-shield"></i> {{ m.homeTeam }}
+              </span>
+              <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 fs-7 fw-bold">
+                {{ m.homePlayers?.length || 0 }} Giocatori
+              </span>
             </div>
-            @if (goal.assistName) {
-            <small class="assist-text">Assist: {{ goal.assistName }}</small>
-            }
-            }
-          </div>
-          <!-- Spazio Centrale -->
-          <div class="timeline-center"></div>
-          <!-- Lato Trasferta -->
-          <div class="timeline-half right-half text-start ps-3 d-flex flex-column align-items-start">
-            @if (!goal.isHome) {
-            <div>
-              <i class="fa fa-soccer-ball-o me-1"></i> {{ goal.scorerName }}
+
+            <div class="lineup-players-list">
+              @if (m.homePlayers && m.homePlayers.length > 0) {
+                @for (player of m.homePlayers; track player.name; let i = $index) {
+                  <div class="player-line-item d-flex align-items-center justify-content-between p-2 mb-2 rounded shadow-2xs">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="player-number home-num">{{ i + 1 }}</span>
+                      <span class="player-fullname fw-medium">{{ player.name }}</span>
+                    </div>
+                    <div class="player-stats-pills d-flex align-items-center gap-1">
+                      @if (player.goals > 0) {
+                        <span class="stat-pill goal-stat-pill" title="Gol segnati">
+                          ⚽ {{ player.goals }}
+                        </span>
+                      }
+                      @if (player.assists > 0) {
+                        <span class="stat-pill assist-stat-pill" title="Assist forniti">
+                          🤝 {{ player.assists }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              } @else {
+                <div class="empty-lineup text-center py-4 text-muted small">
+                  <i class="fa fa-user-times d-block mb-1 fs-4 opacity-50"></i>
+                  Formazione non ancora impostata
+                </div>
+              }
             </div>
-            @if (goal.assistName) {
-            <small class="assist-text">Assist: {{ goal.assistName }}</small>
-            }
-            }
           </div>
         </div>
-        }
+
+        <!-- Away Team Lineup -->
+        <div class="col-12 col-md-6">
+          <div class="lineup-card away-lineup-card p-3 rounded shadow-sm h-100">
+            <div class="lineup-header d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+              <span class="fw-bold text-warning d-flex align-items-center gap-2">
+                <i class="fa fa-shield"></i> {{ m.awayTeam }}
+              </span>
+              <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-1 fs-7 fw-bold">
+                {{ m.awayPlayers?.length || 0 }} Giocatori
+              </span>
+            </div>
+
+            <div class="lineup-players-list">
+              @if (m.awayPlayers && m.awayPlayers.length > 0) {
+                @for (player of m.awayPlayers; track player.name; let i = $index) {
+                  <div class="player-line-item d-flex align-items-center justify-content-between p-2 mb-2 rounded shadow-2xs">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="player-number away-num">{{ i + 1 }}</span>
+                      <span class="player-fullname fw-medium">{{ player.name }}</span>
+                    </div>
+                    <div class="player-stats-pills d-flex align-items-center gap-1">
+                      @if (player.goals > 0) {
+                        <span class="stat-pill goal-stat-pill" title="Gol segnati">
+                          ⚽ {{ player.goals }}
+                        </span>
+                      }
+                      @if (player.assists > 0) {
+                        <span class="stat-pill assist-stat-pill" title="Assist forniti">
+                          🤝 {{ player.assists }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              } @else {
+                <div class="empty-lineup text-center py-4 text-muted small">
+                  <i class="fa fa-user-times d-block mb-1 fs-4 opacity-50"></i>
+                  Formazione non ancora impostata
+                </div>
+              }
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Match Goal Timeline Stream -->
+    <div class="timeline-section">
+      <h4 class="section-title mb-3 d-flex align-items-center gap-2">
+        <i class="fa fa-soccer-ball-o text-success"></i> Cronologia Gol
+      </h4>
+
+      <div class="timeline-card p-3 rounded shadow-sm">
+        @if (goalTimeline().length > 0) {
+          <div class="timeline-stream position-relative">
+            <div class="center-line"></div>
+            @for (goal of goalTimeline(); track goal) {
+              <div class="timeline-event-row mb-3">
+                <!-- Home Side -->
+                <div class="timeline-side left-side">
+                  @if (goal.isHome) {
+                    <div class="event-box home-event d-inline-block p-2 rounded shadow-2xs">
+                      <span class="fw-bold me-1">{{ goal.scorerName }}</span>
+                      <i class="fa fa-soccer-ball-o text-danger"></i>
+                      @if (goal.assistName) {
+                        <div class="small text-muted mt-1">
+                          <i class="fa fa-handshake-o me-1 text-primary"></i> Assist: {{ goal.assistName }}
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- Center Node -->
+                <div class="center-node d-flex align-items-center justify-content-center">
+                  <i class="fa fa-soccer-ball-o"></i>
+                </div>
+
+                <!-- Away Side -->
+                <div class="timeline-side right-side">
+                  @if (!goal.isHome) {
+                    <div class="event-box away-event d-inline-block p-2 rounded shadow-2xs">
+                      <i class="fa fa-soccer-ball-o text-warning me-1"></i>
+                      <span class="fw-bold">{{ goal.scorerName }}</span>
+                      @if (goal.assistName) {
+                        <div class="small text-muted mt-1">
+                          <i class="fa fa-handshake-o me-1 text-primary"></i> Assist: {{ goal.assistName }}
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-timeline text-center py-4 text-muted small">
+            <i class="fa fa-soccer-ball-o d-block mb-1 fs-3 opacity-40"></i>
+            Nessun gol registrato in questa partita
+          </div>
+        }
+      </div>
+    </div>
   </main>
   }
 

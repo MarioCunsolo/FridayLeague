@@ -7,4 +7,5 @@ public interface IReservationService
     Task<List<ReservationDto>> GetReservationsAsync(int userId);
     Task<ReservationDto> CreateReservationAsync(int userId, CreateReservationRequest request);
     Task DeleteReservationAsync(int userId, int playerId);
+    Task<List<ReservationDto>> SeedDummyReservationsAsync(int userId);
 }

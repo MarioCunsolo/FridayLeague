@@ -82,6 +82,41 @@ public class ReservationService : IReservationService
         await _proxy.DeleteAsync(prenotazione);
     }
 
+    public async Task<List<ReservationDto>> SeedDummyReservationsAsync(int userId)
+    {
+        var legaId = await GetLegaAttivaAsync(userId);
+        var partita = await _proxy.GetNextScheduledAsync(legaId)
+            ?? throw new BadRequestException("Nessuna partita in programma per cui popolare le prenotazioni.");
+
+        var prenotazioniEsistenti = await _proxy.GetByPartitaAsync(partita.Id);
+
+        var nomiFittizi = new string[]
+        {
+            "Salvo Vitale", "Mario Cunsolo", "Giuseppe Rossi", "Luca Bianchi", "Marco Neri",
+            "Andrea Gialli", "Roberto Verdi", "Franco Nipotini", "Giorgio Vanni", "Stefano Sogni"
+        };
+
+        foreach (var nome in nomiFittizi)
+        {
+            if (!prenotazioniEsistenti.Any(p => p.NomeCognome.Equals(nome, StringComparison.OrdinalIgnoreCase)))
+            {
+                var membro = await _proxy.FindMembroByNomeCompletoAsync(legaId, nome);
+                var nuova = new Prenotazione
+                {
+                    PartitaId = partita.Id,
+                    UserId = membro?.Id,
+                    PrenotatoDaUserId = userId,
+                    NomeCognome = nome,
+                    DataOra = DateTime.Now
+                };
+                await _proxy.CreateAsync(nuova);
+            }
+        }
+
+        var aggiornate = await _proxy.GetByPartitaAsync(partita.Id);
+        return aggiornate.Select(MappaDto).ToList();
+    }
+
     // Le prenotazioni sono chiuse dal sabato (tutto il giorno) fino a domenica alle 17:00, come da regola già in vigore lato frontend.
     private static void ValidaFinestraPrenotazione()
     {

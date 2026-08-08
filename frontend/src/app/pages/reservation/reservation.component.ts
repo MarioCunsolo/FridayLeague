@@ -73,6 +73,13 @@ export class ReservationComponent implements OnInit {
     });
   }
 
+  popolaFittizie(): void {
+    this.reservationService.seedDummyReservations().subscribe({
+      next: () => this.message.success('10 prenotazioni fittizie generate con successo!'),
+      error: (err) => this.message.error(err.error || 'Errore durante la generazione delle prenotazioni fittizie.')
+    });
+  }
+
   deleteReservation(player: Reservation): void {
     if (!player.playerId) {
       this.message.error('Non è possibile eliminare una prenotazione non collegata a un utente registrato.');

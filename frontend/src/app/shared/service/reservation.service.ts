@@ -45,4 +45,13 @@ export class ReservationService {
       tap(() => this._reservations.update(prev => prev.filter(r => r.playerId !== id)))
     );
   }
+
+  /**
+   * Popola automaticamente le prenotazioni fittizie (10 giocatori).
+   */
+  seedDummyReservations() {
+    return this.http.post<Reservation[]>(`${this.BASE_URL}/seed-dummy`, {}).pipe(
+      tap(data => this._reservations.set(data))
+    );
+  }
 }

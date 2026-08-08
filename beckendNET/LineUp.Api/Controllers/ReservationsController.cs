@@ -29,4 +29,8 @@ public class ReservationsController : ApiControllerBase
     [HttpDelete("{id}")]
     public Task<IActionResult> Delete(int id) =>
         ExecuteAsync(() => _reservationService.DeleteReservationAsync(User.GetUserId(), id));
+
+    [HttpPost("seed-dummy")]
+    public Task<ActionResult<List<ReservationDto>>> SeedDummy() =>
+        ExecuteAsync(() => _reservationService.SeedDummyReservationsAsync(User.GetUserId()));
 }

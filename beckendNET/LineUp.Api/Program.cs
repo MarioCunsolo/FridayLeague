@@ -212,7 +212,14 @@ using (var scope = app.Services.CreateScope())
         {
             ("s@v.com", "Salvo", "Vitale", 4),      // SUPER_ADMIN
             ("m@c.com", "Mario", "Cunsolo", 1),     // ADMIN
-            ("p@db.com", "Player", "Db", 3)         // GIOCATORE
+            ("p@db.com", "Player", "Db", 3),        // GIOCATORE
+            ("g.rossi@friday.com", "Giuseppe", "Rossi", 3),
+            ("l.bianchi@friday.com", "Luca", "Bianchi", 3),
+            ("m.neri@friday.com", "Marco", "Neri", 3),
+            ("a.gialli@friday.com", "Andrea", "Gialli", 3),
+            ("r.verdi@friday.com", "Roberto", "Verdi", 3),
+            ("f.nipotini@friday.com", "Franco", "Nipotini", 3),
+            ("g.vanni@friday.com", "Giorgio", "Vanni", 3)
         };
 
         foreach (var u in seedUsers)
@@ -258,6 +265,27 @@ using (var scope = app.Services.CreateScope())
                 userLega.RuoloId = u.RuoloId;
                 dbContext.SaveChanges();
             }
+        }
+
+        // Seed default reservations for next scheduled match if no reservations exist yet
+        var nextMatch = dbContext.Partite.FirstOrDefault(p => p.LegaId == league.Id && p.StatoId == StatoPartita.ProgrammataId);
+        if (nextMatch != null && !dbContext.Prenotazioni.Any(pr => pr.PartitaId == nextMatch.Id))
+        {
+            var adminUser = dbContext.Users.FirstOrDefault(u => u.Email == "m@c.com") ?? dbContext.Users.First();
+            var leagueUsers = dbContext.Users.Where(u => u.LegaId == league.Id).Take(10).ToList();
+
+            foreach (var u in leagueUsers)
+            {
+                dbContext.Prenotazioni.Add(new Prenotazione
+                {
+                    PartitaId = nextMatch.Id,
+                    UserId = u.Id,
+                    PrenotatoDaUserId = adminUser.Id,
+                    NomeCognome = $"{u.Nome} {u.Cognome}",
+                    DataOra = DateTime.Now
+                });
+            }
+            dbContext.SaveChanges();
         }
     }
     catch (Exception ex)

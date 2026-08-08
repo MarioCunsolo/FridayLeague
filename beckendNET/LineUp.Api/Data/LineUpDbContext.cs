@@ -15,6 +15,7 @@ public class LineUpDbContext : DbContext
     public DbSet<RuoloLega> Ruoli => Set<RuoloLega>();
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
     public DbSet<Squadra> Squadre => Set<Squadra>();
+    public DbSet<StatoPartitaLookup> StatiPartita => Set<StatoPartitaLookup>();
     public DbSet<Partita> Partite => Set<Partita>();
     public DbSet<PartecipantePartita> PartecipantiPartita => Set<PartecipantePartita>();
     public DbSet<EventoGol> EventiGol => Set<EventoGol>();
@@ -66,6 +67,13 @@ public class LineUpDbContext : DbContext
             .HasForeignKey(p => p.SquadraTrasfertaId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Relazione Partita -> StatoPartitaLookup
+        modelBuilder.Entity<Partita>()
+            .HasOne(p => p.Stato)
+            .WithMany()
+            .HasForeignKey(p => p.StatoId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Evita cascade path multipli su EventoGol -> User (Marcatore/Assist)
         modelBuilder.Entity<EventoGol>()
             .HasOne(g => g.Marcatore)
@@ -98,6 +106,14 @@ public class LineUpDbContext : DbContext
             new RuoloLega { Id = 2, Nome = "CO_ADMIN" },
             new RuoloLega { Id = 3, Nome = "GIOCATORE" },
             new RuoloLega { Id = 4, Nome = "SUPER_ADMIN" }
+        );
+
+        // Seed match status lookup data
+        modelBuilder.Entity<StatoPartitaLookup>().HasData(
+            new StatoPartitaLookup { Id = 1, Codice = "PROGRAMMATA", Nome = "Programmata" },
+            new StatoPartitaLookup { Id = 2, Codice = "IN_CORSO", Nome = "In Corso" },
+            new StatoPartitaLookup { Id = 3, Codice = "CONCLUSA", Nome = "Conclusa" },
+            new StatoPartitaLookup { Id = 4, Codice = "ANNULLATA", Nome = "Annullata" }
         );
     }
 }

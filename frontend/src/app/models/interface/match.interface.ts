@@ -1,3 +1,7 @@
+import { MatchStatus, MatchStatusId, StatoPartitaLookup } from '../enum/match-status.enum';
+
+export { MatchStatus, MatchStatusId, StatoPartitaLookup };
+
 export interface Player {
   name: string;
   goals: number;
@@ -10,13 +14,6 @@ export interface GoalEvent {
   assistName?: string;
 }
 
-export enum MatchStatus {
-  PROGRAMMATA = 'Programmata',
-  CONCLUSA = 'Conclusa',
-  IN_CORSO = 'In Corso',
-  ANNULLATA = 'Annullata'
-}
-
 export interface Match {
   id: number;
   homeTeam: string;
@@ -24,6 +21,7 @@ export interface Match {
   homeScore: number;
   awayScore: number;
   status: MatchStatus;
+  statoId?: MatchStatusId;
   date: Date;
   homePlayers?: Player[];
   awayPlayers?: Player[];

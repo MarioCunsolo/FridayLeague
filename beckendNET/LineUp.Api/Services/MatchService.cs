@@ -44,7 +44,7 @@ public class MatchService : IMatchService
             throw new BadRequestException("Le squadre casa e trasferta sono obbligatorie.");
         }
 
-        var stato = ValidaStato(request.Status ?? StatoPartita.Programmata);
+        var statoId = ValidaStatoId(request.Status ?? StatoPartita.Programmata);
 
         var squadraCasa = await _proxy.GetOrCreateSquadraAsync(legaId, request.HomeTeam);
         var squadraTrasferta = await _proxy.GetOrCreateSquadraAsync(legaId, request.AwayTeam);
@@ -55,7 +55,7 @@ public class MatchService : IMatchService
             SquadraCasaId = squadraCasa.Id,
             SquadraTrasfertaId = squadraTrasferta.Id,
             DataOra = request.Date,
-            Stato = stato,
+            StatoId = statoId,
             Stagione = request.Date.Year.ToString()
         };
 
@@ -85,7 +85,7 @@ public class MatchService : IMatchService
         if (request.HomeScore.HasValue) partita.GolCasa = request.HomeScore.Value;
         if (request.AwayScore.HasValue) partita.GolTrasferta = request.AwayScore.Value;
         if (request.Date.HasValue) partita.DataOra = request.Date.Value;
-        if (!string.IsNullOrWhiteSpace(request.Status)) partita.Stato = ValidaStato(request.Status);
+        if (!string.IsNullOrWhiteSpace(request.Status)) partita.StatoId = ValidaStatoId(request.Status);
 
         await _proxy.SalvaPartitaAsync();
         return await BuildMatchDtoAsync(partita);
@@ -113,12 +113,12 @@ public class MatchService : IMatchService
 
         var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
 
-        if (partita.Stato != StatoPartita.InCorso && partita.Stato != StatoPartita.Programmata)
+        if (partita.StatoId != StatoPartita.InCorsoId && partita.StatoId != StatoPartita.ProgrammataId)
         {
             throw new BadRequestException("Puoi annullare solo una partita programmata o in corso.");
         }
 
-        partita.Stato = StatoPartita.Annullata;
+        partita.StatoId = StatoPartita.AnnullataId;
         await _proxy.SalvaPartitaAsync();
 
         return await BuildMatchDtoAsync(partita);
@@ -153,7 +153,7 @@ public class MatchService : IMatchService
         await _proxy.AddGoalAsync(evento);
 
         if (request.IsHome) partita.GolCasa++; else partita.GolTrasferta++;
-        if (partita.Stato == StatoPartita.Programmata) partita.Stato = StatoPartita.InCorso;
+        if (partita.StatoId == StatoPartita.ProgrammataId) partita.StatoId = StatoPartita.InCorsoId;
         await _proxy.SalvaPartitaAsync();
 
         return new GoalEventDto
@@ -251,24 +251,31 @@ public class MatchService : IMatchService
         return partita;
     }
 
-    private static string ValidaStato(string stato)
+    private static int ValidaStatoId(string stato) => stato?.Trim() switch
     {
-        if (!StatiValidi.Contains(stato))
-        {
-            throw new BadRequestException($"Stato non valido. Deve essere uno tra: {string.Join(", ", StatiValidi)}.");
-        }
-        return stato;
-    }
+        StatoPartita.Programmata => StatoPartita.ProgrammataId,
+        StatoPartita.InCorso => StatoPartita.InCorsoId,
+        StatoPartita.Conclusa => StatoPartita.ConclusaId,
+        StatoPartita.Annullata => StatoPartita.AnnullataId,
+        _ => throw new BadRequestException($"Stato non valido. Deve essere uno tra: {string.Join(", ", StatiValidi)}.")
+    };
 
     private static string CalcolaStatoEffettivo(Partita partita)
     {
-        if (partita.Stato == StatoPartita.Conclusa || partita.Stato == StatoPartita.Annullata)
+        if (partita.StatoId == StatoPartita.ConclusaId) return StatoPartita.Conclusa;
+        if (partita.StatoId == StatoPartita.AnnullataId) return StatoPartita.Annullata;
+
+        if (partita.DataOra + DurataPartita <= DateTime.UtcNow)
         {
-            return partita.Stato;
+            return StatoPartita.Conclusa;
         }
 
-        return partita.DataOra + DurataPartita <= DateTime.UtcNow
-            ? StatoPartita.Conclusa
-            : partita.Stato;
+        return partita.StatoId switch
+        {
+            StatoPartita.InCorsoId => StatoPartita.InCorso,
+            StatoPartita.ConclusaId => StatoPartita.Conclusa,
+            StatoPartita.AnnullataId => StatoPartita.Annullata,
+            _ => StatoPartita.Programmata
+        };
     }
 }

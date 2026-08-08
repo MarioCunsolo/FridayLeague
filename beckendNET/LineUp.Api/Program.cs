@@ -113,19 +113,36 @@ using (var scope = app.Services.CreateScope())
         ");
 
         dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS StatiPartita (
+                Id INT PRIMARY KEY,
+                Codice VARCHAR(50) NOT NULL,
+                Nome VARCHAR(50) NOT NULL
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            INSERT IGNORE INTO StatiPartita (Id, Codice, Nome) VALUES
+            (1, 'PROGRAMMATA', 'Programmata'),
+            (2, 'IN_CORSO', 'In Corso'),
+            (3, 'CONCLUSA', 'Conclusa'),
+            (4, 'ANNULLATA', 'Annullata');
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS Partite (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
                 LegaId INT NOT NULL,
                 SquadraCasaId INT NOT NULL,
                 SquadraTrasfertaId INT NOT NULL,
                 DataOra DATETIME NOT NULL,
-                Stato VARCHAR(20) NOT NULL,
+                StatoId INT NOT NULL DEFAULT 1,
                 GolCasa INT NOT NULL DEFAULT 0,
                 GolTrasferta INT NOT NULL DEFAULT 0,
                 Stagione VARCHAR(10) NOT NULL,
                 CONSTRAINT FK_Partite_Leghe_LegaId FOREIGN KEY (LegaId) REFERENCES Leghe(Id) ON DELETE CASCADE,
                 CONSTRAINT FK_Partite_Squadre_SquadraCasaId FOREIGN KEY (SquadraCasaId) REFERENCES Squadre(Id),
-                CONSTRAINT FK_Partite_Squadre_SquadraTrasfertaId FOREIGN KEY (SquadraTrasfertaId) REFERENCES Squadre(Id)
+                CONSTRAINT FK_Partite_Squadre_SquadraTrasfertaId FOREIGN KEY (SquadraTrasfertaId) REFERENCES Squadre(Id),
+                CONSTRAINT FK_Partite_StatiPartita_StatoId FOREIGN KEY (StatoId) REFERENCES StatiPartita(Id)
             );
         ");
 

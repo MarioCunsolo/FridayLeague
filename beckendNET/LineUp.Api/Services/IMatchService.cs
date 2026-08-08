@@ -11,4 +11,5 @@ public interface IMatchService
     Task<MatchDto> AnnullaMatchAsync(int userId, int matchId);
     Task<GoalEventDto> AddGoalAsync(int userId, int matchId, AddGoalRequest request);
     Task SetMotmAsync(int userId, int matchId, SetMotmRequest request);
+    Task<MatchDto> SetupLineupAsync(int userId, int matchId, SetupMatchLineupRequest request);
 }

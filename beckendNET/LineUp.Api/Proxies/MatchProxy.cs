@@ -46,6 +46,12 @@ public class MatchProxy : IMatchProxy
     public Task AddPartecipantiAsync(IEnumerable<PartecipantePartita> partecipanti) =>
         _partecipanteRepository.AddRangeAsync(partecipanti);
 
+    public async Task ReplacePartecipantiAsync(int partitaId, IEnumerable<PartecipantePartita> nuoviPartecipanti)
+    {
+        await _partecipanteRepository.RemoveByPartitaAsync(partitaId);
+        await _partecipanteRepository.AddRangeAsync(nuoviPartecipanti);
+    }
+
     public Task SalvaPartecipantiAsync() => _partecipanteRepository.SaveChangesAsync();
 
     public Task<EventoGol> AddGoalAsync(EventoGol evento) => _eventoGolRepository.AddAsync(evento);

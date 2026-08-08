@@ -4,6 +4,7 @@ import { GoalEvent, Match, MatchStatus } from '../../../models/interface/match.i
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { AddGoalModalComponent } from './add-goal-modal/add-goal-modal.component';
+import { SetupMatchModalComponent } from './setup-match-modal/setup-match-modal.component';
 import { MatchService } from '../../service/match.service';
 import { AuthService } from '../../service/auth.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -14,7 +15,7 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
     templateUrl: './match-detail.component.html',
     styleUrls: ['./match-detail.component.scss'],
     standalone: true,
-    imports: [NzButtonModule, NzIconModule, AddGoalModalComponent]
+    imports: [NzButtonModule, NzIconModule, AddGoalModalComponent, SetupMatchModalComponent]
 })
 export class MatchDetailComponent {
     private matchService = inject(MatchService);
@@ -30,6 +31,7 @@ export class MatchDetailComponent {
     close = output<void>();
 
     isAddGoalModalVisible = signal(false);
+    isSetupModalVisible = signal(false);
     isDeleting = signal(false);
     isAnnullando = signal(false);
 
@@ -37,12 +39,17 @@ export class MatchDetailComponent {
 
     canDelete = computed<boolean>(() => {
         const m = this.match();
-        return !!m && m.date.getTime() > Date.now();
+        return !!m && m.date.getTime() > Date.now() && this.authService.isAdminOrSuperAdmin();
     });
 
     canAnnulla = computed<boolean>(() => {
         const status = this.match()?.status;
-        return status === MatchStatus.IN_CORSO || status === MatchStatus.PROGRAMMATA;
+        return (status === MatchStatus.IN_CORSO || status === MatchStatus.PROGRAMMATA) && this.authService.isAdminOrSuperAdmin();
+    });
+
+    canSetupLineup = computed<boolean>(() => {
+        const m = this.match();
+        return !!m && m.status === MatchStatus.PROGRAMMATA && this.authService.isAdminOrSuperAdmin();
     });
 
     closeDetails() {
@@ -156,5 +163,30 @@ export class MatchDetailComponent {
 
     handleGoalCancel() {
         this.isAddGoalModalVisible.set(false);
+    }
+
+    openSetupModal() {
+        this.isSetupModalVisible.set(true);
+    }
+
+    handleSetupSubmit(lineup: { homePlayerNames: string[]; awayPlayerNames: string[] }) {
+        const currentMatch = this.match();
+        if (currentMatch) {
+            this.matchService.setupLineup(currentMatch.id, lineup.homePlayerNames, lineup.awayPlayerNames).subscribe({
+                next: () => {
+                    this.message.success('Formazioni impostate con successo!');
+                    this.isSetupModalVisible.set(false);
+                    this.matchService.loadMatches().subscribe();
+                },
+                error: () => {
+                    this.message.error('Errore durante l\'impostazione delle formazioni.');
+                    this.isSetupModalVisible.set(false);
+                }
+            });
+        }
+    }
+
+    handleSetupCancel() {
+        this.isSetupModalVisible.set(false);
     }
 }

@@ -45,4 +45,8 @@ public class MatchesController : ApiControllerBase
     [HttpPut("{id}/motm")]
     public Task<IActionResult> SetMotm(int id, SetMotmRequest request) =>
         ExecuteAsync(() => _matchService.SetMotmAsync(User.GetUserId(), id, request));
+
+    [HttpPost("{id}/setup-lineup")]
+    public Task<ActionResult<MatchDto>> SetupLineup(int id, SetupMatchLineupRequest request) =>
+        ExecuteAsync(() => _matchService.SetupLineupAsync(User.GetUserId(), id, request));
 }

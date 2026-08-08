@@ -275,11 +275,30 @@
     box-shadow: 0 0.5rem 1.25rem rgba(0, 204, 102, 0.4);
 }
 
+.setup-match-btn {
+    background-color: var(--primary-color, #1890ff) !important;
+    border-color: var(--primary-color, #1890ff) !important;
+    color: #fff !important;
+    height: 2.5rem;
+    padding: 0 1.25rem;
+    font-weight: 600;
+    box-shadow: 0 0.25rem 0.625rem rgba(24, 144, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.setup-match-btn:hover {
+    background-color: #40a9ff !important;
+    border-color: #40a9ff !important;
+    transform: translateY(-0.125rem) scale(1.02);
+    box-shadow: 0 0.5rem 1.25rem rgba(24, 144, 255, 0.4);
+}
+
 .annulla-match-btn {
     background-color: var(--input-bg) !important;
     border-color: var(--danger-red) !important;
     color: var(--danger-red) !important;
     height: 2.5rem;
+    padding: 0 1.25rem;
     font-weight: 600;
     transition: all 0.3s ease;
 }

@@ -19,6 +19,7 @@ public interface IMatchProxy
     Task<User?> FindMembroByNomeCompletoAsync(int legaId, string nome);
     Task<PartecipantePartita?> FindPartecipanteByNomeAsync(int partitaId, string nome, bool isHome);
     Task AddPartecipantiAsync(IEnumerable<PartecipantePartita> partecipanti);
+    Task ReplacePartecipantiAsync(int partitaId, IEnumerable<PartecipantePartita> nuoviPartecipanti);
     Task SalvaPartecipantiAsync();
     Task<EventoGol> AddGoalAsync(EventoGol evento);
 }

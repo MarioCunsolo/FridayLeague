@@ -23,6 +23,13 @@ export class AuthService {
     return activeLega && (activeLega.ruolo === 'SUPER_ADMIN' || activeLega.ruolo === 'ADMIN' || activeLega.ruolo === 'CO_ADMIN');
   });
 
+  public isAdminOrSuperAdmin = computed(() => {
+    const user = this.currentUser();
+    if (!user || !user.legaId || !user.leghe) return false;
+    const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
+    return activeLega && (activeLega.ruolo === 'SUPER_ADMIN' || activeLega.ruolo === 'ADMIN');
+  });
+
   constructor() {
     this._currentUser.set(null);
   }

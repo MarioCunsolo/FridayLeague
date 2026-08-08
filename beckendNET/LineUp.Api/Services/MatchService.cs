@@ -182,6 +182,60 @@ public class MatchService : IMatchService
         await _proxy.SalvaPartecipantiAsync();
     }
 
+    public async Task<MatchDto> SetupLineupAsync(int userId, int matchId, SetupMatchLineupRequest request)
+    {
+        var legaId = await GetLegaAttivaAsync(userId);
+        await RichiediAdminAsync(userId, legaId);
+
+        var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
+
+        if (partita.StatoId != StatoPartita.ProgrammataId)
+        {
+            throw new BadRequestException("È possibile impostare la formazione solo per le partite in programma.");
+        }
+
+        var nuoviPartecipanti = new List<PartecipantePartita>();
+
+        if (request.HomePlayerNames != null)
+        {
+            foreach (var nome in request.HomePlayerNames)
+            {
+                if (string.IsNullOrWhiteSpace(nome)) continue;
+                var membro = await _proxy.FindMembroByNomeCompletoAsync(legaId, nome);
+                if (membro != null)
+                {
+                    nuoviPartecipanti.Add(new PartecipantePartita
+                    {
+                        PartitaId = partita.Id,
+                        UserId = membro.Id,
+                        InCasa = true
+                    });
+                }
+            }
+        }
+
+        if (request.AwayPlayerNames != null)
+        {
+            foreach (var nome in request.AwayPlayerNames)
+            {
+                if (string.IsNullOrWhiteSpace(nome)) continue;
+                var membro = await _proxy.FindMembroByNomeCompletoAsync(legaId, nome);
+                if (membro != null)
+                {
+                    nuoviPartecipanti.Add(new PartecipantePartita
+                    {
+                        PartitaId = partita.Id,
+                        UserId = membro.Id,
+                        InCasa = false
+                    });
+                }
+            }
+        }
+
+        await _proxy.ReplacePartecipantiAsync(partita.Id, nuoviPartecipanti);
+        return await BuildMatchDtoAsync(partita);
+    }
+
     private async Task<PartecipantePartita> RisolviOCreaPartecipanteAsync(Partita partita, string nome, bool isHome)
     {
         var esistente = await _proxy.FindPartecipanteByNomeAsync(partita.Id, nome, isHome);

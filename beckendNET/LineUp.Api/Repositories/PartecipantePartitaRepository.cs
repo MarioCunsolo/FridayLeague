@@ -43,5 +43,17 @@ public class PartecipantePartitaRepository : IPartecipantePartitaRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task RemoveByPartitaAsync(int partitaId)
+    {
+        var daRimuovere = await _context.PartecipantiPartita
+            .Where(pp => pp.PartitaId == partitaId)
+            .ToListAsync();
+        if (daRimuovere.Any())
+        {
+            _context.PartecipantiPartita.RemoveRange(daRimuovere);
+            await _context.SaveChangesAsync();
+        }
+    }
+
     public Task SaveChangesAsync() => _context.SaveChangesAsync();
 }

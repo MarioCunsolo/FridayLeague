@@ -458,4 +458,20 @@ export class MatchService {
       })
     );
   }
+
+  /**
+   * Imposta le formazioni delle due squadre per una partita in programma.
+   * @param matchId L'ID della partita.
+   * @param homePlayerNames Nomi dei giocatori assegnati alla squadra di casa.
+   * @param awayPlayerNames Nomi dei giocatori assegnati alla squadra in trasferta.
+   * @returns Un Observable con la partita aggiornata.
+   */
+  setupLineup(matchId: number, homePlayerNames: string[], awayPlayerNames: string[]) {
+    return this.http.post<Match>(`${this.BASE_URL}/${matchId}/setup-lineup`, { homePlayerNames, awayPlayerNames }).pipe(
+      map(updatedMatch => this.parseMatchDate(updatedMatch)),
+      tap(updatedMatch => this.matches.update(prev =>
+        prev.map(m => m.id === matchId ? updatedMatch : m)
+      ))
+    );
+  }
 }

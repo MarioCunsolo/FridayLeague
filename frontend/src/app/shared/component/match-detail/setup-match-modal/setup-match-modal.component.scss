@@ -1,0 +1,268 @@
+/* Modal Backdrop matching AddGoalModal & MatchDetail */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(0.25rem);
+    z-index: 2100;
+}
+
+/* Modal Container (Premium Central Design) */
+.modal-container {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 92%;
+    max-width: 52rem;
+    max-height: 88vh;
+    background-color: var(--card-bg);
+    border-radius: 1.5rem;
+    border: 0.0625rem solid var(--border-sub);
+    box-shadow: 0 0 3rem rgba(0, 0, 0, 0.4), 0 0 1rem rgba(0, 204, 102, 0.3);
+    z-index: 2200;
+    overflow: hidden;
+    transition: all var(--transition-speed);
+}
+
+@media (max-width: 576px) {
+    .modal-container {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+}
+
+/* Modal Header (Integrated Back Button + Centered Title) */
+.modal-header {
+    height: 3.75rem;
+    background-color: var(--app-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    border-bottom: 0.0625rem solid var(--border-sub);
+    position: relative;
+}
+
+.modal-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--primary-green);
+    text-align: center;
+}
+
+.back-button {
+    position: absolute;
+    left: 1rem;
+    z-index: 10;
+    color: var(--text-primary) !important;
+
+    &:hover {
+        color: var(--primary-green) !important;
+    }
+}
+
+.btn-random {
+    position: absolute;
+    right: 1rem;
+    z-index: 10;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    border-color: var(--primary-green) !important;
+    color: var(--primary-green) !important;
+    background: var(--input-bg) !important;
+
+    &:hover {
+        background-color: rgba(0, 204, 102, 0.15) !important;
+        transform: translateY(-1px);
+    }
+}
+
+/* Modal Content Area */
+.modal-content-area {
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: var(--card-bg);
+}
+
+/* Unassigned Booked Players Section */
+.unassigned-section {
+    background-color: var(--input-bg);
+    border: 0.0625rem dashed var(--border-main);
+    border-radius: 1rem;
+}
+
+.unassigned-title {
+    color: var(--text-secondary);
+}
+
+.player-pill {
+    background-color: var(--card-bg);
+    border: 0.0625rem solid var(--border-main);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    .player-name {
+        color: var(--text-primary);
+    }
+
+    .btn-group-pill {
+        display: flex;
+        gap: 0.35rem;
+        align-items: center;
+    }
+
+    .btn-assign {
+        border: none;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.home-btn {
+            background-color: rgba(255, 68, 68, 0.15);
+            color: #ff4444;
+
+            &:hover {
+                background-color: #ff4444;
+                color: #ffffff;
+            }
+        }
+
+        &.away-btn {
+            background-color: rgba(255, 204, 0, 0.15);
+            color: #ffcc00;
+
+            &:hover {
+                background-color: #ffcc00;
+                color: #000000;
+            }
+        }
+    }
+}
+
+/* Teams Cards */
+.team-card {
+    background-color: var(--card-bg);
+    border: 0.0625rem solid var(--border-main);
+    border-radius: 1rem;
+
+    &.home-team-card {
+        border-top: 0.25rem solid #ff4444;
+    }
+
+    &.away-team-card {
+        border-top: 0.25rem solid #ffcc00;
+    }
+}
+
+.team-header {
+    border-bottom: 0.0625rem solid var(--border-main) !important;
+}
+
+.player-row {
+    background-color: var(--input-bg) !important;
+    border: 0.0625rem solid var(--border-main);
+    color: var(--text-primary);
+
+    .num-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        background-color: rgba(255, 68, 68, 0.2);
+        color: #ff4444;
+        font-size: 0.75rem;
+        font-weight: 700;
+
+        &.away-num {
+            background-color: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+        }
+    }
+
+    .btn-move-switch {
+        background: transparent;
+        border: 0.0625rem solid var(--border-sub);
+        color: var(--text-secondary);
+        border-radius: 0.375rem;
+        padding: 0.15rem 0.45rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--border-sub);
+            color: var(--text-primary);
+        }
+    }
+
+    .btn-move-remove {
+        background: transparent;
+        border: none;
+        color: var(--danger-red);
+        font-size: 0.85rem;
+        padding: 0.15rem 0.35rem;
+        cursor: pointer;
+
+        &:hover {
+            color: #ff4444;
+        }
+    }
+}
+
+/* Modal Footer Action Buttons */
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    border-top: 0.0625rem solid var(--border-sub);
+    padding: 1.25rem 1.5rem 1.5rem 1.5rem;
+    background-color: var(--app-bg);
+    margin-top: auto;
+}
+
+.footer-btn {
+    flex: 1;
+    height: 3rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn {
+    background-color: var(--input-bg);
+    border: 0.0625rem solid var(--border-main);
+    color: var(--text-secondary);
+
+    &:hover {
+        color: var(--text-primary);
+        background-color: var(--border-sub);
+    }
+}
+
+.save-btn {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    color: #000000 !important;
+    box-shadow: 0 0.25rem 0.625rem rgba(0, 204, 102, 0.2);
+
+    &:hover {
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.375rem 1rem rgba(0, 204, 102, 0.3);
+    }
+}

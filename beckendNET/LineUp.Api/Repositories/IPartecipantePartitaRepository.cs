@@ -8,5 +8,6 @@ public interface IPartecipantePartitaRepository
     Task<PartecipantePartita?> FindByNomeInPartitaAsync(int partitaId, string nomeCompleto, bool isHome);
     Task<List<PartecipantePartita>> GetByLegaAsync(int legaId, string? stagione);
     Task AddRangeAsync(IEnumerable<PartecipantePartita> partecipanti);
+    Task RemoveByPartitaAsync(int partitaId);
     Task SaveChangesAsync();
 }

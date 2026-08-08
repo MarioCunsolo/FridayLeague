@@ -1,0 +1,125 @@
+<!-- Backdrop with blur -->
+<div class="modal-backdrop" (click)="handleCancel()"></div>
+
+<!-- Centered modal container -->
+<div class="modal-container shadow-lg">
+  <header class="modal-header">
+    <button nz-button type="button" nzType="text" class="back-button" (click)="handleCancel()">
+      <nz-icon nzType="arrow-left" nzTheme="outline"></nz-icon>
+    </button>
+    <h2 class="modal-title m-0">Imposta Partita</h2>
+    <button nz-button type="button" nzType="default" class="btn-random shadow-sm" (click)="generateRandomTeams()">
+      <i class="fa fa-random me-1"></i> Genera a Caso
+    </button>
+  </header>
+
+  <main class="modal-content-area">
+    <!-- Unassigned Booked Players Section -->
+    @if (unassignedPlayers().length > 0) {
+      <div class="unassigned-section mb-4 p-3 rounded shadow-sm">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="fw-bold small text-uppercase text-muted">
+            <i class="fa fa-users me-1 text-primary"></i> Giocatori Prenotati da Assegnare ({{ unassignedPlayers().length }})
+          </span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          @for (player of unassignedPlayers(); track player) {
+            <div class="player-pill unassigned-pill d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm">
+              <span class="player-name">{{ player }}</span>
+              <div class="btn-group-pill ms-1 d-flex gap-1">
+                <button type="button" class="btn-assign home-btn" (click)="assignToHome(player)" title="Assegna a Casa">
+                  Casa
+                </button>
+                <button type="button" class="btn-assign away-btn" (click)="assignToAway(player)" title="Assegna a Trasferta">
+                  Trasferta
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Two Teams Grid -->
+    <div class="row g-3">
+      <!-- Home Team Column -->
+      <div class="col-12 col-md-6">
+        <div class="team-card home-team-card p-3 rounded shadow-sm h-100">
+          <div class="team-header d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <h4 class="team-name m-0 text-danger d-flex align-items-center gap-2">
+              <i class="fa fa-shield"></i> {{ match()?.homeTeam || 'Squadra Casa' }}
+            </h4>
+            <span class="badge bg-danger text-white rounded-pill px-2 py-1 fs-7">
+              {{ homeTeamPlayers().length }} Giocatori
+            </span>
+          </div>
+
+          <div class="team-player-list flex-grow-1">
+            @for (player of homeTeamPlayers(); track player; let i = $index) {
+              <div class="player-row d-flex align-items-center justify-content-between p-2 mb-2 rounded bg-body-tertiary">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="num-badge">{{ i + 1 }}</span>
+                  <span class="fw-medium">{{ player }}</span>
+                </span>
+                <div class="d-flex align-items-center gap-1">
+                  <button type="button" class="btn-move-switch" (click)="assignToAway(player)" title="Sposta in Trasferta">
+                    <i class="fa fa-exchange"></i>
+                  </button>
+                  <button type="button" class="btn-move-remove" (click)="moveToUnassigned(player)" title="Rimuovi">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            }
+            @if (homeTeamPlayers().length === 0) {
+              <p class="text-center text-muted small py-4 m-0">Nessun giocatore assegnato alla Squadra Casa</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Away Team Column -->
+      <div class="col-12 col-md-6">
+        <div class="team-card away-team-card p-3 rounded shadow-sm h-100">
+          <div class="team-header d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <h4 class="team-name m-0 text-primary d-flex align-items-center gap-2">
+              <i class="fa fa-shield"></i> {{ match()?.awayTeam || 'Squadra Trasferta' }}
+            </h4>
+            <span class="badge bg-primary text-white rounded-pill px-2 py-1 fs-7">
+              {{ awayTeamPlayers().length }} Giocatori
+            </span>
+          </div>
+
+          <div class="team-player-list flex-grow-1">
+            @for (player of awayTeamPlayers(); track player; let i = $index) {
+              <div class="player-row d-flex align-items-center justify-content-between p-2 mb-2 rounded bg-body-tertiary">
+                <span class="d-flex align-items-center gap-2">
+                  <span class="num-badge away-num">{{ i + 1 }}</span>
+                  <span class="fw-medium">{{ player }}</span>
+                </span>
+                <div class="d-flex align-items-center gap-1">
+                  <button type="button" class="btn-move-switch" (click)="assignToHome(player)" title="Sposta in Casa">
+                    <i class="fa fa-exchange"></i>
+                  </button>
+                  <button type="button" class="btn-move-remove" (click)="moveToUnassigned(player)" title="Rimuovi">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            }
+            @if (awayTeamPlayers().length === 0) {
+              <p class="text-center text-muted small py-4 m-0">Nessun giocatore assegnato alla Squadra Trasferta</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="modal-footer">
+    <button nz-button type="button" nzType="default" (click)="handleCancel()" class="footer-btn cancel-btn">Annulla</button>
+    <button nz-button type="button" nzType="primary" (click)="handleSave()" [nzLoading]="isConfirmLoading" class="footer-btn save-btn">
+      Salva Formazione
+    </button>
+  </footer>
+</div>

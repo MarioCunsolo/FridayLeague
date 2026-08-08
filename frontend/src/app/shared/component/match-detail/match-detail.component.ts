@@ -88,6 +88,11 @@ export class MatchDetailComponent {
         return !!m && m.status === MatchStatus.PROGRAMMATA && this.authService.isAdminOrSuperAdmin();
     });
 
+    isMatchSetup = computed<boolean>(() => {
+        const m = this.match();
+        return !!m && (m.homePlayers?.length || 0) > 0 && (m.awayPlayers?.length || 0) > 0;
+    });
+
     canConcludere = computed<boolean>(() => {
         const m = this.match();
         return !!m && m.status === MatchStatus.IN_CORSO && this.authService.isAdminOrSuperAdmin();

@@ -77,7 +77,7 @@
       </button>
       }
       @if (canInizia()) {
-      <button nz-button nzType="primary" nzShape="round" [nzLoading]="isIniziando()" (click)="iniziaPartita()" class="action-btn inizia-btn">
+      <button nz-button nzType="primary" nzShape="round" [disabled]="!isMatchSetup()" [nzLoading]="isIniziando()" (click)="iniziaPartita()" class="action-btn inizia-btn" [title]="!isMatchSetup() ? 'Imposta prima la formazione per iniziare la partita' : 'Inizia Partita'">
         <nz-icon nzType="play-circle" nzTheme="outline"></nz-icon>
         Inizia Partita
       </button>

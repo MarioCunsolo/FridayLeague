@@ -1,0 +1,43 @@
+# ==========================================
+# Local Developer Configurations (Do Not Push)
+# ==========================================
+
+# Local Frontend Environment Files
+frontend/src/environments/*.local.ts
+frontend/src/environments/environment.development.local.ts
+.env
+.env.local
+.env.*.local
+
+# Local Backend Settings
+beckendNET/LineUp.Api/appsettings.Local.json
+beckendNET/LineUp.Api/appsettings.Development.local.json
+
+# ==========================================
+# Compiled Outputs & Dependencies
+# ==========================================
+
+# .NET Build Output
+**/bin/
+**/obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Node & Angular Build Output
+**/node_modules/
+**/dist/
+**/tmp/
+**/out-tsc/
+**/.angular/cache/
+
+# ==========================================
+# IDE & System Files
+# ==========================================
+.idea/
+.vscode/
+.claude/
+*.suo
+*.sublime-workspace
+.DS_Store
+Thumbs.db

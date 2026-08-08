@@ -1,4 +1,6 @@
+const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api'
+  apiUrl: `http://${host}:8080/api`
 };

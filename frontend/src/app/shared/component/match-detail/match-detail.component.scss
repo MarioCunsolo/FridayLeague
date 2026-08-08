@@ -257,6 +257,17 @@
         }
     }
 
+    &:disabled,
+    &[disabled] {
+        background-color: var(--input-bg) !important;
+        border-color: var(--border-main) !important;
+        color: var(--text-secondary) !important;
+        box-shadow: none !important;
+        opacity: 0.5;
+        cursor: not-allowed !important;
+        transform: none !important;
+    }
+
     &.inizia-btn,
     &.goal-btn {
         background-color: var(--primary-green) !important;
@@ -264,7 +275,7 @@
         color: #000000 !important;
         box-shadow: 0 0.25rem 0.625rem rgba(0, 204, 102, 0.3);
 
-        &:hover {
+        &:hover:not(:disabled):not([disabled]) {
             background-color: var(--secondary-green) !important;
             transform: translateY(-0.125rem) scale(1.02);
         }

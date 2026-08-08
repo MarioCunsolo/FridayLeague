@@ -329,15 +329,14 @@ export class MatchService {
   }
 
   /**
-   * Recupera l'ultima partita terminata (utilizzato per la card in home page).
-   * @returns L'ultima partita completata o la prima disponibile se nessuna è terminata.
+   * Recupera l'ultima partita terminata (utilizzato per la card in home page e profilo).
+   * @returns L'ultima partita completata o null se nessuna partita è stata giocata.
    */
-  getLastMatch() {
-    // Return the latest completed match for the home page card
+  getLastMatch(): Match | null {
     const completed = this.matches()
       .filter(m => m.status === MatchStatus.CONCLUSA)
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
-    return completed.length > 0 ? completed[0] : this.getMatches()()[0];
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return completed.length > 0 ? completed[0] : null;
   }
 
   // --- API Methods ---

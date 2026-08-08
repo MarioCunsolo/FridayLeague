@@ -124,6 +124,42 @@ public class MatchService : IMatchService
         return await BuildMatchDtoAsync(partita);
     }
 
+    public async Task<MatchDto> IniziaMatchAsync(int userId, int matchId)
+    {
+        var legaId = await GetLegaAttivaAsync(userId);
+        await RichiediAdminAsync(userId, legaId);
+
+        var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
+
+        if (partita.StatoId != StatoPartita.ProgrammataId)
+        {
+            throw new BadRequestException("Puoi iniziare solo una partita nello stato in programma.");
+        }
+
+        partita.StatoId = StatoPartita.InCorsoId;
+        await _proxy.SalvaPartitaAsync();
+
+        return await BuildMatchDtoAsync(partita);
+    }
+
+    public async Task<MatchDto> ConcludiMatchAsync(int userId, int matchId)
+    {
+        var legaId = await GetLegaAttivaAsync(userId);
+        await RichiediAdminAsync(userId, legaId);
+
+        var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
+
+        if (partita.StatoId != StatoPartita.InCorsoId)
+        {
+            throw new BadRequestException("Puoi concludere solo una partita attualmente in corso.");
+        }
+
+        partita.StatoId = StatoPartita.ConclusaId;
+        await _proxy.SalvaPartitaAsync();
+
+        return await BuildMatchDtoAsync(partita);
+    }
+
     public async Task<GoalEventDto> AddGoalAsync(int userId, int matchId, AddGoalRequest request)
     {
         var legaId = await GetLegaAttivaAsync(userId);

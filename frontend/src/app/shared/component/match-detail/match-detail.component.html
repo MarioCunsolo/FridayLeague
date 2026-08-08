@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    @if (canSetupLineup() || m.status === MatchStatus.IN_CORSO || canAnnulla()) {
+    @if (canSetupLineup() || canInizia() || m.status === MatchStatus.IN_CORSO || canAnnulla()) {
     <div class="d-flex justify-content-center flex-wrap gap-2 mt-3">
       @if (canSetupLineup()) {
       <button nz-button nzType="primary" nzShape="round" (click)="openSetupModal()" class="setup-match-btn">
@@ -104,10 +104,22 @@
         Imposta Partita
       </button>
       }
+      @if (canInizia()) {
+      <button nz-button nzType="primary" nzShape="round" [nzLoading]="isIniziando()" (click)="iniziaPartita()" class="inizia-match-btn">
+        <nz-icon nzType="play-circle" nzTheme="outline"></nz-icon>
+        Inizia Partita
+      </button>
+      }
       @if (m.status === MatchStatus.IN_CORSO) {
       <button nz-button nzType="primary" nzShape="round" (click)="openAddGoalModal()" class="add-goal-btn">
         <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
         Aggiungi Goal
+      </button>
+      }
+      @if (canConcludere()) {
+      <button nz-button nzType="primary" nzShape="round" [nzLoading]="isConcludendo()" (click)="chiediConfermaConclusione()" class="concludi-match-btn">
+        <nz-icon nzType="check-circle" nzTheme="outline"></nz-icon>
+        Concludi Partita
       </button>
       }
       @if (canAnnulla()) {

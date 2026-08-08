@@ -38,6 +38,14 @@ public class MatchesController : ApiControllerBase
     public Task<ActionResult<MatchDto>> Annulla(int id) =>
         ExecuteAsync(() => _matchService.AnnullaMatchAsync(User.GetUserId(), id));
 
+    [HttpPut("{id}/inizia")]
+    public Task<ActionResult<MatchDto>> Inizia(int id) =>
+        ExecuteAsync(() => _matchService.IniziaMatchAsync(User.GetUserId(), id));
+
+    [HttpPut("{id}/concludi")]
+    public Task<ActionResult<MatchDto>> Concludi(int id) =>
+        ExecuteAsync(() => _matchService.ConcludiMatchAsync(User.GetUserId(), id));
+
     [HttpPost("{id}/goals")]
     public Task<ActionResult<GoalEventDto>> AddGoal(int id, AddGoalRequest request) =>
         ExecuteAsync(() => _matchService.AddGoalAsync(User.GetUserId(), id, request));

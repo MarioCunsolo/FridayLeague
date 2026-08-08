@@ -34,6 +34,8 @@ export class MatchDetailComponent {
     isSetupModalVisible = signal(false);
     isDeleting = signal(false);
     isAnnullando = signal(false);
+    isIniziando = signal(false);
+    isConcludendo = signal(false);
 
     goalTimeline = computed<GoalEvent[]>(() => this.match()?.goalTimeline || []);
 
@@ -50,6 +52,16 @@ export class MatchDetailComponent {
     canSetupLineup = computed<boolean>(() => {
         const m = this.match();
         return !!m && m.status === MatchStatus.PROGRAMMATA && this.authService.isAdminOrSuperAdmin();
+    });
+
+    canInizia = computed<boolean>(() => {
+        const m = this.match();
+        return !!m && m.status === MatchStatus.PROGRAMMATA && this.authService.isAdminOrSuperAdmin();
+    });
+
+    canConcludere = computed<boolean>(() => {
+        const m = this.match();
+        return !!m && m.status === MatchStatus.IN_CORSO && this.authService.isAdminOrSuperAdmin();
     });
 
     closeDetails() {
@@ -135,6 +147,61 @@ export class MatchDetailComponent {
             error: () => {
                 this.message.error('Errore durante l\'annullamento della partita.');
                 this.isAnnullando.set(false);
+            }
+        });
+    }
+
+    iniziaPartita() {
+        const currentMatch = this.match();
+        if (!currentMatch) return;
+
+        this.isIniziando.set(true);
+        this.matchService.iniziaMatch(currentMatch.id).subscribe({
+            next: () => {
+                this.message.success('Partita iniziata con successo!');
+                this.isIniziando.set(false);
+            },
+            error: () => {
+                this.message.error('Errore durante l\'avvio della partita.');
+                this.isIniziando.set(false);
+            }
+        });
+    }
+
+    chiediConfermaConclusione() {
+        const currentMatch = this.match();
+        if (!currentMatch) return;
+
+        const componentRef = this.viewContainerRef.createComponent(ConfirmModalComponent);
+        componentRef.instance.isVisible = true;
+        componentRef.instance.title = 'Concludi Partita';
+        componentRef.instance.message = 'Sei sicuro di voler concludere la partita? Una volta conclusa, non sarà più possibile registrare nuovi goal.';
+        componentRef.instance.confirmText = 'Concludi';
+
+        const confirmSub = componentRef.instance.confirm.subscribe(() => {
+            this.concludiPartita(currentMatch.id);
+            confirmSub.unsubscribe();
+            cancelSub.unsubscribe();
+            componentRef.destroy();
+        });
+
+        const cancelSub = componentRef.instance.cancel.subscribe(() => {
+            confirmSub.unsubscribe();
+            cancelSub.unsubscribe();
+            componentRef.destroy();
+        });
+    }
+
+    private concludiPartita(matchId: number) {
+        this.isConcludendo.set(true);
+        this.matchService.concludiMatch(matchId).subscribe({
+            next: () => {
+                this.message.success('Partita conclusa con successo!');
+                this.isConcludendo.set(false);
+            },
+            error: () => {
+                this.message.error('Errore durante la conclusione della partita.');
+                this.isConcludendo.set(false);
             }
         });
     }

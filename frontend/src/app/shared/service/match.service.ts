@@ -410,6 +410,34 @@ export class MatchService {
   }
 
   /**
+   * Avvia una partita attualmente in programma portandola nello stato in corso.
+   * @param id L'ID della partita da iniziare.
+   * @returns Un Observable con la partita aggiornata.
+   */
+  iniziaMatch(id: number) {
+    return this.http.put<Match>(`${this.BASE_URL}/${id}/inizia`, {}).pipe(
+      map(updatedMatch => this.parseMatchDate(updatedMatch)),
+      tap(updatedMatch => this.matches.update(prev =>
+        prev.map(m => m.id === id ? updatedMatch : m)
+      ))
+    );
+  }
+
+  /**
+   * Conclude anticipatamente una partita in corso.
+   * @param id L'ID della partita da concludere.
+   * @returns Un Observable con la partita aggiornata.
+   */
+  concludiMatch(id: number) {
+    return this.http.put<Match>(`${this.BASE_URL}/${id}/concludi`, {}).pipe(
+      map(updatedMatch => this.parseMatchDate(updatedMatch)),
+      tap(updatedMatch => this.matches.update(prev =>
+        prev.map(m => m.id === id ? updatedMatch : m)
+      ))
+    );
+  }
+
+  /**
    * Registra un nuovo goal per una partita in corso.
    * @param matchId L'ID della partita.
    * @param goal I dati del goal (marcatore, assist, squadra).

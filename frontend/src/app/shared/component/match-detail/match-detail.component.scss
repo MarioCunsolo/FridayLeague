@@ -196,13 +196,8 @@
 }
 
 .bonus-icon-assist {
-    width: 0.9rem;
-    height: 0.9rem;
-    object-fit: contain;
-}
-
-:host-context([data-theme='dark']) .bonus-icon-assist {
-    filter: invert(1) brightness(2);
+    font-size: 0.9rem;
+    color: var(--primary-color, #0d6efd);
 }
 
 .mr-1 {

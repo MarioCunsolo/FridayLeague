@@ -14,50 +14,51 @@
   </div>
 
   <!-- KPI League Overview Strip -->
-  <div class="row justify-content-center mb-5 g-3">
+  <!-- KPI League Overview Strip -->
+  <div class="row justify-content-center mb-4 g-2 g-md-3">
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm">
+      <div class="kpi-card shadow-sm h-100">
         <div class="kpi-icon-wrapper bg-success-subtle text-success">
           <i class="fa fa-futbol-o"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Partite Giocate</span>
-          <span class="kpi-value">{{ totalMatchesPlayed() }}</span>
+          <span class="kpi-label text-truncate">Partite Giocate</span>
+          <span class="kpi-value text-truncate">{{ totalMatchesPlayed() }}</span>
         </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm">
+      <div class="kpi-card shadow-sm h-100">
         <div class="kpi-icon-wrapper bg-primary-subtle text-primary">
           <i class="fa fa-bullseye"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Gol Totali</span>
-          <span class="kpi-value">{{ totalGoalsScored() }}</span>
+          <span class="kpi-label text-truncate">Gol Totali</span>
+          <span class="kpi-value text-truncate">{{ totalGoalsScored() }}</span>
         </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm">
+      <div class="kpi-card shadow-sm h-100">
         <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
           <i class="fa fa-trophy"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Capocannoniere</span>
-          <span class="kpi-value text-truncate d-block" style="max-width: 130px;">
+          <span class="kpi-label text-truncate">Capocannoniere</span>
+          <span class="kpi-value text-truncate">
             {{ topScorer() ? topScorer()!.name : '-' }}
           </span>
         </div>
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="kpi-card shadow-sm">
+      <div class="kpi-card shadow-sm h-100">
         <div class="kpi-icon-wrapper bg-info-subtle text-info">
           <i class="fa fa-line-chart"></i>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Media Gol/Match</span>
-          <span class="kpi-value">{{ avgGoalsPerMatch() }}</span>
+          <span class="kpi-label text-truncate">Media Gol/Match</span>
+          <span class="kpi-value text-truncate">{{ avgGoalsPerMatch() }}</span>
         </div>
       </div>
     </div>
@@ -67,27 +68,27 @@
   <div class="row justify-content-center mb-5">
     <div class="col-12 col-lg-10">
       <h3 class="section-title mb-3"><i class="fa fa-bolt me-2 text-warning"></i>Azioni Rapide</h3>
-      <div class="row g-3">
+      <div class="row g-2 g-md-3">
         <div class="col-6 col-md-3" routerLink="/prenotazioni">
-          <div class="action-card shadow-sm">
+          <div class="action-card shadow-sm h-100">
             <i class="fa fa-calendar action-icon text-success"></i>
             <span>Prenota</span>
           </div>
         </div>
         <div class="col-6 col-md-3" routerLink="/calendario">
-          <div class="action-card shadow-sm">
+          <div class="action-card shadow-sm h-100">
             <i class="fa fa-futbol-o action-icon text-primary"></i>
             <span>Calendario</span>
           </div>
         </div>
         <div class="col-6 col-md-3" routerLink="/classifiche">
-          <div class="action-card shadow-sm">
+          <div class="action-card shadow-sm h-100">
             <i class="fa fa-trophy action-icon text-warning"></i>
             <span>Classifiche</span>
           </div>
         </div>
         <div class="col-6 col-md-3" routerLink="/account">
-          <div class="action-card shadow-sm">
+          <div class="action-card shadow-sm h-100">
             <i class="fa fa-user-circle action-icon text-info"></i>
             <span>Profilo</span>
           </div>
@@ -108,7 +109,7 @@
           <div class="match-card shadow-sm next-match">
             <div class="match-card-header d-flex justify-content-between align-items-center mb-2">
               <span class="badge bg-success-subtle text-success border border-success-subtle">PROSSIMA PARTITA</span>
-              <span class="match-date text-primary"><i class="fa fa-clock-o me-1"></i>{{ nextMatch()!.date | date:'d MMMM HH:mm' | titlecase }}</span>
+              <span class="match-date text-primary"><i class="fa fa-clock-o me-1"></i>{{ nextMatch()!.date | date:'d MMM, HH:mm' | titlecase }}</span>
             </div>
             <div class="match-content">
               <div class="team-container">

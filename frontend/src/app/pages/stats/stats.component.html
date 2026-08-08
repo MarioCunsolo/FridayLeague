@@ -3,7 +3,8 @@
     <h1 class="stats-title">Classifiche</h1>
     <nz-segmented 
       [nzOptions]="options" 
-      (nzValueChange)="handleIndexChange($event)"
+      [ngModel]="activeOption()"
+      (ngModelChange)="handleIndexChange($event)"
       class="custom-segmented">
     </nz-segmented>
   </div>

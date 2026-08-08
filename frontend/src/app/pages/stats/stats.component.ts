@@ -8,10 +8,13 @@ import { StatsService } from '../../shared/service/stats.service';
 
 import { trigger, transition, style, animate, keyframes } from '@angular/animations';
 
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+
 @Component({
   selector: 'app-stats',
   standalone: true,
-  imports: [CommonModule, NzSegmentedModule, NzIconModule, NzAvatarModule],
+  imports: [CommonModule, FormsModule, NzSegmentedModule, NzIconModule, NzAvatarModule],
   templateUrl: './stats.component.html',
   styleUrls: ['./stats.component.scss'],
   animations: [
@@ -31,6 +34,7 @@ import { trigger, transition, style, animate, keyframes } from '@angular/animati
 })
 export class StatsComponent implements OnInit {
   private statsService = inject(StatsService);
+  private route = inject(ActivatedRoute);
 
   options = ['GOL', 'ASSIST', 'MOTM'];
   activeOption = signal('GOL');
@@ -40,6 +44,15 @@ export class StatsComponent implements OnInit {
   motm = signal<PlayerStats[]>([]);
 
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['tab']) {
+        const tabUpper = params['tab'].toUpperCase();
+        if (this.options.includes(tabUpper)) {
+          this.activeOption.set(tabUpper);
+        }
+      }
+    });
+
     this.statsService.getScorers().subscribe(data => this.scorers.set(data));
     this.statsService.getAssists().subscribe(data => this.assists.set(data));
     this.statsService.getMOTM().subscribe(data => this.motm.set(data));

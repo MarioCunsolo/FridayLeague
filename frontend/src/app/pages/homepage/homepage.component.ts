@@ -4,6 +4,7 @@ import { MatchService } from 'src/app/shared/service/match.service';
 import { StatsService } from 'src/app/shared/service/stats.service';
 import { AuthService } from 'src/app/shared/service/auth.service';
 import { DatePipe, TitleCasePipe, CommonModule } from '@angular/common';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { PlayerStats } from 'src/app/models/interface/player-stats.interface';
 
 @Component({
@@ -11,7 +12,7 @@ import { PlayerStats } from 'src/app/models/interface/player-stats.interface';
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe, TitleCasePipe]
+  imports: [CommonModule, RouterLink, DatePipe, TitleCasePipe, NzIconModule]
 })
 export class HomepageComponent implements OnInit {
   public matchService = inject(MatchService);
@@ -61,7 +62,11 @@ export class HomepageComponent implements OnInit {
     this.router.navigate(['/calendario'], { queryParams: { matchId } });
   }
 
-  goToStats(): void {
-    this.router.navigate(['/statistiche']);
+  goToStats(tab?: string): void {
+    if (tab) {
+      this.router.navigate(['/classifiche'], { queryParams: { tab } });
+    } else {
+      this.router.navigate(['/classifiche']);
+    }
   }
 }

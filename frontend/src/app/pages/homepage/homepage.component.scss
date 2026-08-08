@@ -153,33 +153,36 @@
   padding: 1.25rem 1.5rem;
 }
 
-.rank-badge {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--bg-hover, #f0f0f0);
+.rank-badge-wrapper {
+  width: 2.25rem;
+  height: 2.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 0.95rem;
   flex-shrink: 0;
 }
 
-.rank-1 {
-  background: linear-gradient(135deg, #ffe066, #ffd700);
-  color: #5c4900;
-  box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
-}
-
-.rank-2 {
-  background: linear-gradient(135deg, #e6e6e6, #c0c0c0);
-  color: #333333;
-}
-
-.rank-3 {
-  background: linear-gradient(135deg, #f4a460, #cd7f32);
+.medal {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   color: #ffffff;
+  font-size: 1.1rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+  border: 0.125rem solid var(--card-bg);
+}
+
+.gold { background: linear-gradient(135deg, #ffcc00, #ff9900); }
+.silver { background: linear-gradient(135deg, #bdc3c7, #95a5a6); }
+.bronze { background: linear-gradient(135deg, #e67e22, #d35400); }
+
+.rank-number {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .player-name {

@@ -219,15 +219,22 @@
 }
 
 .role-tag {
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.75rem;
-  padding: 4px 10px;
-  border: none;
+  width: 135px;
+  height: 2.1rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 0.625rem !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.02rem;
+  padding: 0 0.75rem !important;
+  border: none !important;
   text-transform: uppercase;
   color: #fff !important;
   white-space: nowrap !important;
   margin: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .action-buttons-group {

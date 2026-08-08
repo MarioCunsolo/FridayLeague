@@ -12,7 +12,7 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
 @Component({
     selector: 'app-match-detail',
     templateUrl: './match-detail.component.html',
-    styleUrls: ['./match-detail.component.css'],
+    styleUrls: ['./match-detail.component.scss'],
     standalone: true,
     imports: [NzButtonModule, NzIconModule, AddGoalModalComponent]
 })

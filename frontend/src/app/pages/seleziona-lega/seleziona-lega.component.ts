@@ -22,7 +22,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
     NzIconModule
   ],
   templateUrl: './seleziona-lega.component.html',
-  styleUrls: ['./seleziona-lega.component.css']
+  styleUrls: ['./seleziona-lega.component.scss']
 })
 export class SelezionaLegaComponent {
   private fb = inject(FormBuilder);

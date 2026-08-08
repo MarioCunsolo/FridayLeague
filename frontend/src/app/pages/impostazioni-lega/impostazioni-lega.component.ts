@@ -9,7 +9,7 @@ import { AuthService } from '../../shared/service/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink, NzIconModule],
   templateUrl: './impostazioni-lega.component.html',
-  styleUrls: ['./impostazioni-lega.component.css']
+  styleUrls: ['./impostazioni-lega.component.scss']
 })
 export class ImpostazioniLegaComponent {
   public authService = inject(AuthService);

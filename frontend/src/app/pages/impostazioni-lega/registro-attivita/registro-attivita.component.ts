@@ -24,7 +24,7 @@ import { LegaService } from '../../../shared/service/lega.service';
     DatePipe
   ],
   templateUrl: './registro-attivita.component.html',
-  styleUrls: ['./registro-attivita.component.css']
+  styleUrls: ['./registro-attivita.component.scss']
 })
 export class RegistroAttivitaComponent implements OnInit {
   private authService = inject(AuthService);

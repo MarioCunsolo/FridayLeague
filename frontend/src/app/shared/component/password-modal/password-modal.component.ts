@@ -9,7 +9,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
   standalone: true,
   imports: [CommonModule, FormsModule, NzIconModule, NzButtonModule],
   templateUrl: './password-modal.component.html',
-  styleUrls: ['./password-modal.component.css']
+  styleUrls: ['./password-modal.component.scss']
 })
 export class PasswordModalComponent {
   @Input() isVisible: boolean = false;

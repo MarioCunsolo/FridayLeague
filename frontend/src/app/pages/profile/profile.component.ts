@@ -11,7 +11,7 @@ import { MatchService } from 'src/app/shared/service/match.service';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css'],
+  styleUrls: ['./profile.component.scss'],
   standalone: true,
   imports: [CommonModule, MatchDetailComponent, NzSelectModule, FormsModule]
 })

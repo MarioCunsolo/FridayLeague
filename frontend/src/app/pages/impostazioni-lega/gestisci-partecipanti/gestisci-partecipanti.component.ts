@@ -24,7 +24,7 @@ import { ConfirmModalComponent } from '../../../shared/component/confirm-modal/c
     NzSpinModule
   ],
   templateUrl: './gestisci-partecipanti.component.html',
-  styleUrls: ['./gestisci-partecipanti.component.css']
+  styleUrls: ['./gestisci-partecipanti.component.scss']
 })
 export class GestisciPartecipantiComponent implements OnInit {
   private authService = inject(AuthService);

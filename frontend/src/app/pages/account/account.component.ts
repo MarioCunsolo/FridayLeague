@@ -10,7 +10,7 @@ import { PasswordModalComponent } from 'src/app/shared/component/password-modal/
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
-  styleUrls: ['./account.component.css'],
+  styleUrls: ['./account.component.scss'],
   standalone: true,
   imports: [
     CommonModule,

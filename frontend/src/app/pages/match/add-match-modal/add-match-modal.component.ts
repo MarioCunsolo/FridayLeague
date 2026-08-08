@@ -40,7 +40,7 @@ function squadreDiverseValidator(control: AbstractControl): ValidationErrors | n
     NzIconModule
   ],
   templateUrl: './add-match-modal.component.html',
-  styleUrls: ['./add-match-modal.component.css']
+  styleUrls: ['./add-match-modal.component.scss']
 })
 export class AddMatchModalComponent {
   submit = output<NewMatchData>();

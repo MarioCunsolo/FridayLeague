@@ -15,7 +15,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 @Component({
   selector: 'app-match',
   templateUrl: './match.component.html',
-  styleUrls: ['./match.component.css'],
+  styleUrls: ['./match.component.scss'],
   standalone: true,
   imports: [MatchDetailComponent, AddMatchModalComponent, DatePipe, NzButtonModule, NzIconModule]
 })

@@ -5,7 +5,11 @@
   "projects": {
     "angular16-base": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -34,7 +38,7 @@
               "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": [],
             "browser": "src/main.ts"
@@ -103,7 +107,7 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": []
           }
@@ -116,6 +120,7 @@
   },
   "schematics": {
     "@schematics/angular:component": {
+      "style": "scss",
       "type": "component"
     },
     "@schematics/angular:directive": {

@@ -13,7 +13,7 @@ import { trigger, transition, style, animate, keyframes } from '@angular/animati
   standalone: true,
   imports: [CommonModule, NzSegmentedModule, NzIconModule, NzAvatarModule],
   templateUrl: './stats.component.html',
-  styleUrls: ['./stats.component.css'],
+  styleUrls: ['./stats.component.scss'],
   animations: [
     trigger('tabAnimation', [
       transition(':enter', [

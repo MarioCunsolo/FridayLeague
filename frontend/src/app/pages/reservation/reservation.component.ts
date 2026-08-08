@@ -17,7 +17,7 @@ import { AuthService } from '../../shared/service/auth.service';
 @Component({
   selector: 'app-reservation',
   templateUrl: './reservation.component.html',
-  styleUrls: ['./reservation.component.css'],
+  styleUrls: ['./reservation.component.scss'],
   standalone: true,
   imports: [
     CommonModule,

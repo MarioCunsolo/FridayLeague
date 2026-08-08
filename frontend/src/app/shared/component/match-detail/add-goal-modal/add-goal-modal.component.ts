@@ -22,7 +22,7 @@ import { Match, Player, GoalEvent } from '../../../../models/interface/match.int
     NzIconModule
   ],
   templateUrl: './add-goal-modal.component.html',
-  styleUrls: ['./add-goal-modal.component.css']
+  styleUrls: ['./add-goal-modal.component.scss']
 })
 export class AddGoalModalComponent {
   match = input<Match | null>(null);

@@ -8,7 +8,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
   standalone: true,
   imports: [CommonModule, NzIconModule, NzButtonModule],
   templateUrl: './confirm-modal.component.html',
-  styleUrls: ['./confirm-modal.component.css']
+  styleUrls: ['./confirm-modal.component.scss']
 })
 export class ConfirmModalComponent {
   @Input() isVisible: boolean = false;

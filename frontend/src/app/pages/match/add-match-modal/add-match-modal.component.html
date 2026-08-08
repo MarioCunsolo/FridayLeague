@@ -29,7 +29,7 @@
       <nz-form-item>
         <nz-form-label nzRequired>Data e Ora</nz-form-label>
         <nz-form-control nzErrorTip="Seleziona data e ora della partita">
-          <nz-date-picker formControlName="date" nzShowTime nzFormat="dd/MM/yyyy HH:mm" nzPlaceHolder="Seleziona data e ora" class="custom-date-picker"></nz-date-picker>
+          <nz-date-picker formControlName="date" [nzShowTime]="{ nzFormat: 'HH:mm' }" nzFormat="dd/MM/yyyy HH:mm" nzPlaceHolder="Seleziona data e ora" class="custom-date-picker"></nz-date-picker>
         </nz-form-control>
       </nz-form-item>
 

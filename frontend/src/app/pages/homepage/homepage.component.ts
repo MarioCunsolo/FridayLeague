@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/shared/service/auth.service';
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.component.html',
-  styleUrls: ['./homepage.component.css'],
+  styleUrls: ['./homepage.component.scss'],
   standalone: true,
   imports: [RouterLink, DatePipe, TitleCasePipe]
 })

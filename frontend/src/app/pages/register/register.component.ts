@@ -21,7 +21,7 @@ import { AuthService } from '../../shared/service/auth.service';
     RouterLink
   ],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);

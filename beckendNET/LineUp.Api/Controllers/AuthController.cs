@@ -149,13 +149,33 @@ public class AuthController : ControllerBase
         var user = await _context.Users.FindAsync(userId);
         if (user == null) return NotFound("Utente non trovato.");
 
+        // Validazione Tipo Lega
+        var tipoLegaExists = await _context.TipiLega.AnyAsync(t => t.Id == request.TipoLegaId);
+        if (!tipoLegaExists)
+        {
+            request.TipoLegaId = 1; // Default: Partita Singola
+        }
+
+        if (request.TipoLegaId == 2 && (!request.NumeroSquadre.HasValue || request.NumeroSquadre.Value < 2))
+        {
+            return BadRequest("Per un Campionato è necessario indicare un numero valido di squadre (almeno 2).");
+        }
+
+        if (request.TipoLegaId == 3 && (!request.NumeroGironi.HasValue || request.NumeroGironi.Value < 1))
+        {
+            return BadRequest("Per un Torneo è necessario indicare un numero valido di gironi (almeno 1).");
+        }
+
         var inviteCode = await GenerateUniqueInviteCode();
 
         var newLega = new Lega
         {
             Nome = request.NomeLega,
             Descrizione = request.Descrizione,
-            CodiceInvito = inviteCode
+            CodiceInvito = inviteCode,
+            TipoLegaId = request.TipoLegaId,
+            NumeroSquadre = request.TipoLegaId == 2 ? request.NumeroSquadre : null,
+            NumeroGironi = request.TipoLegaId == 3 ? request.NumeroGironi : null
         };
 
         _context.Leghe.Add(newLega);
@@ -521,6 +541,7 @@ public class AuthController : ControllerBase
         var userLegheRaw = await _context.UserLeghe
             .Where(ul => ul.UserId == user.Id)
             .Include(ul => ul.Lega)
+                .ThenInclude(l => l!.TipoLega)
             .Include(ul => ul.Ruolo)
             .ToListAsync();
 
@@ -545,7 +566,12 @@ public class AuthController : ControllerBase
             Nome = ul.Lega.Nome,
             Ruolo = ul.Ruolo.Nome,
             CodiceInvito = ul.Lega.CodiceInvito,
-            Descrizione = ul.Lega.Descrizione
+            Descrizione = ul.Lega.Descrizione,
+            TipoLegaId = ul.Lega.TipoLegaId,
+            TipoLegaCodice = ul.Lega.TipoLega?.Codice ?? "PARTITA_SINGOLA",
+            TipoLegaNome = ul.Lega.TipoLega?.Nome ?? "Partita Singola",
+            NumeroSquadre = ul.Lega.NumeroSquadre,
+            NumeroGironi = ul.Lega.NumeroGironi
         }).ToList();
 
         Console.WriteLine($"DEBUG [MapToUserDto]: User {user.Email}, Active LegaId: {user.LegaId}");

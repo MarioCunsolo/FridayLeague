@@ -9,4 +9,11 @@ public class CreaLegaRequest
     public string NomeLega { get; set; } = string.Empty;
 
     public string? Descrizione { get; set; }
+
+    public int TipoLegaId { get; set; } = 1;
+
+    public int? NumeroSquadre { get; set; }
+
+    public int? NumeroGironi { get; set; }
 }
+

@@ -122,7 +122,26 @@ Il flusso di cambio password (`account.component.ts` → `apriModificaPassword()
 
 ---
 
+## 10. Tipologie di Lega e Formati di Competizione
+
+Il sistema supporta 3 tipologie di competizione per le leghe, memorizzate tramite la tabella di lookup `TipiLega` e le colonne di configurazione in `Leghe`:
+
+* **Entità Lookup (`TipoLegaLookup`)**: [TipoLegaLookup.cs](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/LineUp.Api/Data/TipoLegaLookup.cs)
+  * `1` - `PARTITA_SINGOLA`: "Partita Singola". Lega classica basata sulla prenotazione individuale dei giocatori e formazione di 2 squadre per match.
+  * `2` - `CAMPIONATO`: "Campionato". Campionato a girone unico a scontri diretti con numero di squadre stabilito alla creazione (`NumeroSquadre`).
+  * `3` - `TORNEO`: "Torneo". Torneo a gironi con numero di gironi stabilito alla creazione (`NumeroGironi`) con successiva fase finale ad eliminazione diretta.
+* **Proprietà in `Lega`**:
+  * `TipoLegaId` (`int`, FK a `TipiLega`, default `1`).
+  * `NumeroSquadre` (`int?`, obbligatorio solo per Campionato).
+  * `NumeroGironi` (`int?`, obbligatorio solo per Torneo).
+* **Creazione Lega (FE/BE)**:
+  * Durante la creazione in `SelezionaLegaComponent`, l'utente visualizza le card interattive con le descrizioni per ciascun formato di competizione.
+  * I parametri `NumeroSquadre` e `NumeroGironi` compaiono in modo dinamico e sono validati sia lato frontend che nel controller .NET (`CreaLega`).
+
+---
+
 ## 9. Linee Guida per gli Aggiornamenti Futuri
 
 * **Controllo Preventivo**: Leggere e comprendere questo file all'inizio di ogni attività per mantenere intatta la coerenza dell'architettura e dei flussi.
 * **Manutenzione del File**: Se una richiesta introduce modifiche architetturali, aggiornamenti a endpoint chiave, nuovi ruoli o nuovi componenti condivisi, questo file deve essere aggiornato tempestivamente.
+

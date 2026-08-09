@@ -18,4 +18,10 @@ public class LegaDto
     public string Ruolo { get; set; } = string.Empty;
     public string CodiceInvito { get; set; } = string.Empty;
     public string? Descrizione { get; set; }
+    public int TipoLegaId { get; set; } = 1;
+    public string TipoLegaCodice { get; set; } = "PARTITA_SINGOLA";
+    public string TipoLegaNome { get; set; } = "Partita Singola";
+    public int? NumeroSquadre { get; set; }
+    public int? NumeroGironi { get; set; }
 }
+

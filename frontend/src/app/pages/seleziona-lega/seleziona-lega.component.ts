@@ -5,10 +5,21 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/service/auth.service';
 import { LegaService } from 'src/app/shared/service/lega.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+
+export interface LeagueTypeOption {
+  id: number;
+  code: string;
+  name: string;
+  icon: string;
+  badge: string;
+  shortDesc: string;
+  longDesc: string;
+}
 
 @Component({
   selector: 'app-seleziona-lega',
@@ -19,7 +30,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
     NzFormModule,
     NzInputModule,
     NzButtonModule,
-    NzIconModule
+    NzIconModule,
+    NzTagModule
   ],
   templateUrl: './seleziona-lega.component.html',
   styleUrls: ['./seleziona-lega.component.scss']
@@ -31,6 +43,37 @@ export class SelezionaLegaComponent {
   private legaService = inject(LegaService);
   private message = inject(NzMessageService);
 
+  // Lista delle tipologie di lega disponibili
+  leagueTypes: LeagueTypeOption[] = [
+    {
+      id: 1,
+      code: 'PARTITA_SINGOLA',
+      name: 'Partita Singola',
+      icon: 'usergroup-add',
+      badge: 'Standard',
+      shortDesc: 'Match singoli a due squadre con prenotazione libera',
+      longDesc: 'Lega classica per match singoli a due squadre. I giocatori prenotano autonomamente il loro posto per disputare la prossima partita programmata.'
+    },
+    {
+      id: 2,
+      code: 'CAMPIONATO',
+      name: 'Campionato',
+      icon: 'trophy',
+      badge: 'Girone Unico',
+      shortDesc: 'Campionato a scontri diretti tutti contro tutti',
+      longDesc: 'Campionato strutturato su un numero prefissato di squadre. Tutte le squadre si affrontano in scontri diretti e vince chi accumula più punti in classifica.'
+    },
+    {
+      id: 3,
+      code: 'TORNEO',
+      name: 'Torneo',
+      icon: 'appstore',
+      badge: 'Gironi & Playoff',
+      shortDesc: 'Torneo con fase a gironi ed eliminazione diretta',
+      longDesc: 'Torneo articolato in più gironi iniziali. Le squadre si sfidano nei gironi per qualificarsi alla fase finale a eliminazione diretta.'
+    }
+  ];
+
   // Stato per gestire quale vista visualizzare: 'none' | 'create' | 'join'
   activeForm = signal<'none' | 'create' | 'join'>('none');
   
@@ -38,10 +81,20 @@ export class SelezionaLegaComponent {
   loadingJoin = signal(false);
   errorMessage = signal<string | null>(null);
 
+  // Tipo lega selezionato per la creazione
+  selectedTipoLegaId = signal<number>(1);
+
+  // Opzioni rapide per numero di squadre e gironi
+  squadreOptions = [4, 6, 8, 10, 12, 16];
+  gironiOptions = [1, 2, 4, 8];
+
   // Form Reattivo per Creare una Lega
   createForm: FormGroup<{
     nome: FormControl<string>;
     descrizione: FormControl<string>;
+    tipoLegaId: FormControl<number>;
+    numeroSquadre: FormControl<number | null>;
+    numeroGironi: FormControl<number | null>;
   }>;
 
   // Form Reattivo per Partecipare a una Lega
@@ -52,7 +105,10 @@ export class SelezionaLegaComponent {
   constructor() {
     this.createForm = this.fb.nonNullable.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
-      descrizione: ['']
+      descrizione: [''],
+      tipoLegaId: [1, [Validators.required]],
+      numeroSquadre: [4 as number | null],
+      numeroGironi: [2 as number | null]
     });
 
     this.joinForm = this.fb.nonNullable.group({
@@ -61,12 +117,47 @@ export class SelezionaLegaComponent {
   }
 
   /**
-   * Cambia la modalità del form.
+   * Seleziona il tipo di lega da creare.
+   */
+  selectTipoLega(tipoId: number): void {
+    this.selectedTipoLegaId.set(tipoId);
+    this.createForm.controls.tipoLegaId.setValue(tipoId);
+    
+    if (tipoId === 2 && !this.createForm.controls.numeroSquadre.value) {
+      this.createForm.controls.numeroSquadre.setValue(4);
+    } else if (tipoId === 3 && !this.createForm.controls.numeroGironi.value) {
+      this.createForm.controls.numeroGironi.setValue(2);
+    }
+  }
+
+  /**
+   * Imposta velocemente il numero di squadre per il Campionato.
+   */
+  setNumeroSquadre(num: number): void {
+    this.createForm.controls.numeroSquadre.setValue(num);
+  }
+
+  /**
+   * Imposta velocemente il numero di gironi per il Torneo.
+   */
+  setNumeroGironi(num: number): void {
+    this.createForm.controls.numeroGironi.setValue(num);
+  }
+
+  /**
+   * Cambia la modalità del form ('create' | 'join').
    */
   selectAction(action: 'create' | 'join'): void {
     this.activeForm.set(action);
     this.errorMessage.set(null);
-    this.createForm.reset();
+    this.selectedTipoLegaId.set(1);
+    this.createForm.reset({
+      nome: '',
+      descrizione: '',
+      tipoLegaId: 1,
+      numeroSquadre: 4,
+      numeroGironi: 2
+    });
     this.joinForm.reset();
   }
 
@@ -90,11 +181,25 @@ export class SelezionaLegaComponent {
    */
   submitCreate(): void {
     if (this.createForm.valid) {
+      const { nome, descrizione, tipoLegaId, numeroSquadre, numeroGironi } = this.createForm.value;
+
+      if (tipoLegaId === 2 && (!numeroSquadre || numeroSquadre < 2)) {
+        this.errorMessage.set('Per un Campionato è necessario specificare un numero di squadre valido (almeno 2).');
+        return;
+      }
+
+      if (tipoLegaId === 3 && (!numeroGironi || numeroGironi < 1)) {
+        this.errorMessage.set('Per un Torneo è necessario specificare un numero di gironi valido (almeno 1).');
+        return;
+      }
+
       this.loadingCreate.set(true);
       this.errorMessage.set(null);
-      const { nome, descrizione } = this.createForm.value;
-      
-      this.legaService.creaLega(nome!, descrizione).subscribe({
+
+      const squadreVal = tipoLegaId === 2 ? numeroSquadre : null;
+      const gironiVal = tipoLegaId === 3 ? numeroGironi : null;
+
+      this.legaService.creaLega(nome!, descrizione, tipoLegaId!, squadreVal, gironiVal).subscribe({
         next: () => {
           this.loadingCreate.set(false);
           this.message.success('Lega creata con successo!');
@@ -102,7 +207,8 @@ export class SelezionaLegaComponent {
         },
         error: (err) => {
           this.loadingCreate.set(false);
-          this.errorMessage.set('Errore durante la creazione della lega. Riprova più tardi.');
+          const msg = err?.error || 'Errore durante la creazione della lega. Riprova più tardi.';
+          this.errorMessage.set(typeof msg === 'string' ? msg : 'Errore durante la creazione della lega.');
           console.error(err);
         }
       });

@@ -11,6 +11,7 @@ public class LineUpDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Lega> Leghe => Set<Lega>();
+    public DbSet<TipoLegaLookup> TipiLega => Set<TipoLegaLookup>();
     public DbSet<UserLega> UserLeghe => Set<UserLega>();
     public DbSet<RuoloLega> Ruoli => Set<RuoloLega>();
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
@@ -48,6 +49,13 @@ public class LineUpDbContext : DbContext
         modelBuilder.Entity<Lega>()
             .HasIndex(l => l.CodiceInvito)
             .IsUnique();
+
+        // Relazione Lega -> TipoLegaLookup
+        modelBuilder.Entity<Lega>()
+            .HasOne(l => l.TipoLega)
+            .WithMany()
+            .HasForeignKey(l => l.TipoLegaId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Un utente compare al più una volta come partecipante in una partita
         modelBuilder.Entity<PartecipantePartita>()
@@ -114,6 +122,13 @@ public class LineUpDbContext : DbContext
             new StatoPartitaLookup { Id = 2, Codice = "IN_CORSO", Nome = "In Corso" },
             new StatoPartitaLookup { Id = 3, Codice = "CONCLUSA", Nome = "Conclusa" },
             new StatoPartitaLookup { Id = 4, Codice = "ANNULLATA", Nome = "Annullata" }
+        );
+
+        // Seed tipo lega lookup data
+        modelBuilder.Entity<TipoLegaLookup>().HasData(
+            new TipoLegaLookup { Id = 1, Codice = "PARTITA_SINGOLA", Nome = "Partita Singola", Descrizione = "Lega classica in cui i giocatori prenotano singolarmente il posto per ogni match a due squadre." },
+            new TipoLegaLookup { Id = 2, Codice = "CAMPIONATO", Nome = "Campionato", Descrizione = "Campionato a girone unico con numero di squadre definito. Tutte le squadre si affrontano in scontri diretti e vince chi accumula più punti." },
+            new TipoLegaLookup { Id = 3, Codice = "TORNEO", Nome = "Torneo", Descrizione = "Torneo a gironi con numero di gironi definito. Le squadre competono prima nei gironi e poi avanzano alla fase ad eliminazione diretta fino alla finale." }
         );
     }
 }

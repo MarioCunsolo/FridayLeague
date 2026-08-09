@@ -79,35 +79,79 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<LineUpDbContext>();
     try
     {
-        // Fail-safe per la migrazione a UUID: se le tabelle esistenti usavano INT, le ricreiamo con tipi VARCHAR(36)
-        try
-        {
-            dbContext.Database.ExecuteSqlRaw(@"
-                SELECT Id FROM Users WHERE CHAR_LENGTH(CAST(Id AS CHAR)) < 10 LIMIT 1;
-            ");
-            // Se la query sopra non fallisce, significa che Users.Id è ancora INT. Resettiamo il DB per la migrazione a UUID.
-            dbContext.Database.ExecuteSqlRaw(@"
-                SET FOREIGN_KEY_CHECKS = 0;
-                DROP TABLE IF EXISTS ActivityLogs;
-                DROP TABLE IF EXISTS EventiGol;
-                DROP TABLE IF EXISTS PartecipantiPartita;
-                DROP TABLE IF EXISTS Prenotazioni;
-                DROP TABLE IF EXISTS Partite;
-                DROP TABLE IF EXISTS Squadre;
-                DROP TABLE IF EXISTS UserLeghe;
-                DROP TABLE IF EXISTS Users;
-                DROP TABLE IF EXISTS Leghe;
-                SET FOREIGN_KEY_CHECKS = 1;
-            ");
-        }
-        catch
-        {
-            // Il DB è già stato convertito a UUID o è nuovo
-        }
-
+        // Inizializza il database tramite EF Core
         dbContext.Database.EnsureCreated();
 
-        // Fail-safe: assicura che la tabella ActivityLogs esista nel database esistente
+        // Fail-safe: assicura che la tabella TipiLega esista e sia popolata
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS TipiLega (
+                Id INT PRIMARY KEY,
+                Codice VARCHAR(50) NOT NULL,
+                Nome VARCHAR(100) NOT NULL,
+                Descrizione TEXT NULL
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            INSERT IGNORE INTO TipiLega (Id, Codice, Nome, Descrizione) VALUES
+            (1, 'PARTITA_SINGOLA', 'Partita Singola', 'Lega classica in cui i giocatori prenotano singolarmente il posto per ogni match a due squadre.'),
+            (2, 'CAMPIONATO', 'Campionato', 'Campionato a girone unico con numero di squadre definito. Tutte le squadre si affrontano in scontri diretti e vince chi accumula più punti.'),
+            (3, 'TORNEO', 'Torneo', 'Torneo a gironi con numero di gironi definito. Le squadre competono prima nei gironi e poi avanzano alla fase ad eliminazione diretta fino alla finale.');
+        ");
+
+        // Fail-safe: assicura che le tabelle core esistano
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS Leghe (
+                Id VARCHAR(36) PRIMARY KEY,
+                Nome VARCHAR(255) NOT NULL,
+                Descrizione TEXT NULL,
+                CodiceInvito VARCHAR(50) NOT NULL UNIQUE,
+                TipoLegaId INT NOT NULL DEFAULT 1,
+                NumeroSquadre INT NULL,
+                NumeroGironi INT NULL,
+                CONSTRAINT FK_Leghe_TipiLega_TipoLegaId FOREIGN KEY (TipoLegaId) REFERENCES TipiLega(Id)
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS Users (
+                Id VARCHAR(36) PRIMARY KEY,
+                Nome VARCHAR(255) NOT NULL,
+                Cognome VARCHAR(255) NOT NULL,
+                Email VARCHAR(255) NOT NULL UNIQUE,
+                PasswordHash VARCHAR(255) NOT NULL,
+                LegaId VARCHAR(36) NULL,
+                Tema VARCHAR(20) NOT NULL DEFAULT 'dark'
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS Ruoli (
+                Id INT PRIMARY KEY,
+                Nome VARCHAR(50) NOT NULL
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            INSERT IGNORE INTO Ruoli (Id, Nome) VALUES
+            (1, 'ADMIN'),
+            (2, 'CO_ADMIN'),
+            (3, 'GIOCATORE'),
+            (4, 'SUPER_ADMIN');
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS UserLeghe (
+                UserId VARCHAR(36) NOT NULL,
+                LegaId VARCHAR(36) NOT NULL,
+                RuoloId INT NOT NULL,
+                PRIMARY KEY (UserId, LegaId),
+                CONSTRAINT FK_UserLeghe_Users_UserId FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+                CONSTRAINT FK_UserLeghe_Leghe_LegaId FOREIGN KEY (LegaId) REFERENCES Leghe(Id) ON DELETE CASCADE,
+                CONSTRAINT FK_UserLeghe_Ruoli_RuoloId FOREIGN KEY (RuoloId) REFERENCES Ruoli(Id)
+            );
+        ");
+
         dbContext.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS ActivityLogs (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
@@ -127,6 +171,54 @@ using (var scope = app.Services.CreateScope())
         // Fail-safe: rimuove le vecchie tabelle Teams/Players (modello legacy scollegato dalla Lega, mai popolato)
         dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Players;");
         dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Teams;");
+
+        // Fail-safe: assicura che la tabella TipiLega esista e sia popolata
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS TipiLega (
+                Id INT PRIMARY KEY,
+                Codice VARCHAR(50) NOT NULL,
+                Nome VARCHAR(100) NOT NULL,
+                Descrizione TEXT NULL
+            );
+        ");
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            INSERT IGNORE INTO TipiLega (Id, Codice, Nome, Descrizione) VALUES
+            (1, 'PARTITA_SINGOLA', 'Partita Singola', 'Lega classica in cui i giocatori prenotano singolarmente il posto per ogni match a due squadre.'),
+            (2, 'CAMPIONATO', 'Campionato', 'Campionato a girone unico con numero di squadre definito. Tutte le squadre si affrontano in scontri diretti e vince chi accumula più punti.'),
+            (3, 'TORNEO', 'Torneo', 'Torneo a gironi con numero di gironi definito. Le squadre competono prima nei gironi e poi avanzano alla fase ad eliminazione diretta fino alla finale.');
+        ");
+
+        try
+        {
+            var hasTipoLegaId = dbContext.Database.SqlQueryRaw<int>(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'TipoLegaId'"
+            ).AsEnumerable().FirstOrDefault() > 0;
+
+            if (!hasTipoLegaId)
+            {
+                dbContext.Database.ExecuteSqlRaw("ALTER TABLE Leghe ADD COLUMN TipoLegaId INT NOT NULL DEFAULT 1;");
+            }
+
+            var hasNumeroSquadre = dbContext.Database.SqlQueryRaw<int>(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'NumeroSquadre'"
+            ).AsEnumerable().FirstOrDefault() > 0;
+
+            if (!hasNumeroSquadre)
+            {
+                dbContext.Database.ExecuteSqlRaw("ALTER TABLE Leghe ADD COLUMN NumeroSquadre INT NULL;");
+            }
+
+            var hasNumeroGironi = dbContext.Database.SqlQueryRaw<int>(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'NumeroGironi'"
+            ).AsEnumerable().FirstOrDefault() > 0;
+
+            if (!hasNumeroGironi)
+            {
+                dbContext.Database.ExecuteSqlRaw("ALTER TABLE Leghe ADD COLUMN NumeroGironi INT NULL;");
+            }
+        }
+        catch { }
 
         // Fail-safe: assicura che le tabelle del dominio Partite/Prenotazioni esistano nel database esistente
         dbContext.Database.ExecuteSqlRaw(@"

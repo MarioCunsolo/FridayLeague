@@ -22,7 +22,7 @@
       @if (activeForm() === 'none') {
         <p class="subtitle text-secondary">Crea la tua lega o unisciti a una esistente per scendere in campo!</p>
       } @else if (activeForm() === 'create') {
-        <p class="subtitle text-secondary">Inserisci i dettagli per dare vita alla tua nuova lega di calcetto.</p>
+        <p class="subtitle text-secondary">Seleziona la tipologia e inserisci i dettagli per dare vita alla tua lega.</p>
       } @else if (activeForm() === 'join') {
         <p class="subtitle text-secondary">Inserisci il codice d'accesso alfanumerico fornito dall'amministratore.</p>
       }
@@ -38,7 +38,7 @@
               <i class="fa fa-trophy option-icon"></i>
             </div>
             <h3 class="option-title">Crea una Lega</h3>
-            <p class="option-desc">Diventa amministratore, imposta le regole, programma i match e invita i tuoi amici a iscriversi.</p>
+            <p class="option-desc">Diventa amministratore, scegli la formula di gioco (Partita Singola, Campionato o Torneo) e invita i tuoi amici.</p>
           </div>
         </div>
         
@@ -57,24 +57,104 @@
 
     <!-- Form Creazione Lega -->
     @if (activeForm() === 'create') {
-      <form nz-form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="action-form">
+      <form nz-form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="action-form create-form-expanded">
+        
+        <!-- Nome Lega -->
         <nz-form-item>
           <nz-form-control nzErrorTip="Il nome della lega deve contenere almeno 3 caratteri">
             <label class="form-input-label">Nome della Lega</label>
             <nz-input-group nzPrefixIcon="trophy">
-              <input nz-input formControlName="nome" placeholder="Es. LineUp Milano" />
+              <input nz-input formControlName="nome" placeholder="Es. LineUp Milano / Friday Champions" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
 
+        <!-- Descrizione Lega -->
         <nz-form-item>
           <nz-form-control>
             <label class="form-input-label">Descrizione (Opzionale)</label>
             <nz-input-group nzPrefixIcon="profile">
-              <textarea nz-input formControlName="descrizione" rows="3" placeholder="Aggiungi dettagli, orari e campo principale della lega..."></textarea>
+              <textarea nz-input formControlName="descrizione" rows="2" placeholder="Aggiungi dettagli, orari e campo principale della lega..."></textarea>
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
+
+        <!-- Selezione Tipo Lega (Cards interattive con descrizione) -->
+        <div class="league-type-section mb-4">
+          <label class="form-input-label mb-2">Formato di Competizione</label>
+          <div class="row g-3 league-types-grid">
+            @for (type of leagueTypes; track type.id) {
+              <div class="col-12 col-md-4">
+                <div class="league-type-card" 
+                     [class.active]="selectedTipoLegaId() === type.id" 
+                     (click)="selectTipoLega(type.id)">
+                  
+                  <div class="type-card-header">
+                    <div class="type-icon-wrapper">
+                      <span nz-icon [nzType]="type.icon" nzTheme="outline" class="type-icon"></span>
+                    </div>
+                    <span class="type-badge">{{ type.badge }}</span>
+                  </div>
+
+                  <h4 class="type-title">{{ type.name }}</h4>
+                  <p class="type-short-desc">{{ type.shortDesc }}</p>
+                  <p class="type-long-desc">{{ type.longDesc }}</p>
+
+                  <div class="selected-check" *ngIf="selectedTipoLegaId() === type.id">
+                    <span nz-icon nzType="check-circle" nzTheme="fill"></span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Parametri specifici in base al tipo di lega -->
+        @if (selectedTipoLegaId() === 2) {
+          <div class="conditional-config-box mb-4">
+            <label class="form-input-label">Numero di Squadre del Campionato</label>
+            <p class="config-help-text">Seleziona quante squadre si contenderanno la vittoria a punti:</p>
+            <div class="quick-selectors d-flex flex-wrap gap-2 mb-3">
+              @for (opt of squadreOptions; track opt) {
+                <button type="button" class="btn-quick-chip" 
+                        [class.active]="createForm.controls.numeroSquadre.value === opt"
+                        (click)="setNumeroSquadre(opt)">
+                  {{ opt }} Squadre
+                </button>
+              }
+            </div>
+            <nz-form-item class="m-0">
+              <nz-form-control nzErrorTip="Inserisci un numero valido di squadre (minimo 2)">
+                <nz-input-group nzPrefixIcon="team">
+                  <input nz-input type="number" formControlName="numeroSquadre" min="2" max="64" placeholder="Es. 8" />
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        }
+
+        @if (selectedTipoLegaId() === 3) {
+          <div class="conditional-config-box mb-4">
+            <label class="form-input-label">Numero di Gironi del Torneo</label>
+            <p class="config-help-text">Seleziona in quanti gironi saranno divise le squadre nella prima fase:</p>
+            <div class="quick-selectors d-flex flex-wrap gap-2 mb-3">
+              @for (opt of gironiOptions; track opt) {
+                <button type="button" class="btn-quick-chip" 
+                        [class.active]="createForm.controls.numeroGironi.value === opt"
+                        (click)="setNumeroGironi(opt)">
+                  {{ opt }} {{ opt === 1 ? 'Girone' : 'Gironi' }}
+                </button>
+              }
+            </div>
+            <nz-form-item class="m-0">
+              <nz-form-control nzErrorTip="Inserisci un numero valido di gironi (minimo 1)">
+                <nz-input-group nzPrefixIcon="appstore">
+                  <input nz-input type="number" formControlName="numeroGironi" min="1" max="16" placeholder="Es. 4" />
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        }
 
         @if (errorMessage()) {
           <div class="form-error-alert mb-4">

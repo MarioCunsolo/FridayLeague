@@ -15,8 +15,14 @@ export class LegaService {
   /**
    * Crea una nuova lega nel backend.
    */
-  creaLega(nomeLega: string, descrizione?: string) {
-    return this.http.post<any>(`${this.BASE_URL}/crea-lega`, { nomeLega, descrizione }).pipe(
+  creaLega(nomeLega: string, descrizione?: string, tipoLegaId: number = 1, numeroSquadre?: number | null, numeroGironi?: number | null) {
+    return this.http.post<any>(`${this.BASE_URL}/crea-lega`, {
+      nomeLega,
+      descrizione,
+      tipoLegaId,
+      numeroSquadre,
+      numeroGironi
+    }).pipe(
       tap(user => {
         this.authService.updateCurrentUser(user);
       })

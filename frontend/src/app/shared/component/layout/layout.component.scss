@@ -106,10 +106,12 @@
 .sidebar-footer {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.35rem;
     border-top: 0.0625rem solid var(--border-sub);
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
+    padding-top: 1rem;
+    margin-top: auto;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0;
 }
 
 .content-wrapper {
@@ -141,13 +143,14 @@
 
 /* Selettore Lega nella Sidebar */
 .sidebar-league-selector {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     padding: 0 0.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     border-bottom: 0.0625rem solid var(--border-sub);
-    padding-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    flex-shrink: 0;
 }
 
 .selector-label {
@@ -278,14 +281,17 @@
     left: -18rem;
     width: 18rem;
     height: 100vh;
+    height: 100dvh;
     background-color: var(--sidebar-bg);
     border-right: 0.0625rem solid var(--border-sub);
     z-index: 1210;
     display: flex;
     flex-direction: column;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1.25rem;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0.25rem 0 1.5rem rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .mobile-sidebar-drawer.open {

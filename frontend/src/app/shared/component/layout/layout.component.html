@@ -138,14 +138,6 @@
         <span nz-icon nzType="user" nzTheme="outline"></span>
         <span>Account</span>
       </div>
-      <div class="nav-item-desktop" (click)="toggleTheme(); closeMobileMenu()">
-        <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
-        <span>{{ currentTheme() === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
-      </div>
-      <div class="nav-item-desktop" (click)="logout(); closeMobileMenu()" style="cursor: pointer;">
-        <span nz-icon nzType="logout" nzTheme="outline"></span>
-        <span>Esci</span>
-      </div>
     </div>
   </aside>
 

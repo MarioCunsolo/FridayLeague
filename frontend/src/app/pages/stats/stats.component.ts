@@ -36,12 +36,11 @@ export class StatsComponent implements OnInit {
   private statsService = inject(StatsService);
   private route = inject(ActivatedRoute);
 
-  options = ['GOL', 'ASSIST', 'MOTM'];
+  options = ['GOL', 'ASSIST'];
   activeOption = signal('GOL');
 
   scorers = signal<PlayerStats[]>([]);
   assists = signal<PlayerStats[]>([]);
-  motm = signal<PlayerStats[]>([]);
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -55,7 +54,6 @@ export class StatsComponent implements OnInit {
 
     this.statsService.getScorers().subscribe(data => this.scorers.set(data));
     this.statsService.getAssists().subscribe(data => this.assists.set(data));
-    this.statsService.getMOTM().subscribe(data => this.motm.set(data));
   }
 
   handleIndexChange(value: string | number): void {
@@ -67,7 +65,6 @@ export class StatsComponent implements OnInit {
     switch (this.activeOption()) {
       case 'GOL': return this.scorers();
       case 'ASSIST': return this.assists();
-      case 'MOTM': return this.motm();
       default: return this.scorers();
     }
   }

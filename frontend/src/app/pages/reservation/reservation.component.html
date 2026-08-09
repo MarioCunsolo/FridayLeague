@@ -71,9 +71,11 @@
                 </td>
                 <td class="text-success text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
                 <td class="text-center">
-                  <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)">
-                    <i class="fa fa-trash-o"></i>
-                  </button>
+                  @if (canDeleteReservation(res)) {
+                    <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)" title="Elimina prenotazione">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  }
                 </td>
               </tr>
               }
@@ -97,9 +99,11 @@
                 </td>
                 <td class="text-muted text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
                 <td class="text-center">
-                  <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)">
-                    <i class="fa fa-trash-o"></i>
-                  </button>
+                  @if (canDeleteReservation(res)) {
+                    <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)" title="Elimina prenotazione">
+                      <i class="fa fa-trash-o"></i>
+                    </button>
+                  }
                 </td>
               </tr>
               }

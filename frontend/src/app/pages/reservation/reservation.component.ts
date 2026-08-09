@@ -80,9 +80,30 @@ export class ReservationComponent implements OnInit {
     });
   }
 
+  getCurrentUserRole(): string {
+    const user = this.authService.currentUser();
+    if (!user || !user.legaId || !user.leghe) return 'GIOCATORE';
+    const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
+    return activeLega ? activeLega.ruolo : 'GIOCATORE';
+  }
+
+  canDeleteReservation(player: Reservation): boolean {
+    const user = this.authService.currentUser();
+    if (!user) return false;
+
+    const userRole = this.getCurrentUserRole();
+    const isAdminOrCoAdmin = userRole === 'SUPER_ADMIN' || userRole === 'ADMIN' || userRole === 'CO_ADMIN';
+
+    // Super Admin, Admin e Co-Admin possono eliminare qualsiasi prenotazione
+    if (isAdminOrCoAdmin) return true;
+
+    // Utente semplice: può eliminare solamente la propria prenotazione
+    return player.playerId === user.id;
+  }
+
   deleteReservation(player: Reservation): void {
-    if (!player.playerId) {
-      this.message.error('Non è possibile eliminare una prenotazione non collegata a un utente registrato.');
+    if (!this.canDeleteReservation(player)) {
+      this.message.error('Non hai i permessi per eliminare questa prenotazione.');
       return;
     }
 
@@ -92,7 +113,8 @@ export class ReservationComponent implements OnInit {
       nzOkText: 'Sì, elimina',
       nzOkDanger: true,
       nzOnOk: () => {
-        this.reservationService.deleteReservation(player.playerId!).subscribe({
+        if (!player.playerId) return;
+        this.reservationService.deleteReservation(player.playerId).subscribe({
           error: (err) => this.message.error(err.error || "Errore durante l'eliminazione della prenotazione.")
         });
       },

@@ -23,14 +23,14 @@ public class PlayersController : ApiControllerBase
         ExecuteAsync(() => _playerService.GetPlayersAsync(User.GetUserId()));
 
     [HttpGet("{id}")]
-    public Task<ActionResult<PlayerDto>> GetById(int id) =>
+    public Task<ActionResult<PlayerDto>> GetById(Guid id) =>
         ExecuteAsync(() => _playerService.GetPlayerByIdAsync(User.GetUserId(), id));
 
     [HttpGet("{id}/stats")]
-    public Task<ActionResult<List<UserStatsDto>>> GetStats(int id) =>
+    public Task<ActionResult<List<UserStatsDto>>> GetStats(Guid id) =>
         ExecuteAsync(() => _playerService.GetPlayerStatsAsync(User.GetUserId(), id, null));
 
     [HttpGet("{id}/stats/{season}")]
-    public Task<ActionResult<List<UserStatsDto>>> GetStatsPerStagione(int id, string season) =>
+    public Task<ActionResult<List<UserStatsDto>>> GetStatsPerStagione(Guid id, string season) =>
         ExecuteAsync(() => _playerService.GetPlayerStatsAsync(User.GetUserId(), id, season));
 }

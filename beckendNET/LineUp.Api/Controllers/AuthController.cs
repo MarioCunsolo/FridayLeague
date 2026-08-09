@@ -262,7 +262,7 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("lega/{legaId}/partecipanti")]
-    public async Task<ActionResult<List<ParticipantDto>>> GetLegaPartecipanti(int legaId)
+    public async Task<ActionResult<List<ParticipantDto>>> GetLegaPartecipanti(Guid legaId)
     {
         var userId = User.GetUserId();
 
@@ -294,7 +294,7 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("lega/{legaId}/registri-attivita")]
-    public async Task<ActionResult<List<ActivityLogDto>>> GetLegaRegistriAttivita(int legaId)
+    public async Task<ActionResult<List<ActivityLogDto>>> GetLegaRegistriAttivita(Guid legaId)
     {
         var userId = User.GetUserId();
 

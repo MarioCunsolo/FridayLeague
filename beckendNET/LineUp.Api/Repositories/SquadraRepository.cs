@@ -12,7 +12,7 @@ public class SquadraRepository : ISquadraRepository
         _context = context;
     }
 
-    public async Task<Squadra> GetOrCreateAsync(int legaId, string nome)
+    public async Task<Squadra> GetOrCreateAsync(Guid legaId, string nome)
     {
         var nomeTrim = nome.Trim();
         var esistente = await _context.Squadre

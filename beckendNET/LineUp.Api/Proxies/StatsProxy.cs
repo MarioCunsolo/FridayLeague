@@ -19,11 +19,11 @@ public class StatsProxy : IStatsProxy
         _userLegaRepository = userLegaRepository;
     }
 
-    public Task<int?> GetActiveLegaIdAsync(int userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
+    public Task<Guid?> GetActiveLegaIdAsync(Guid userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
 
-    public Task<List<PartecipantePartita>> GetPartecipazioniAsync(int legaId, string? stagione) =>
+    public Task<List<PartecipantePartita>> GetPartecipazioniAsync(Guid legaId, string? stagione) =>
         _partecipanteRepository.GetByLegaAsync(legaId, stagione);
 
-    public Task<List<EventoGol>> GetGolLegaAsync(int legaId, string? stagione) =>
+    public Task<List<EventoGol>> GetGolLegaAsync(Guid legaId, string? stagione) =>
         _eventoGolRepository.GetByLegaAsync(legaId, stagione);
 }

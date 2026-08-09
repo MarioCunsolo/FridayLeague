@@ -14,7 +14,7 @@ public class StatsService : IStatsService
         _proxy = proxy;
     }
 
-    public async Task<List<PlayerStatsDto>> GetScorersAsync(int userId, string? season)
+    public async Task<List<PlayerStatsDto>> GetScorersAsync(Guid userId, string? season)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var gol = await _proxy.GetGolLegaAsync(legaId, season);
@@ -23,7 +23,7 @@ public class StatsService : IStatsService
         return CostruisciClassifica(gol.GroupBy(g => g.MarcatoreUserId), partecipazioni);
     }
 
-    public async Task<List<PlayerStatsDto>> GetAssistsAsync(int userId, string? season)
+    public async Task<List<PlayerStatsDto>> GetAssistsAsync(Guid userId, string? season)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var gol = await _proxy.GetGolLegaAsync(legaId, season);
@@ -36,7 +36,7 @@ public class StatsService : IStatsService
         return CostruisciClassifica(raggruppati, partecipazioni);
     }
 
-    public async Task<List<PlayerStatsDto>> GetMotmAsync(int userId, string? season)
+    public async Task<List<PlayerStatsDto>> GetMotmAsync(Guid userId, string? season)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var partecipazioni = await _proxy.GetPartecipazioniAsync(legaId, season);
@@ -48,7 +48,7 @@ public class StatsService : IStatsService
         return CostruisciClassifica(raggruppati, partecipazioni);
     }
 
-    private static List<PlayerStatsDto> CostruisciClassifica(IEnumerable<IGrouping<int, EventoGol>> raggruppati, List<PartecipantePartita> partecipazioni)
+    private static List<PlayerStatsDto> CostruisciClassifica(IEnumerable<IGrouping<Guid, EventoGol>> raggruppati, List<PartecipantePartita> partecipazioni)
     {
         return raggruppati
             .Select(g => Costruisci(g.Key, g.Count(), partecipazioni))
@@ -58,7 +58,7 @@ public class StatsService : IStatsService
             .ToList();
     }
 
-    private static List<PlayerStatsDto> CostruisciClassifica(IEnumerable<IGrouping<int, PartecipantePartita>> raggruppati, List<PartecipantePartita> partecipazioni)
+    private static List<PlayerStatsDto> CostruisciClassifica(IEnumerable<IGrouping<Guid, PartecipantePartita>> raggruppati, List<PartecipantePartita> partecipazioni)
     {
         return raggruppati
             .Select(g => Costruisci(g.Key, g.Count(), partecipazioni))
@@ -68,7 +68,7 @@ public class StatsService : IStatsService
             .ToList();
     }
 
-    private static PlayerStatsDto? Costruisci(int userId, int value, List<PartecipantePartita> partecipazioni)
+    private static PlayerStatsDto? Costruisci(Guid userId, int value, List<PartecipantePartita> partecipazioni)
     {
         // La squadra mostrata è quella dell'ultima partita giocata nel periodo filtrato (un giocatore può cambiare squadra ogni partita)
         var ultimaPartecipazione = partecipazioni
@@ -89,10 +89,10 @@ public class StatsService : IStatsService
             Team = squadra,
             Value = value,
             Avatar = PlayerDisplayExtensions.GetInitials(user.Nome, user.Cognome),
-            Color = PlayerDisplayExtensions.GetAvatarColor(user.Id)
+            Color = PlayerDisplayExtensions.GetAvatarColor(user.Id.ToString())
         };
     }
 
-    private async Task<int> GetLegaAttivaAsync(int userId) =>
+    private async Task<Guid> GetLegaAttivaAsync(Guid userId) =>
         await _proxy.GetActiveLegaIdAsync(userId) ?? throw new BadRequestException("Nessuna lega attiva selezionata.");
 }

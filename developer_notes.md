@@ -10,7 +10,7 @@ Il progetto è suddiviso in due componenti principali:
 * **Backend (.NET Core)**: Situato nella cartella `beckendNET`.
   * **API Project**: [LineUp.Api](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api)
   * **Database**: MySQL 8.0 avviato tramite Docker Compose ([docker-compose.yml](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/docker-compose.yml)) sulla porta `3306`.
-  * **ORM**: Entity Framework Core con connessione MySQL.
+* **ORM & Data Types**: Entity Framework Core con connessione MySQL. Le entità **User** e **Lega** (e tutte le chiavi esterne correlate `UserId`, `LegaId`, `EsecutoreId`, `TargetUserId`, `PrenotatoDaUserId`) utilizzano **UUID** (`Guid` in C#, `VARCHAR(36)` in MySQL, `string` in TypeScript) per garantire identificatori univoci e sicurezza dei riferimenti.
 * **Frontend (Angular)**: Situato nella cartella `frontend`.
   * **Framework**: Angular 21 (standalone components, control flow syntax `@if`, `@for`, ecc.).
   * **UI Library**: Ng-Zorro-Antd (Ant Design per Angular).

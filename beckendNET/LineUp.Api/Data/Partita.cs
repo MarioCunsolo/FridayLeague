@@ -16,7 +16,7 @@ public static class StatoPartita
 public class Partita
 {
     public int Id { get; set; }
-    public int LegaId { get; set; }
+    public Guid LegaId { get; set; }
     public Lega Lega { get; set; } = null!;
 
     public int SquadraCasaId { get; set; }

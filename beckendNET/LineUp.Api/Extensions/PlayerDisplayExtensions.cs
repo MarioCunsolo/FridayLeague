@@ -16,5 +16,6 @@ public static class PlayerDisplayExtensions
         return string.IsNullOrEmpty(initials) ? "??" : initials;
     }
 
-    public static string GetAvatarColor(int userId) => Palette[Math.Abs(userId) % Palette.Length];
+    public static string GetAvatarColor(Guid userId) => Palette[Math.Abs(userId.GetHashCode()) % Palette.Length];
+    public static string GetAvatarColor(string userKey) => Palette[Math.Abs(userKey.GetHashCode()) % Palette.Length];
 }

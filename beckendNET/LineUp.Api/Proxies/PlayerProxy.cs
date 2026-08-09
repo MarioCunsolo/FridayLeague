@@ -19,19 +19,19 @@ public class PlayerProxy : IPlayerProxy
         _eventoGolRepository = eventoGolRepository;
     }
 
-    public Task<int?> GetActiveLegaIdAsync(int userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
+    public Task<Guid?> GetActiveLegaIdAsync(Guid userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
 
-    public async Task<List<User>> GetMembriAsync(int legaId) => await _userLegaRepository.GetMembriAsync(legaId);
+    public async Task<List<User>> GetMembriAsync(Guid legaId) => await _userLegaRepository.GetMembriAsync(legaId);
 
-    public async Task<User?> GetMembroAsync(int legaId, int userId)
+    public async Task<User?> GetMembroAsync(Guid legaId, Guid userId)
     {
         var membri = await _userLegaRepository.GetMembriAsync(legaId);
         return membri.SingleOrDefault(u => u.Id == userId);
     }
 
-    public Task<List<PartecipantePartita>> GetPartecipazioniAsync(int legaId, string? stagione) =>
+    public Task<List<PartecipantePartita>> GetPartecipazioniAsync(Guid legaId, string? stagione) =>
         _partecipanteRepository.GetByLegaAsync(legaId, stagione);
 
-    public Task<List<EventoGol>> GetGolLegaAsync(int legaId, string? stagione) =>
+    public Task<List<EventoGol>> GetGolLegaAsync(Guid legaId, string? stagione) =>
         _eventoGolRepository.GetByLegaAsync(legaId, stagione);
 }

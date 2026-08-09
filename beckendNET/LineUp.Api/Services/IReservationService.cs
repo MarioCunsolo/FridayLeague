@@ -4,8 +4,8 @@ namespace LineUp.Api.Services;
 
 public interface IReservationService
 {
-    Task<List<ReservationDto>> GetReservationsAsync(int userId);
-    Task<ReservationDto> CreateReservationAsync(int userId, CreateReservationRequest request);
-    Task DeleteReservationAsync(int userId, int playerId);
-    Task<List<ReservationDto>> SeedDummyReservationsAsync(int userId);
+    Task<List<ReservationDto>> GetReservationsAsync(Guid userId);
+    Task<ReservationDto> CreateReservationAsync(Guid userId, CreateReservationRequest request);
+    Task DeleteReservationAsync(Guid userId, Guid playerId);
+    Task<List<ReservationDto>> SeedDummyReservationsAsync(Guid userId);
 }

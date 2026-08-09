@@ -4,6 +4,6 @@ namespace LineUp.Api.Repositories;
 
 public interface ISquadraRepository
 {
-    Task<Squadra> GetOrCreateAsync(int legaId, string nome);
+    Task<Squadra> GetOrCreateAsync(Guid legaId, string nome);
     Task<Squadra?> GetByIdAsync(int id);
 }

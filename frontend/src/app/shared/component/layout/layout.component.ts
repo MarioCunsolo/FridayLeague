@@ -69,7 +69,7 @@ export class LayoutComponent {
     }
   }
 
-  onLeagueChange(idLega: number): void {
+  onLeagueChange(idLega: string): void {
     this.legaService.cambiaLega(idLega);
     // Reindirizziamo alla homepage per rinfrescare i dati della lega attiva
     this.router.navigate(['/home']);

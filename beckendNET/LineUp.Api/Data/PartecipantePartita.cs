@@ -7,7 +7,7 @@ public class PartecipantePartita
     public int PartitaId { get; set; }
     public Partita Partita { get; set; } = null!;
 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
     public bool InCasa { get; set; }

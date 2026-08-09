@@ -19,13 +19,13 @@ public class ReservationProxy : IReservationProxy
         _userLegaRepository = userLegaRepository;
     }
 
-    public Task<int?> GetActiveLegaIdAsync(int userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
-    public Task<Partita?> GetNextScheduledAsync(int legaId) => _partitaRepository.GetNextScheduledAsync(legaId);
+    public Task<Guid?> GetActiveLegaIdAsync(Guid userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
+    public Task<Partita?> GetNextScheduledAsync(Guid legaId) => _partitaRepository.GetNextScheduledAsync(legaId);
     public Task<List<Prenotazione>> GetByPartitaAsync(int partitaId) => _prenotazioneRepository.GetByPartitaAsync(partitaId);
     public Task<Prenotazione?> GetByIdAsync(int id) => _prenotazioneRepository.GetByIdAsync(id);
-    public Task<Prenotazione?> GetByPartitaAndUserIdAsync(int partitaId, int userId) =>
+    public Task<Prenotazione?> GetByPartitaAndUserIdAsync(int partitaId, Guid userId) =>
         _prenotazioneRepository.GetByPartitaAndUserIdAsync(partitaId, userId);
-    public Task<User?> FindMembroByNomeCompletoAsync(int legaId, string nomeCompleto) =>
+    public Task<User?> FindMembroByNomeCompletoAsync(Guid legaId, string nomeCompleto) =>
         _userLegaRepository.FindMembroByNomeCompletoAsync(legaId, nomeCompleto);
     public Task<Prenotazione> CreateAsync(Prenotazione prenotazione) => _prenotazioneRepository.AddAsync(prenotazione);
     public Task DeleteAsync(Prenotazione prenotazione) => _prenotazioneRepository.DeleteAsync(prenotazione);

@@ -12,7 +12,7 @@ public class AuthorizationHelper : IAuthorizationHelper
         _context = context;
     }
 
-    public async Task<bool> IsAdminOrCoAdminAsync(int userId, int legaId)
+    public async Task<bool> IsAdminOrCoAdminAsync(Guid userId, Guid legaId)
     {
         var member = await _context.UserLeghe
             .SingleOrDefaultAsync(ul => ul.UserId == userId && ul.LegaId == legaId);

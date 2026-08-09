@@ -25,19 +25,19 @@ public class MatchProxy : IMatchProxy
         _userLegaRepository = userLegaRepository;
     }
 
-    public Task<int?> GetActiveLegaIdAsync(int userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
+    public Task<Guid?> GetActiveLegaIdAsync(Guid userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
 
-    public Task<List<Partita>> GetPartiteAsync(int legaId) => _partitaRepository.GetByLegaAsync(legaId);
+    public Task<List<Partita>> GetPartiteAsync(Guid legaId) => _partitaRepository.GetByLegaAsync(legaId);
     public Task<Partita?> GetPartitaAsync(int id) => _partitaRepository.GetByIdAsync(id);
     public Task<List<PartecipantePartita>> GetPartecipantiAsync(int partitaId) => _partecipanteRepository.GetByPartitaAsync(partitaId);
     public Task<List<EventoGol>> GetGolAsync(int partitaId) => _eventoGolRepository.GetByPartitaAsync(partitaId);
 
-    public Task<Squadra> GetOrCreateSquadraAsync(int legaId, string nome) => _squadraRepository.GetOrCreateAsync(legaId, nome);
+    public Task<Squadra> GetOrCreateSquadraAsync(Guid legaId, string nome) => _squadraRepository.GetOrCreateAsync(legaId, nome);
     public Task<Partita> CreatePartitaAsync(Partita partita) => _partitaRepository.AddAsync(partita);
     public Task SalvaPartitaAsync() => _partitaRepository.SaveChangesAsync();
     public Task DeletePartitaAsync(Partita partita) => _partitaRepository.DeleteAsync(partita);
 
-    public Task<User?> FindMembroByNomeCompletoAsync(int legaId, string nome) =>
+    public Task<User?> FindMembroByNomeCompletoAsync(Guid legaId, string nome) =>
         _userLegaRepository.FindMembroByNomeCompletoAsync(legaId, nome);
 
     public Task<PartecipantePartita?> FindPartecipanteByNomeAsync(int partitaId, string nome, bool isHome) =>

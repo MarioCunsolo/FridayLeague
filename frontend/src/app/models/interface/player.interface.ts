@@ -1,5 +1,5 @@
 export interface PlayerProfile {
-  id: number;
+  id: string;
   name: string;
   goals: number;
   assists: number;

@@ -27,7 +27,7 @@ public class EventoGolRepository : IEventoGolRepository
         return evento;
     }
 
-    public Task<List<EventoGol>> GetByLegaAsync(int legaId, string? stagione) =>
+    public Task<List<EventoGol>> GetByLegaAsync(Guid legaId, string? stagione) =>
         _context.EventiGol
             .Include(g => g.Marcatore)
             .Include(g => g.Assist)

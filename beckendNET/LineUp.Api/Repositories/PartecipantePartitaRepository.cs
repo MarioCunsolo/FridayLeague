@@ -29,7 +29,7 @@ public class PartecipantePartitaRepository : IPartecipantePartitaRepository
         return partecipanti.SingleOrDefault(pp => $"{pp.User.Nome} {pp.User.Cognome}".Trim().ToLower() == target);
     }
 
-    public Task<List<PartecipantePartita>> GetByLegaAsync(int legaId, string? stagione) =>
+    public Task<List<PartecipantePartita>> GetByLegaAsync(Guid legaId, string? stagione) =>
         _context.PartecipantiPartita
             .Include(pp => pp.User)
             .Include(pp => pp.Partita).ThenInclude(p => p.SquadraCasa)

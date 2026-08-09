@@ -12,7 +12,7 @@ public class PartitaRepository : IPartitaRepository
         _context = context;
     }
 
-    public Task<List<Partita>> GetByLegaAsync(int legaId) =>
+    public Task<List<Partita>> GetByLegaAsync(Guid legaId) =>
         _context.Partite
             .Where(p => p.LegaId == legaId)
             .Include(p => p.SquadraCasa)
@@ -28,7 +28,7 @@ public class PartitaRepository : IPartitaRepository
             .Include(p => p.Stato)
             .SingleOrDefaultAsync(p => p.Id == id);
 
-    public Task<Partita?> GetNextScheduledAsync(int legaId) =>
+    public Task<Partita?> GetNextScheduledAsync(Guid legaId) =>
         _context.Partite
             .Where(p => p.LegaId == legaId && p.StatoId == StatoPartita.ProgrammataId)
             .Include(p => p.SquadraCasa)

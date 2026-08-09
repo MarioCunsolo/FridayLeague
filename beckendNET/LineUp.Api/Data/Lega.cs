@@ -2,7 +2,7 @@ namespace LineUp.Api.Data;
 
 public class Lega
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Nome { get; set; } = string.Empty;
     public string? Descrizione { get; set; }
     public string CodiceInvito { get; set; } = string.Empty;

@@ -7,11 +7,11 @@ public class EventoGol
     public int PartitaId { get; set; }
     public Partita Partita { get; set; } = null!;
 
-    public int MarcatoreUserId { get; set; }
+    public Guid MarcatoreUserId { get; set; }
     public User Marcatore { get; set; } = null!;
 
     public bool InCasa { get; set; }
 
-    public int? AssistUserId { get; set; }
+    public Guid? AssistUserId { get; set; }
     public User? Assist { get; set; }
 }

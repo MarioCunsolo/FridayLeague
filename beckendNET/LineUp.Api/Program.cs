@@ -77,20 +77,46 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<LineUpDbContext>();
-    dbContext.Database.EnsureCreated();
-
     try
     {
+        // Fail-safe per la migrazione a UUID: se le tabelle esistenti usavano INT, le ricreiamo con tipi VARCHAR(36)
+        try
+        {
+            dbContext.Database.ExecuteSqlRaw(@"
+                SELECT Id FROM Users WHERE CHAR_LENGTH(CAST(Id AS CHAR)) < 10 LIMIT 1;
+            ");
+            // Se la query sopra non fallisce, significa che Users.Id è ancora INT. Resettiamo il DB per la migrazione a UUID.
+            dbContext.Database.ExecuteSqlRaw(@"
+                SET FOREIGN_KEY_CHECKS = 0;
+                DROP TABLE IF EXISTS ActivityLogs;
+                DROP TABLE IF EXISTS EventiGol;
+                DROP TABLE IF EXISTS PartecipantiPartita;
+                DROP TABLE IF EXISTS Prenotazioni;
+                DROP TABLE IF EXISTS Partite;
+                DROP TABLE IF EXISTS Squadre;
+                DROP TABLE IF EXISTS UserLeghe;
+                DROP TABLE IF EXISTS Users;
+                DROP TABLE IF EXISTS Leghe;
+                SET FOREIGN_KEY_CHECKS = 1;
+            ");
+        }
+        catch
+        {
+            // Il DB è già stato convertito a UUID o è nuovo
+        }
+
+        dbContext.Database.EnsureCreated();
+
         // Fail-safe: assicura che la tabella ActivityLogs esista nel database esistente
         dbContext.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS ActivityLogs (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
-                LegaId INT NOT NULL,
-                EsecutoreId INT NOT NULL,
+                LegaId VARCHAR(36) NOT NULL,
+                EsecutoreId VARCHAR(36) NOT NULL,
                 EsecutoreNome VARCHAR(255) NOT NULL,
                 EsecutoreRuolo VARCHAR(50) NOT NULL,
                 Azione VARCHAR(50) NOT NULL,
-                TargetUserId INT NULL,
+                TargetUserId VARCHAR(36) NULL,
                 TargetUserNome VARCHAR(255) NOT NULL,
                 Dettagli TEXT NOT NULL,
                 Timestamp DATETIME NOT NULL,
@@ -106,7 +132,7 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS Squadre (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
-                LegaId INT NOT NULL,
+                LegaId VARCHAR(36) NOT NULL,
                 Nome VARCHAR(255) NOT NULL,
                 CONSTRAINT FK_Squadre_Leghe_LegaId FOREIGN KEY (LegaId) REFERENCES Leghe(Id) ON DELETE CASCADE
             );
@@ -131,7 +157,7 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS Partite (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
-                LegaId INT NOT NULL,
+                LegaId VARCHAR(36) NOT NULL,
                 SquadraCasaId INT NOT NULL,
                 SquadraTrasfertaId INT NOT NULL,
                 DataOra DATETIME NOT NULL,
@@ -150,7 +176,7 @@ using (var scope = app.Services.CreateScope())
             CREATE TABLE IF NOT EXISTS PartecipantiPartita (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
                 PartitaId INT NOT NULL,
-                UserId INT NOT NULL,
+                UserId VARCHAR(36) NOT NULL,
                 InCasa TINYINT(1) NOT NULL,
                 Motm TINYINT(1) NOT NULL DEFAULT 0,
                 CONSTRAINT FK_PartecipantiPartita_Partite_PartitaId FOREIGN KEY (PartitaId) REFERENCES Partite(Id) ON DELETE CASCADE,
@@ -163,9 +189,9 @@ using (var scope = app.Services.CreateScope())
             CREATE TABLE IF NOT EXISTS EventiGol (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
                 PartitaId INT NOT NULL,
-                MarcatoreUserId INT NOT NULL,
+                MarcatoreUserId VARCHAR(36) NOT NULL,
                 InCasa TINYINT(1) NOT NULL,
-                AssistUserId INT NULL,
+                AssistUserId VARCHAR(36) NULL,
                 CONSTRAINT FK_EventiGol_Partite_PartitaId FOREIGN KEY (PartitaId) REFERENCES Partite(Id) ON DELETE CASCADE,
                 CONSTRAINT FK_EventiGol_Users_MarcatoreUserId FOREIGN KEY (MarcatoreUserId) REFERENCES Users(Id),
                 CONSTRAINT FK_EventiGol_Users_AssistUserId FOREIGN KEY (AssistUserId) REFERENCES Users(Id)
@@ -176,8 +202,8 @@ using (var scope = app.Services.CreateScope())
             CREATE TABLE IF NOT EXISTS Prenotazioni (
                 Id INT AUTO_INCREMENT PRIMARY KEY,
                 PartitaId INT NOT NULL,
-                UserId INT NULL,
-                PrenotatoDaUserId INT NOT NULL,
+                UserId VARCHAR(36) NULL,
+                PrenotatoDaUserId VARCHAR(36) NOT NULL,
                 NomeCognome VARCHAR(255) NOT NULL,
                 DataOra DATETIME NOT NULL,
                 CONSTRAINT FK_Prenotazioni_Partite_PartitaId FOREIGN KEY (PartitaId) REFERENCES Partite(Id) ON DELETE CASCADE,

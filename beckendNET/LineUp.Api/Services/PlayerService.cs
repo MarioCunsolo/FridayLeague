@@ -12,7 +12,7 @@ public class PlayerService : IPlayerService
         _proxy = proxy;
     }
 
-    public async Task<List<PlayerDto>> GetPlayersAsync(int userId)
+    public async Task<List<PlayerDto>> GetPlayersAsync(Guid userId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var membri = await _proxy.GetMembriAsync(legaId);
@@ -27,7 +27,7 @@ public class PlayerService : IPlayerService
         }).ToList();
     }
 
-    public async Task<PlayerDto> GetPlayerByIdAsync(int userId, int playerId)
+    public async Task<PlayerDto> GetPlayerByIdAsync(Guid userId, Guid playerId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var membro = await _proxy.GetMembroAsync(legaId, playerId)
@@ -43,7 +43,7 @@ public class PlayerService : IPlayerService
         };
     }
 
-    public async Task<List<UserStatsDto>> GetPlayerStatsAsync(int userId, int playerId, string? season)
+    public async Task<List<UserStatsDto>> GetPlayerStatsAsync(Guid userId, Guid playerId, string? season)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         _ = await _proxy.GetMembroAsync(legaId, playerId)
@@ -53,13 +53,13 @@ public class PlayerService : IPlayerService
         var partecipazioni = await _proxy.GetPartecipazioniAsync(legaId, season);
         var gol = await _proxy.GetGolLegaAsync(legaId, season);
 
-        int GoalsOf(int uid) => gol.Count(g => g.MarcatoreUserId == uid);
-        int AssistsOf(int uid) => gol.Count(g => g.AssistUserId == uid);
-        int MotmOf(int uid) => partecipazioni.Count(p => p.UserId == uid && p.Motm);
-        int PartiteOf(int uid) => partecipazioni.Count(p => p.UserId == uid);
+        int GoalsOf(Guid uid) => gol.Count(g => g.MarcatoreUserId == uid);
+        int AssistsOf(Guid uid) => gol.Count(g => g.AssistUserId == uid);
+        int MotmOf(Guid uid) => partecipazioni.Count(p => p.UserId == uid && p.Motm);
+        int PartiteOf(Guid uid) => partecipazioni.Count(p => p.UserId == uid);
 
         // Ranking "1224": la posizione riflette il valore nella classifica della lega, a parità di valore stesso rank.
-        int RankOf(Func<int, int> selettore)
+        int RankOf(Func<Guid, int> selettore)
         {
             var valoriOrdinati = membri.Select(m => selettore(m.Id)).OrderByDescending(v => v).ToList();
             return valoriOrdinati.IndexOf(selettore(playerId)) + 1;
@@ -74,6 +74,6 @@ public class PlayerService : IPlayerService
         };
     }
 
-    private async Task<int> GetLegaAttivaAsync(int userId) =>
+    private async Task<Guid> GetLegaAttivaAsync(Guid userId) =>
         await _proxy.GetActiveLegaIdAsync(userId) ?? throw new BadRequestException("Nessuna lega attiva selezionata.");
 }

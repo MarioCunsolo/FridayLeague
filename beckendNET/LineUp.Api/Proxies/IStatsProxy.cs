@@ -4,7 +4,7 @@ namespace LineUp.Api.Proxies;
 
 public interface IStatsProxy
 {
-    Task<int?> GetActiveLegaIdAsync(int userId);
-    Task<List<PartecipantePartita>> GetPartecipazioniAsync(int legaId, string? stagione);
-    Task<List<EventoGol>> GetGolLegaAsync(int legaId, string? stagione);
+    Task<Guid?> GetActiveLegaIdAsync(Guid userId);
+    Task<List<PartecipantePartita>> GetPartecipazioniAsync(Guid legaId, string? stagione);
+    Task<List<EventoGol>> GetGolLegaAsync(Guid legaId, string? stagione);
 }

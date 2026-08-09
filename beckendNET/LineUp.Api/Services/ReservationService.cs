@@ -15,7 +15,7 @@ public class ReservationService : IReservationService
         _authorizationHelper = authorizationHelper;
     }
 
-    public async Task<List<ReservationDto>> GetReservationsAsync(int userId)
+    public async Task<List<ReservationDto>> GetReservationsAsync(Guid userId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var partita = await _proxy.GetNextScheduledAsync(legaId);
@@ -25,7 +25,7 @@ public class ReservationService : IReservationService
         return prenotazioni.Select(MappaDto).ToList();
     }
 
-    public async Task<ReservationDto> CreateReservationAsync(int userId, CreateReservationRequest request)
+    public async Task<ReservationDto> CreateReservationAsync(Guid userId, CreateReservationRequest request)
     {
         var legaId = await GetLegaAttivaAsync(userId);
 
@@ -64,7 +64,7 @@ public class ReservationService : IReservationService
         return MappaDto(prenotazione);
     }
 
-    public async Task DeleteReservationAsync(int userId, int playerId)
+    public async Task DeleteReservationAsync(Guid userId, Guid playerId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var partita = await _proxy.GetNextScheduledAsync(legaId)
@@ -82,7 +82,7 @@ public class ReservationService : IReservationService
         await _proxy.DeleteAsync(prenotazione);
     }
 
-    public async Task<List<ReservationDto>> SeedDummyReservationsAsync(int userId)
+    public async Task<List<ReservationDto>> SeedDummyReservationsAsync(Guid userId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var partita = await _proxy.GetNextScheduledAsync(legaId)
@@ -135,6 +135,6 @@ public class ReservationService : IReservationService
         PlayerId = p.UserId
     };
 
-    private async Task<int> GetLegaAttivaAsync(int userId) =>
+    private async Task<Guid> GetLegaAttivaAsync(Guid userId) =>
         await _proxy.GetActiveLegaIdAsync(userId) ?? throw new BadRequestException("Nessuna lega attiva selezionata.");
 }

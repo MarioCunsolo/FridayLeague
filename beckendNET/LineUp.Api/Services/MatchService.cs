@@ -21,7 +21,7 @@ public class MatchService : IMatchService
         _authorizationHelper = authorizationHelper;
     }
 
-    public async Task<List<MatchDto>> GetMatchesAsync(int userId)
+    public async Task<List<MatchDto>> GetMatchesAsync(Guid userId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var partite = await _proxy.GetPartiteAsync(legaId);
@@ -34,7 +34,7 @@ public class MatchService : IMatchService
         return risultato;
     }
 
-    public async Task<MatchDto> CreateMatchAsync(int userId, CreateMatchRequest request)
+    public async Task<MatchDto> CreateMatchAsync(Guid userId, CreateMatchRequest request)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -63,7 +63,7 @@ public class MatchService : IMatchService
         return await BuildMatchDtoAsync(partita);
     }
 
-    public async Task<MatchDto> UpdateMatchAsync(int userId, int matchId, UpdateMatchRequest request)
+    public async Task<MatchDto> UpdateMatchAsync(Guid userId, int matchId, UpdateMatchRequest request)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -91,7 +91,7 @@ public class MatchService : IMatchService
         return await BuildMatchDtoAsync(partita);
     }
 
-    public async Task DeleteMatchAsync(int userId, int matchId)
+    public async Task DeleteMatchAsync(Guid userId, int matchId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -106,7 +106,7 @@ public class MatchService : IMatchService
         await _proxy.DeletePartitaAsync(partita);
     }
 
-    public async Task<MatchDto> AnnullaMatchAsync(int userId, int matchId)
+    public async Task<MatchDto> AnnullaMatchAsync(Guid userId, int matchId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -124,7 +124,7 @@ public class MatchService : IMatchService
         return await BuildMatchDtoAsync(partita);
     }
 
-    public async Task<MatchDto> IniziaMatchAsync(int userId, int matchId)
+    public async Task<MatchDto> IniziaMatchAsync(Guid userId, int matchId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -142,7 +142,7 @@ public class MatchService : IMatchService
         return await BuildMatchDtoAsync(partita);
     }
 
-    public async Task<MatchDto> ConcludiMatchAsync(int userId, int matchId)
+    public async Task<MatchDto> ConcludiMatchAsync(Guid userId, int matchId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -160,7 +160,7 @@ public class MatchService : IMatchService
         return await BuildMatchDtoAsync(partita);
     }
 
-    public async Task<GoalEventDto> AddGoalAsync(int userId, int matchId, AddGoalRequest request)
+    public async Task<GoalEventDto> AddGoalAsync(Guid userId, int matchId, AddGoalRequest request)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
@@ -200,7 +200,7 @@ public class MatchService : IMatchService
         };
     }
 
-    public async Task SetMotmAsync(int userId, int matchId, SetMotmRequest request)
+    public async Task SetMotmAsync(Guid userId, int matchId, SetMotmRequest request)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -218,7 +218,7 @@ public class MatchService : IMatchService
         await _proxy.SalvaPartecipantiAsync();
     }
 
-    public async Task<MatchDto> SetupLineupAsync(int userId, int matchId, SetupMatchLineupRequest request)
+    public async Task<MatchDto> SetupLineupAsync(Guid userId, int matchId, SetupMatchLineupRequest request)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         await RichiediAdminAsync(userId, legaId);
@@ -317,10 +317,10 @@ public class MatchService : IMatchService
         };
     }
 
-    private async Task<int> GetLegaAttivaAsync(int userId) =>
+    private async Task<Guid> GetLegaAttivaAsync(Guid userId) =>
         await _proxy.GetActiveLegaIdAsync(userId) ?? throw new BadRequestException("Nessuna lega attiva selezionata.");
 
-    private async Task RichiediAdminAsync(int userId, int legaId)
+    private async Task RichiediAdminAsync(Guid userId, Guid legaId)
     {
         if (!await _authorizationHelper.IsAdminOrCoAdminAsync(userId, legaId))
         {
@@ -328,7 +328,7 @@ public class MatchService : IMatchService
         }
     }
 
-    private async Task<Partita> GetPartitaDellaLegaAsync(int matchId, int legaId)
+    private async Task<Partita> GetPartitaDellaLegaAsync(int matchId, Guid legaId)
     {
         var partita = await _proxy.GetPartitaAsync(matchId)
             ?? throw new NotFoundException("Partita non trovata.");

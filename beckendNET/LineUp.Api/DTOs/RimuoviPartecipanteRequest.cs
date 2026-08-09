@@ -2,6 +2,6 @@ namespace LineUp.Api.DTOs;
 
 public class RimuoviPartecipanteRequest
 {
-    public int LegaId { get; set; }
-    public int TargetUserId { get; set; }
+    public Guid LegaId { get; set; }
+    public Guid TargetUserId { get; set; }
 }

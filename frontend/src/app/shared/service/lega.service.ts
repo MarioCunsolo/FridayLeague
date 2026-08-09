@@ -37,7 +37,7 @@ export class LegaService {
   /**
    * Cambia la lega attualmente attiva.
    */
-  cambiaLega(idLega: number) {
+  cambiaLega(idLega: string) {
     this.http.post<any>(`${this.BASE_URL}/cambia-lega`, { idLega }).subscribe({
       next: user => {
         this.authService.updateCurrentUser(user);
@@ -51,14 +51,14 @@ export class LegaService {
   /**
    * Recupera la lista dei partecipanti di una lega.
    */
-  getLegaPartecipanti(legaId: number) {
+  getLegaPartecipanti(legaId: string) {
     return this.http.get<any[]>(`${this.BASE_URL}/lega/${legaId}/partecipanti`);
   }
 
   /**
    * Modifica il ruolo di un partecipante.
    */
-  cambiaRuoloPartecipante(legaId: number, targetUserId: number, nuovoRuolo: string) {
+  cambiaRuoloPartecipante(legaId: string, targetUserId: string, nuovoRuolo: string) {
     return this.http.post<void>(`${this.BASE_URL}/lega/cambia-ruolo-partecipante`, {
       legaId,
       targetUserId,
@@ -69,7 +69,7 @@ export class LegaService {
   /**
    * Rimuove un partecipante dalla lega.
    */
-  rimuoviPartecipante(legaId: number, targetUserId: number) {
+  rimuoviPartecipante(legaId: string, targetUserId: string) {
     return this.http.post<void>(`${this.BASE_URL}/lega/rimuovi-partecipante`, {
       legaId,
       targetUserId
@@ -79,7 +79,7 @@ export class LegaService {
   /**
    * Recupera il registro attività di una lega.
    */
-  getRegistroAttivita(legaId: number) {
+  getRegistroAttivita(legaId: string) {
     return this.http.get<any[]>(`${this.BASE_URL}/lega/${legaId}/registri-attivita`);
   }
 }

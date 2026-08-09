@@ -24,7 +24,7 @@ export class PlayerService {
    * @param id L'identificativo unico del giocatore.
    * @returns Un Observable con l'oggetto giocatore corrispondente.
    */
-  getPlayerById(id: number) {
+  getPlayerById(id: string) {
     return this.http.get<PlayerProfile>(`${this.BASE_URL}/${id}`);
   }
 
@@ -34,7 +34,7 @@ export class PlayerService {
    * @param season Opzionale: filtra le statistiche per una specifica stagione.
    * @returns Un Observable con le statistiche del giocatore, con relativo posizionamento in classifica.
    */
-  getPlayerStats(id: number, season?: string) {
+  getPlayerStats(id: string, season?: string) {
     const url = season ? `${this.BASE_URL}/${id}/stats/${season}` : `${this.BASE_URL}/${id}/stats`;
     return this.http.get<UserStats[]>(url);
   }

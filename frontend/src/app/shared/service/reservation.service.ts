@@ -40,7 +40,7 @@ export class ReservationService {
    * @param id L'identificativo del giocatore la cui prenotazione deve essere rimossa.
    * @returns Un Observable di tipo void.
    */
-  deleteReservation(id: number) {
+  deleteReservation(id: string) {
     return this.http.delete<void>(`${this.BASE_URL}/${id}`).pipe(
       tap(() => this._reservations.update(prev => prev.filter(r => r.playerId !== id)))
     );

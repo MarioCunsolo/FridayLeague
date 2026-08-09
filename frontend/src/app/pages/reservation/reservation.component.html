@@ -121,4 +121,15 @@
       </div>
     </div>
   </div>
+
+  <app-confirm-modal
+    [isVisible]="isDeleteModalVisible()"
+    title="Elimina Prenotazione"
+    message="Sei sicuro di voler eliminare questa prenotazione? L'operazione è irreversibile e perderai la tua posizione attuale nella lista."
+    confirmText="Sì, Elimina"
+    cancelText="Annulla"
+    [isDanger]="true"
+    (confirm)="confermaEliminazionePrenotazione()"
+    (cancel)="annullaEliminazionePrenotazione()">
+  </app-confirm-modal>
 </div>

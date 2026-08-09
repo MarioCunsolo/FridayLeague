@@ -1,4 +1,4 @@
-import { Component, computed, inject, TemplateRef, OnInit } from '@angular/core';
+import { Component, computed, inject, signal, TemplateRef, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Reservation } from '../../models/interface/reservation.interface';
@@ -13,6 +13,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { ReservationService } from '../../shared/service/reservation.service';
 import { LegaService } from '../../shared/service/lega.service';
 import { AuthService } from '../../shared/service/auth.service';
+import { ConfirmModalComponent } from '../../shared/component/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-reservation',
@@ -28,7 +29,8 @@ import { AuthService } from '../../shared/service/auth.service';
     NzModalModule,
     NzFormModule,
     NzInputModule,
-    NzAutocompleteModule
+    NzAutocompleteModule,
+    ConfirmModalComponent
   ]
 })
 export class ReservationComponent implements OnInit {
@@ -101,25 +103,42 @@ export class ReservationComponent implements OnInit {
     return player.playerId === user.id;
   }
 
+  isDeleteModalVisible = signal<boolean>(false);
+  selectedReservationToDelete = signal<Reservation | null>(null);
+
   deleteReservation(player: Reservation): void {
     if (!this.canDeleteReservation(player)) {
       this.message.error('Non hai i permessi per eliminare questa prenotazione.');
       return;
     }
 
-    this.modal.confirm({
-      nzTitle: 'Sei sicuro di voler eliminare questa prenotazione?',
-      nzContent: `<b style="color: #ff4d4f;">L'operazione è irreversibile.</b><br>Perderai la tua posizione attuale nella lista (Titolare/Sostituto).`,
-      nzOkText: 'Sì, elimina',
-      nzOkDanger: true,
-      nzOnOk: () => {
-        if (!player.playerId) return;
-        this.reservationService.deleteReservation(player.playerId).subscribe({
-          error: (err) => this.message.error(err.error || "Errore durante l'eliminazione della prenotazione.")
-        });
+    this.selectedReservationToDelete.set(player);
+    this.isDeleteModalVisible.set(true);
+  }
+
+  confermaEliminazionePrenotazione(): void {
+    const player = this.selectedReservationToDelete();
+    if (!player || !player.playerId) {
+      this.isDeleteModalVisible.set(false);
+      return;
+    }
+
+    this.reservationService.deleteReservation(player.playerId).subscribe({
+      next: () => {
+        this.message.success('Prenotazione eliminata con successo.');
+        this.isDeleteModalVisible.set(false);
+        this.selectedReservationToDelete.set(null);
       },
-      nzCancelText: 'Annulla'
+      error: (err) => {
+        this.message.error(err.error || "Errore durante l'eliminazione della prenotazione.");
+        this.isDeleteModalVisible.set(false);
+      }
     });
+  }
+
+  annullaEliminazionePrenotazione(): void {
+    this.isDeleteModalVisible.set(false);
+    this.selectedReservationToDelete.set(null);
   }
 
   isReservationDisabled = computed(() => {

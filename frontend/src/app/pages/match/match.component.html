@@ -5,12 +5,6 @@
       <!-- Section Header -->
       <div class="d-flex align-items-center justify-content-between mb-4">
         <h2 class="section-title m-0">Calendario Partite</h2>
-        @if (authService.isAdminOrCoAdmin()) {
-        <button nz-button nzType="primary" nzShape="round" class="add-match-btn" (click)="openAddMatchModal()">
-          <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
-          Nuova Partita
-        </button>
-        }
       </div>
 
       <div class="matches-list">
@@ -61,6 +55,14 @@
       </div>
     </div>
   </div>
+
+  @if (authService.isAdminOrCoAdmin()) {
+  <button nz-button nzType="primary" nzShape="round" class="add-match-btn shadow" (click)="openAddMatchModal()">
+    <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
+    Nuova Partita
+  </button>
+  }
+
   } @else {
   <div class="row justify-content-center">
     <div class="col-12 col-md-10 col-lg-9">

@@ -49,7 +49,7 @@
             <thead>
               <tr>
                 <th>GIOCATORE</th>
-                <th>ORARIO</th>
+                <th>DATA E ORARIO</th>
                 <th class="text-center">AZIONI</th>
               </tr>
             </thead>
@@ -69,7 +69,10 @@
                     nz-tooltip nzTooltipTitle="Utente Registrato"></span>
                   }
                 </td>
-                <td class="text-success text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
+                <td class="text-nowrap">
+                  <span class="d-block text-muted" style="font-size: 0.75rem;">{{ res.dataOra | date:'dd/MM/yyyy' }}</span>
+                  <span class="d-block text-success fw-bold" style="font-size: 0.85rem;">{{ res.dataOra | date:'HH:mm:ss' }}</span>
+                </td>
                 <td class="text-center">
                   @if (canDeleteReservation(res)) {
                     <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)" title="Elimina prenotazione">
@@ -97,7 +100,10 @@
                     nz-tooltip nzTooltipTitle="Utente Registrato"></span>
                   }
                 </td>
-                <td class="text-muted text-nowrap">{{ res.dataOra | date:'HH:mm:ss' }}</td>
+                <td class="text-nowrap">
+                  <span class="d-block text-muted" style="font-size: 0.75rem;">{{ res.dataOra | date:'dd/MM/yyyy' }}</span>
+                  <span class="d-block text-muted fw-bold" style="font-size: 0.85rem;">{{ res.dataOra | date:'HH:mm:ss' }}</span>
+                </td>
                 <td class="text-center">
                   @if (canDeleteReservation(res)) {
                     <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)" title="Elimina prenotazione">

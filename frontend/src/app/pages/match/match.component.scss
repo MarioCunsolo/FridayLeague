@@ -3,20 +3,40 @@
 }
 
 .add-match-btn {
+    position: fixed;
+    bottom: 2.5rem;
+    right: 2.5rem;
+    z-index: 1050;
     background-color: var(--primary-green) !important;
     border-color: var(--primary-green) !important;
-    color: #000 !important;
-    height: 2.5rem;
-    font-weight: 600;
-    box-shadow: 0 0.25rem 0.625rem rgba(0, 204, 102, 0.3);
-    transition: all 0.3s ease;
+    color: #000000 !important;
+    height: 3rem;
+    padding: 0 1.35rem;
+    font-weight: 700;
+    font-size: 0.92rem;
+    border-radius: 2rem !important;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 204, 102, 0.45);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .add-match-btn:hover {
     background-color: var(--secondary-green) !important;
     border-color: var(--secondary-green) !important;
-    transform: translateY(-0.125rem) scale(1.02);
-    box-shadow: 0 0.5rem 1.25rem rgba(0, 204, 102, 0.4);
+    transform: translateY(-0.25rem) scale(1.04);
+    box-shadow: 0 0.75rem 2rem rgba(0, 204, 102, 0.6);
+}
+
+@media (max-width: 768px) {
+    .add-match-btn {
+        bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+        right: 1.25rem;
+        height: 2.75rem;
+        padding: 0 1.15rem;
+        font-size: 0.85rem;
+    }
 }
 
 .match-card {

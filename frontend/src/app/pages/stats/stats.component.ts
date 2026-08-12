@@ -35,9 +35,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   ]
 })
 export class StatsComponent implements OnInit {
-  private statsService = inject(StatsService);
-  private route = inject(ActivatedRoute);
-  private destroyRef = inject(DestroyRef);
+  private readonly statsService = inject(StatsService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   options = ['GOL', 'ASSIST'];
   activeOption = signal('GOL');
@@ -72,7 +72,29 @@ export class StatsComponent implements OnInit {
     }
   });
 
-  readonly top3 = computed(() => this.activeList().slice(0, 3));
+  /** Ranking competitivo "1224": a parità di valore si condivide la posizione. */
+  readonly rankedList = computed(() => {
+    let previousValue: number | undefined;
+    let rank = 0;
 
-  readonly others = computed(() => this.activeList().slice(3));
+    return this.activeList().map((player, index) => {
+      if (index === 0 || player.value !== previousValue) {
+        rank = index + 1;
+        previousValue = player.value;
+      }
+
+      return { ...player, rank };
+    });
+  });
+
+  readonly top3 = computed(() => this.rankedList().slice(0, 3));
+
+  readonly others = computed(() => this.rankedList().slice(3));
+
+  medalClass(rank: number): 'gold' | 'silver' | 'bronze' | 'standard' {
+    if (rank === 1) return 'gold';
+    if (rank === 2) return 'silver';
+    if (rank === 3) return 'bronze';
+    return 'standard';
+  }
 }

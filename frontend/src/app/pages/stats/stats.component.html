@@ -17,10 +17,11 @@
       <div class="podium-item second">
         <div class="avatar-wrapper">
           <nz-avatar [nzSize]="80" [nzText]="second.avatar" [style.background-color]="second.color"></nz-avatar>
-          <div class="medal silver"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
+          <div [class]="'medal ' + medalClass(second.rank)"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
         </div>
         <div class="podium-info">
           <span class="player-name">{{ second.name }}</span>
+          <span class="podium-rank">#{{ second.rank }}</span>
           <span class="value">{{ second.value }}</span>
         </div>
       </div>
@@ -30,10 +31,11 @@
       <div class="podium-item first">
         <div class="avatar-wrapper">
           <nz-avatar [nzSize]="100" [nzText]="first.avatar" [style.background-color]="first.color"></nz-avatar>
-          <div class="medal gold"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
+          <div [class]="'medal ' + medalClass(first.rank)"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
         </div>
         <div class="podium-info">
           <span class="player-name">{{ first.name }}</span>
+          <span class="podium-rank">#{{ first.rank }}</span>
           <span class="value">{{ first.value }}</span>
         </div>
       </div>
@@ -43,10 +45,11 @@
       <div class="podium-item third">
         <div class="avatar-wrapper">
           <nz-avatar [nzSize]="70" [nzText]="third.avatar" [style.background-color]="third.color"></nz-avatar>
-          <div class="medal bronze"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
+          <div [class]="'medal ' + medalClass(third.rank)"><span nz-icon nzType="trophy" nzTheme="outline"></span></div>
         </div>
         <div class="podium-info">
           <span class="player-name">{{ third.name }}</span>
+          <span class="podium-rank">#{{ third.rank }}</span>
           <span class="value">{{ third.value }}</span>
         </div>
       </div>
@@ -55,9 +58,9 @@
 
     <!-- Others List -->
     <div class="others-list">
-      @for (player of others(); track player.name; let i = $index) {
+      @for (player of others(); track player.name) {
       <div class="list-item">
-        <div class="rank">{{ i + 4 }}</div>
+        <div class="rank">#{{ player.rank }}</div>
         <nz-avatar [nzSize]="40" [nzText]="player.avatar" [style.background-color]="player.color"></nz-avatar>
         <div class="player-details">
           <span class="name">{{ player.name }}</span>

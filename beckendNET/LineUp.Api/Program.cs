@@ -417,26 +417,6 @@ using (var scope = app.Services.CreateScope())
             }
             }
 
-            // Seed default reservations for next scheduled match if no reservations exist yet
-            var nextMatch = dbContext.Partite.FirstOrDefault(p => p.LegaId == league.Id && p.StatoId == StatoPartita.ProgrammataId);
-            if (nextMatch != null && !dbContext.Prenotazioni.Any(pr => pr.PartitaId == nextMatch.Id))
-            {
-            var adminUser = dbContext.Users.FirstOrDefault(u => u.Email == "m@c.com") ?? dbContext.Users.First();
-            var leagueUsers = dbContext.Users.Where(u => u.LegaId == league.Id).Take(10).ToList();
-
-            foreach (var u in leagueUsers)
-            {
-                dbContext.Prenotazioni.Add(new Prenotazione
-                {
-                    PartitaId = nextMatch.Id,
-                    UserId = u.Id,
-                    PrenotatoDaUserId = adminUser.Id,
-                    NomeCognome = $"{u.Nome} {u.Cognome}",
-                    DataOra = DateTime.Now
-                });
-            }
-            dbContext.SaveChanges();
-            }
         }
     }
     catch (Exception ex)

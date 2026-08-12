@@ -111,6 +111,12 @@
     gap: 0.25rem;
 }
 
+.podium-rank {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
 .player-name {
     font-weight: 700;
     font-size: 1rem;
@@ -120,6 +126,7 @@
     text-overflow: ellipsis;
     width: 100%;
 }
+
 
 .player-team {
     font-size: 0.75rem;

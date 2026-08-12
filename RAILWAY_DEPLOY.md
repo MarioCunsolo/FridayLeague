@@ -43,7 +43,7 @@ Il container Angular usa Nginx, gestisce i refresh sulle rotte Angular e legge `
 
 4. Genera il dominio pubblico dell'API. Railway esegue il controllo salute su `/health` come definito in `railway.toml`.
 
-Genera `JwtSettings__TokenKey` localmente con:
+Genera `JwtSettings__TokenKey` localmente con (la chiave HMAC-SHA512 deve avere almeno 64 byte):
 
 ```bash
 openssl rand -base64 48

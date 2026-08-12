@@ -15,10 +15,16 @@ public class TokenService : ITokenService
     {
         _config = config;
         var tokenKey = _config["JwtSettings:TokenKey"];
-        if (string.IsNullOrEmpty(tokenKey))
+        if (string.IsNullOrWhiteSpace(tokenKey))
         {
             throw new ArgumentNullException("JwtSettings:TokenKey", "JWT Key is not configured.");
         }
+
+        if (Encoding.UTF8.GetByteCount(tokenKey) < 64)
+        {
+            throw new ArgumentException("JWT Key must be at least 64 bytes for HMAC-SHA512.", "JwtSettings:TokenKey");
+        }
+
         _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
     }
 

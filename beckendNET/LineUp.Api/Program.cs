@@ -21,9 +21,15 @@ builder.Services.AddDbContext<LineUpDbContext>(options =>
     options.UseMySql(connectionString, serverVersion));
 
 var jwtTokenKey = builder.Configuration["JwtSettings:TokenKey"];
+const int jwtMinimumKeySizeBytes = 64;
 if (string.IsNullOrWhiteSpace(jwtTokenKey))
 {
     throw new InvalidOperationException("JwtSettings:TokenKey deve essere configurata tramite variabile d'ambiente.");
+}
+
+if (Encoding.UTF8.GetByteCount(jwtTokenKey) < jwtMinimumKeySizeBytes)
+{
+    throw new InvalidOperationException($"JwtSettings:TokenKey deve avere almeno {jwtMinimumKeySizeBytes} byte per HMAC-SHA512.");
 }
 
 var allowedCorsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];

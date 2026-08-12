@@ -1,4 +1,14 @@
+declare global {
+  interface Window {
+    __env?: {
+      apiUrl?: string;
+    };
+  }
+}
+
+const runtimeApiUrl = typeof window !== 'undefined' ? window.__env?.apiUrl : undefined;
+
 export const environment = {
   production: true,
-  apiUrl: 'https://api.lineup.it/api'
+  apiUrl: runtimeApiUrl ?? 'https://api.lineup.it/api'
 };

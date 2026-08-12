@@ -20,6 +20,18 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 30));
 builder.Services.AddDbContext<LineUpDbContext>(options =>
     options.UseMySql(connectionString, serverVersion));
 
+var jwtTokenKey = builder.Configuration["JwtSettings:TokenKey"];
+if (string.IsNullOrWhiteSpace(jwtTokenKey))
+{
+    throw new InvalidOperationException("JwtSettings:TokenKey deve essere configurata tramite variabile d'ambiente.");
+}
+
+var allowedCorsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+if (!builder.Environment.IsDevelopment() && allowedCorsOrigins.Length == 0)
+{
+    throw new InvalidOperationException("In produzione deve essere configurata almeno un'origine CORS tramite Cors__AllowedOrigins__0.");
+}
+
 // Register Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthorizationHelper, AuthorizationHelper>();
@@ -42,14 +54,23 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IStatsService, StatsService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 
-// Configure CORS
+// In sviluppo sono consentite le origini locali (inclusi i test da dispositivi mobili).
+// In produzione l'elenco deve essere definito esplicitamente nelle variabili d'ambiente.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.SetIsOriginAllowed(_ => true);
+        }
+        else
+        {
+            policy.WithOrigins(allowedCorsOrigins);
+        }
+
         policy.AllowAnyHeader()
               .AllowAnyMethod()
-              .SetIsOriginAllowed(_ => true)
               .AllowCredentials();
     });
 });
@@ -61,7 +82,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:TokenKey"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtTokenKey)),
             ValidateIssuer = true,
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidateAudience = true,
@@ -168,9 +189,12 @@ using (var scope = app.Services.CreateScope())
             );
         ");
 
-        // Fail-safe: rimuove le vecchie tabelle Teams/Players (modello legacy scollegato dalla Lega, mai popolato)
-        dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Players;");
-        dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Teams;");
+        // La rimozione delle tabelle legacy è consentita solo in sviluppo e deve essere esplicita.
+        if (builder.Configuration.GetValue<bool>("Database:RemoveLegacyTables"))
+        {
+            dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Players;");
+            dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS Teams;");
+        }
 
         // Fail-safe: assicura che la tabella TipiLega esista e sia popolata
         dbContext.Database.ExecuteSqlRaw(@"
@@ -311,23 +335,25 @@ using (var scope = app.Services.CreateScope())
             dbContext.Database.ExecuteSqlRaw("INSERT INTO Ruoli (Id, Nome) VALUES (4, 'SUPER_ADMIN') ON DUPLICATE KEY UPDATE Nome='SUPER_ADMIN';");
         }
 
-        // Seed "Friday League" if it doesn't exist
-        var league = dbContext.Leghe.FirstOrDefault(l => l.Nome == "Friday League");
-        if (league == null)
+        if (builder.Configuration.GetValue<bool>("SeedDemoData"))
         {
-            league = new Lega 
-            { 
-                Nome = "Friday League", 
-                CodiceInvito = "FRIDAY123", 
-                Descrizione = "Lega ufficiale del venerdì" 
-            };
-            dbContext.Leghe.Add(league);
-            dbContext.SaveChanges();
-        }
+            // Seed "Friday League" if it doesn't exist
+            var league = dbContext.Leghe.FirstOrDefault(l => l.Nome == "Friday League");
+            if (league == null)
+            {
+                league = new Lega
+                {
+                    Nome = "Friday League",
+                    CodiceInvito = "FRIDAY123",
+                    Descrizione = "Lega ufficiale del venerdì"
+                };
+                dbContext.Leghe.Add(league);
+                dbContext.SaveChanges();
+            }
 
-        // Seed default users
-        var seedUsers = new List<(string Email, string Nome, string Cognome, int RuoloId)>
-        {
+            // Seed default users
+            var seedUsers = new List<(string Email, string Nome, string Cognome, int RuoloId)>
+            {
             ("s@v.com", "Salvo", "Vitale", 4),      // SUPER_ADMIN
             ("m@c.com", "Mario", "Cunsolo", 1),     // ADMIN
             ("p@db.com", "Player", "Db", 3),        // GIOCATORE
@@ -338,10 +364,10 @@ using (var scope = app.Services.CreateScope())
             ("r.verdi@friday.com", "Roberto", "Verdi", 3),
             ("f.nipotini@friday.com", "Franco", "Nipotini", 3),
             ("g.vanni@friday.com", "Giorgio", "Vanni", 3)
-        };
+            };
 
-        foreach (var u in seedUsers)
-        {
+            foreach (var u in seedUsers)
+            {
             var user = dbContext.Users.FirstOrDefault(x => x.Email == u.Email);
             if (user == null)
             {
@@ -383,12 +409,12 @@ using (var scope = app.Services.CreateScope())
                 userLega.RuoloId = u.RuoloId;
                 dbContext.SaveChanges();
             }
-        }
+            }
 
-        // Seed default reservations for next scheduled match if no reservations exist yet
-        var nextMatch = dbContext.Partite.FirstOrDefault(p => p.LegaId == league.Id && p.StatoId == StatoPartita.ProgrammataId);
-        if (nextMatch != null && !dbContext.Prenotazioni.Any(pr => pr.PartitaId == nextMatch.Id))
-        {
+            // Seed default reservations for next scheduled match if no reservations exist yet
+            var nextMatch = dbContext.Partite.FirstOrDefault(p => p.LegaId == league.Id && p.StatoId == StatoPartita.ProgrammataId);
+            if (nextMatch != null && !dbContext.Prenotazioni.Any(pr => pr.PartitaId == nextMatch.Id))
+            {
             var adminUser = dbContext.Users.FirstOrDefault(u => u.Email == "m@c.com") ?? dbContext.Users.First();
             var leagueUsers = dbContext.Users.Where(u => u.LegaId == league.Id).Take(10).ToList();
 
@@ -404,6 +430,7 @@ using (var scope = app.Services.CreateScope())
                 });
             }
             dbContext.SaveChanges();
+            }
         }
     }
     catch (Exception ex)
@@ -426,6 +453,7 @@ app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.MapControllers();
 
 app.Run();

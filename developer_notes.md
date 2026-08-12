@@ -145,3 +145,16 @@ Il sistema supporta 3 tipologie di competizione per le leghe, memorizzate tramit
 * **Controllo Preventivo**: Leggere e comprendere questo file all'inizio di ogni attività per mantenere intatta la coerenza dell'architettura e dei flussi.
 * **Manutenzione del File**: Se una richiesta introduce modifiche architetturali, aggiornamenti a endpoint chiave, nuovi ruoli o nuovi componenti condivisi, questo file deve essere aggiornato tempestivamente.
 * **SDK .NET**: il repository richiede .NET SDK 10. Il file `global.json` richiede la feature band `10.0.100` e consente l'avanzamento automatico all'ultima feature band stabile di .NET 10 installata.
+
+---
+
+## 11. Deploy Railway
+
+Il deploy Railway usa tre servizi nello stesso ambiente: `mysql` (privato), `api` (ASP.NET Core) e `frontend` (Angular/Nginx). Le configurazioni dei singoli servizi sono co-locate con il codice (`Dockerfile`, `railway.toml` e `.dockerignore`).
+
+* **API**: richiede le variabili `ASPNETCORE_ENVIRONMENT=Production`, `ASPNETCORE_URLS=http://+:${PORT}`, `ConnectionStrings__DefaultConnection`, `JwtSettings__TokenKey` e `Cors__AllowedOrigins__0`. Espone `GET /health` per Railway.
+* **Database**: la connection string usa le variabili referenziate del servizio `mysql` (`MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`), senza esporre il database pubblicamente.
+* **Frontend**: legge `API_URL` al runtime da `assets/runtime-config.js`, generato dall'entrypoint Nginx. Il valore deve essere l'URL pubblico dell'API, completo di `/api`.
+* **Sicurezza produzione**: `SeedDemoData` e `Database__RemoveLegacyTables` devono rimanere `false`; in produzione il CORS viene avviato solo con un'origine esplicita e non è presente alcuna chiave JWT nel repository.
+
+La procedura operativa completa e le variabili da inserire sono documentate in [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md).

@@ -7,10 +7,10 @@ Questo file contiene gli appunti di sviluppo, l'architettura del progetto LineUp
 ## 1. Struttura del Progetto & Tecnologie
 
 Il progetto è suddiviso in due componenti principali:
-* **Backend (.NET Core)**: Situato nella cartella `beckendNET`.
+* **Backend (ASP.NET Core su .NET 10)**: Situato nella cartella `beckendNET`.
   * **API Project**: [LineUp.Api](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api)
   * **Database**: MySQL 8.0 avviato tramite Docker Compose ([docker-compose.yml](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/docker-compose.yml)) sulla porta `3306`.
-* **ORM & Data Types**: Entity Framework Core con connessione MySQL. Le entità **User** e **Lega** (e tutte le chiavi esterne correlate `UserId`, `LegaId`, `EsecutoreId`, `TargetUserId`, `PrenotatoDaUserId`) utilizzano **UUID** (`Guid` in C#, `VARCHAR(36)` in MySQL, `string` in TypeScript) per garantire identificatori univoci e sicurezza dei riferimenti.
+* **ORM & Data Types**: Entity Framework Core 9 con il provider MySQL Pomelo 9, in esecuzione su .NET 10. Pomelo non dispone ancora di una release stabile per EF Core 10: non aggiornare EF Core a 10 né sostituire il provider senza una migrazione dedicata e verificata. Le entità **User** e **Lega** (e tutte le chiavi esterne correlate `UserId`, `LegaId`, `EsecutoreId`, `TargetUserId`, `PrenotatoDaUserId`) utilizzano **UUID** (`Guid` in C#, `VARCHAR(36)` in MySQL, `string` in TypeScript) per garantire identificatori univoci e sicurezza dei riferimenti.
 * **Frontend (Angular)**: Situato nella cartella `frontend`.
   * **Framework**: Angular 21 (standalone components, control flow syntax `@if`, `@for`, ecc.).
   * **UI Library**: Ng-Zorro-Antd (Ant Design per Angular).
@@ -144,4 +144,4 @@ Il sistema supporta 3 tipologie di competizione per le leghe, memorizzate tramit
 
 * **Controllo Preventivo**: Leggere e comprendere questo file all'inizio di ogni attività per mantenere intatta la coerenza dell'architettura e dei flussi.
 * **Manutenzione del File**: Se una richiesta introduce modifiche architetturali, aggiornamenti a endpoint chiave, nuovi ruoli o nuovi componenti condivisi, questo file deve essere aggiornato tempestivamente.
-
+* **SDK .NET**: il repository richiede .NET SDK 10. Il file `global.json` richiede la feature band `10.0.100` e consente l'avanzamento automatico all'ultima feature band stabile di .NET 10 installata.

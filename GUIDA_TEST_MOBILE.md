@@ -1,6 +1,6 @@
 # 📱 Guida per Testare l'Applicazione su Dispositivo Mobile (Wi-Fi Locale)
 
-Questa guida spiega come testare la web app **FridayLeague** (Frontend Angular + Backend .NET 8) direttamente sul tuo smartphone (iOS / Android) collegato alla stessa rete Wi-Fi del tuo computer (**macOS** o **Windows**).
+Questa guida spiega come testare la web app **FridayLeague** (Frontend Angular + Backend .NET 10) direttamente sul tuo smartphone (iOS / Android) collegato alla stessa rete Wi-Fi del tuo computer (**macOS** o **Windows**).
 
 ---
 
@@ -45,7 +45,7 @@ Di default Angular risponde solo su `localhost`. Per abilitare le connessioni da
 
 ---
 
-## ⚙️ Passo 3: Configurare ed Avviare il Backend (.NET 8)
+## ⚙️ Passo 3: Configurare ed Avviare il Backend (.NET 10)
 
 Per fare in modo che l'app sul telefono comunichi con l'API sul computer:
 

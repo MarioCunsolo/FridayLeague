@@ -5,7 +5,7 @@ Questa è una breve guida per configurare e avviare correttamente il progetto su
 ### Prerequisiti
 Assicurati di aver installato:
 - **Docker** e Docker Compose
-- **.NET 8 SDK** (o la versione supportata dal progetto)
+- **.NET 10 SDK** (richiesto dal progetto; verificare con `dotnet --version`)
 - **Node.js** e NPM
 
 ---

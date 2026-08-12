@@ -2,7 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CreateMatchRequest, MatchDto } from '../../models/api/match.models';
+import { CreateMatchRequest, MatchDto, MatchFormData } from '../../models/api/match.models';
 import { LoadState } from '../../models/load-state';
 import { GoalEvent, Match, MatchStatus } from '../../models/interface/match.interface';
 
@@ -65,7 +65,7 @@ export class MatchService {
     return this.http.post<MatchDto>(this.baseUrl, match).pipe(tap(dto => this.upsert(this.toMatch(dto))));
   }
 
-  updateMatch(id: number, match: Partial<CreateMatchRequest>) {
+  updateMatch(id: number, match: MatchFormData) {
     return this.http.put<MatchDto>(`${this.baseUrl}/${id}`, match).pipe(tap(dto => this.upsert(this.toMatch(dto))));
   }
 

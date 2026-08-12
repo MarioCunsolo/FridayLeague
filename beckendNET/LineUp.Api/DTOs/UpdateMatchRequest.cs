@@ -2,10 +2,7 @@ namespace LineUp.Api.DTOs;
 
 public class UpdateMatchRequest
 {
-    public string? HomeTeam { get; set; }
-    public string? AwayTeam { get; set; }
-    public int? HomeScore { get; set; }
-    public int? AwayScore { get; set; }
-    public string? Status { get; set; }
-    public DateTime? Date { get; set; }
+    public string HomeTeam { get; set; } = string.Empty;
+    public string AwayTeam { get; set; } = string.Empty;
+    public DateTime Date { get; set; }
 }

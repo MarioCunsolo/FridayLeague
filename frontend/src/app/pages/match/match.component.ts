@@ -9,7 +9,8 @@ import { Match, MatchStatus } from 'src/app/models/interface/match.interface';
 import { MatchService } from 'src/app/shared/service/match.service';
 import { AuthService } from 'src/app/shared/service/auth.service';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
-import { AddMatchModalComponent, NewMatchData } from './add-match-modal/add-match-modal.component';
+import { AddMatchModalComponent } from './add-match-modal/add-match-modal.component';
+import { MatchFormData } from '../../models/api/match.models';
 
 @Component({
   selector: 'app-match',
@@ -72,7 +73,7 @@ export class MatchComponent {
 
   openAddMatchModal(): void { this.isAddMatchModalVisible.set(true); }
 
-  handleMatchSubmit(newMatch: NewMatchData): void {
+  handleMatchSubmit(newMatch: MatchFormData): void {
     this.matchService.createMatch(newMatch).subscribe({
       next: () => {
         this.message.success('Partita creata con successo!');

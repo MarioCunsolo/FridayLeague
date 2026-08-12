@@ -69,23 +69,33 @@ public class MatchService : IMatchService
         await RichiediAdminAsync(userId, legaId);
 
         var partita = await GetPartitaDellaLegaAsync(matchId, legaId);
-
-        if (!string.IsNullOrWhiteSpace(request.HomeTeam))
+        if (partita.StatoId != StatoPartita.ProgrammataId || partita.DataOra <= DateTime.UtcNow)
         {
-            var squadra = await _proxy.GetOrCreateSquadraAsync(legaId, request.HomeTeam);
-            partita.SquadraCasaId = squadra.Id;
+            throw new BadRequestException("Puoi modificare solo una partita futura ancora programmata.");
         }
 
-        if (!string.IsNullOrWhiteSpace(request.AwayTeam))
+        if (string.IsNullOrWhiteSpace(request.HomeTeam) || string.IsNullOrWhiteSpace(request.AwayTeam))
         {
-            var squadra = await _proxy.GetOrCreateSquadraAsync(legaId, request.AwayTeam);
-            partita.SquadraTrasfertaId = squadra.Id;
+            throw new BadRequestException("Le squadre casa e trasferta sono obbligatorie.");
         }
 
-        if (request.HomeScore.HasValue) partita.GolCasa = request.HomeScore.Value;
-        if (request.AwayScore.HasValue) partita.GolTrasferta = request.AwayScore.Value;
-        if (request.Date.HasValue) partita.DataOra = request.Date.Value;
-        if (!string.IsNullOrWhiteSpace(request.Status)) partita.StatoId = ValidaStatoId(request.Status);
+        if (request.HomeTeam.Trim().Equals(request.AwayTeam.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            throw new BadRequestException("Le squadre casa e trasferta devono essere diverse.");
+        }
+
+        if (request.Date <= DateTime.UtcNow)
+        {
+            throw new BadRequestException("La data della partita deve essere futura.");
+        }
+
+        // La modifica comprende esclusivamente i campi esposti nella modale: squadre e data/ora.
+        var squadraCasa = await _proxy.GetOrCreateSquadraAsync(legaId, request.HomeTeam);
+        var squadraTrasferta = await _proxy.GetOrCreateSquadraAsync(legaId, request.AwayTeam);
+        partita.SquadraCasaId = squadraCasa.Id;
+        partita.SquadraTrasfertaId = squadraTrasferta.Id;
+        partita.DataOra = request.Date;
+        partita.Stagione = request.Date.Year.ToString();
 
         await _proxy.SalvaPartitaAsync();
         return await BuildMatchDtoAsync(partita);

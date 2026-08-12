@@ -31,3 +31,10 @@ export interface CreateMatchRequest {
   date: Date;
   status?: MatchStatus;
 }
+
+/** Campi modificabili dalla modale di creazione/modifica partita. */
+export interface MatchFormData {
+  homeTeam: string;
+  awayTeam: string;
+  date: Date;
+}

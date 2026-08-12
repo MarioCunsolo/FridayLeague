@@ -5,6 +5,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { AddGoalModalComponent } from './add-goal-modal/add-goal-modal.component';
 import { SetupMatchModalComponent } from './setup-match-modal/setup-match-modal.component';
+import { AddMatchModalComponent } from '../../../pages/match/add-match-modal/add-match-modal.component';
+import { MatchFormData } from '../../../models/api/match.models';
 import { MatchService } from '../../service/match.service';
 import { AuthService } from '../../service/auth.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -15,7 +17,7 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
     templateUrl: './match-detail.component.html',
     styleUrls: ['./match-detail.component.scss'],
     standalone: true,
-    imports: [CommonModule, NzButtonModule, NzIconModule, AddGoalModalComponent, SetupMatchModalComponent]
+    imports: [CommonModule, NzButtonModule, NzIconModule, AddGoalModalComponent, SetupMatchModalComponent, AddMatchModalComponent]
 })
 export class MatchDetailComponent {
     private matchService = inject(MatchService);
@@ -32,6 +34,7 @@ export class MatchDetailComponent {
 
     isAddGoalModalVisible = signal(false);
     isSetupModalVisible = signal(false);
+    isEditMatchModalVisible = signal(false);
     isDeleting = signal(false);
     isAnnullando = signal(false);
     isIniziando = signal(false);
@@ -73,6 +76,11 @@ export class MatchDetailComponent {
         return !!m && m.date.getTime() > Date.now() && this.authService.isAdminOrSuperAdmin();
     });
 
+    canEdit = computed<boolean>(() => {
+        const m = this.match();
+        return !!m && m.status === MatchStatus.PROGRAMMATA && m.date.getTime() > Date.now() && this.authService.isAdminOrSuperAdmin();
+    });
+
     canAnnulla = computed<boolean>(() => {
         const status = this.match()?.status;
         return (status === MatchStatus.IN_CORSO || status === MatchStatus.PROGRAMMATA) && this.authService.isAdminOrSuperAdmin();
@@ -100,6 +108,30 @@ export class MatchDetailComponent {
 
     closeDetails() {
         this.close.emit();
+    }
+
+    openEditMatchModal(): void {
+        this.isEditMatchModalVisible.set(true);
+    }
+
+    handleEditMatchSubmit(updatedMatch: MatchFormData): void {
+        const currentMatch = this.match();
+        if (!currentMatch) return;
+
+        this.matchService.updateMatch(currentMatch.id, updatedMatch).subscribe({
+            next: () => {
+                this.message.success('Partita modificata con successo!');
+                this.isEditMatchModalVisible.set(false);
+            },
+            error: error => {
+                this.message.error(error?.error || 'Errore durante la modifica della partita.');
+                this.isEditMatchModalVisible.set(false);
+            }
+        });
+    }
+
+    handleEditMatchCancel(): void {
+        this.isEditMatchModalVisible.set(false);
     }
 
     chiediConfermaEliminazione() {

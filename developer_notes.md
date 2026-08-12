@@ -172,7 +172,7 @@ Creazione e adesione aggiornano l'utente autenticato con la lega attiva. Il codi
 
 Le entità principali sono `Squadra`, `Partita`, `StatoPartitaLookup`, `PartecipantePartita`, `EventoGol` e `Prenotazione`; sono tutte isolate dalla lega attiva. Lo stato partita è `Programmata`, `In Corso`, `Conclusa` o `Annullata`.
 
-- Setup formazioni, inizio, conclusione, annullamento, eliminazione e MOTM sono riservati a `SUPER_ADMIN`/`ADMIN`.
+- Setup formazioni, inizio, conclusione, annullamento, eliminazione e MOTM sono riservati a `SUPER_ADMIN`/`ADMIN`. Le partite future ancora `Programmata` possono essere modificate dagli stessi ruoli tramite la modale riutilizzata della creazione: sono modificabili esclusivamente squadra casa, squadra trasferta e data/ora; punteggio e stato non sono aggiornabili da questo flusso.
 - Un gol può risolvere e aggiungere automaticamente un membro della lega non ancora presente nella formazione.
 - Le classifiche sono calcolate on-the-fly da gol e partecipazioni, filtrabili per stagione. Ogni classifica include tutti i membri attuali della lega attiva: chi non ha ancora gol, assist o MOTM compare con valore `0`. Il client applica il ranking competitivo `1224` (i pari merito condividono la posizione). Colori e iniziali degli avatar sono generati deterministicamente dal backend.
 - Il frontend apre il dettaglio di una partita anche con `?matchId=<id>` e non usa più query del DOM o timeout per farlo.

@@ -12,10 +12,12 @@ namespace LineUp.Api.Controllers;
 public class ReservationsController : ApiControllerBase
 {
     private readonly IReservationService _reservationService;
+    private readonly IWebHostEnvironment _environment;
 
-    public ReservationsController(IReservationService reservationService)
+    public ReservationsController(IReservationService reservationService, IWebHostEnvironment environment)
     {
         _reservationService = reservationService;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -27,10 +29,17 @@ public class ReservationsController : ApiControllerBase
         ExecuteAsync(() => _reservationService.CreateReservationAsync(User.GetUserId(), request));
 
     [HttpDelete("{id}")]
-    public Task<IActionResult> Delete(Guid id) =>
+    public Task<IActionResult> Delete(int id) =>
         ExecuteAsync(() => _reservationService.DeleteReservationAsync(User.GetUserId(), id));
 
     [HttpPost("seed-dummy")]
-    public Task<ActionResult<List<ReservationDto>>> SeedDummy() =>
-        ExecuteAsync(() => _reservationService.SeedDummyReservationsAsync(User.GetUserId()));
+    public Task<ActionResult<List<ReservationDto>>> SeedDummy()
+    {
+        if (!_environment.IsDevelopment())
+        {
+            return Task.FromResult<ActionResult<List<ReservationDto>>>(NotFound());
+        }
+
+        return ExecuteAsync(() => _reservationService.SeedDummyReservationsAsync(User.GetUserId()));
+    }
 }

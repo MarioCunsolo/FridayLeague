@@ -199,7 +199,13 @@ export class SelezionaLegaComponent {
       const squadreVal = tipoLegaId === 2 ? numeroSquadre : null;
       const gironiVal = tipoLegaId === 3 ? numeroGironi : null;
 
-      this.legaService.creaLega(nome!, descrizione, tipoLegaId!, squadreVal, gironiVal).subscribe({
+      this.legaService.creaLega({
+        nomeLega: nome!,
+        descrizione: descrizione || undefined,
+        tipoLegaId: tipoLegaId!,
+        numeroSquadre: squadreVal,
+        numeroGironi: gironiVal
+      }).subscribe({
         next: () => {
           this.loadingCreate.set(false);
           this.message.success('Lega creata con successo!');
@@ -226,7 +232,7 @@ export class SelezionaLegaComponent {
       this.errorMessage.set(null);
       const { codice } = this.joinForm.value;
 
-      this.legaService.partecipaLega(codice!).subscribe({
+      this.legaService.partecipaLega({ codiceLega: codice! }).subscribe({
         next: () => {
           this.loadingJoin.set(false);
           this.message.success('Sei entrato nella lega con successo!');

@@ -12,6 +12,9 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../../../shared/service/auth.service';
 import { LegaService } from '../../../shared/service/lega.service';
 import { ConfirmModalComponent } from '../../../shared/component/confirm-modal/confirm-modal.component';
+import { ParticipantDto } from '../../../models/api/league.models';
+import { LeagueRole, Uuid } from '../../../models/api/core.models';
+import { AuthorizationService } from '../../../shared/service/authorization.service';
 
 @Component({
   selector: 'app-gestisci-partecipanti',
@@ -35,8 +38,9 @@ export class GestisciPartecipantiComponent implements OnInit {
   private legaService = inject(LegaService);
   private message = inject(NzMessageService);
   private viewContainerRef = inject(ViewContainerRef);
+  private authorization = inject(AuthorizationService);
 
-  public partecipanti = signal<any[]>([]);
+  public partecipanti = signal<ParticipantDto[]>([]);
   public loading = signal<boolean>(true);
   public actionLoading = signal<boolean>(false);
 
@@ -64,50 +68,19 @@ export class GestisciPartecipantiComponent implements OnInit {
     }
   }
 
-  getCurrentUserId(): number {
-    return this.authService.currentUser()?.id || 0;
+  getCurrentUserId(): Uuid | null {
+    return this.authService.currentUser()?.id ?? null;
   }
 
-  getCurrentUserRole(): string {
-    const user = this.authService.currentUser();
-    if (!user || !user.legaId || !user.leghe) return 'GIOCATORE';
-    const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
-    return activeLega ? activeLega.ruolo : 'GIOCATORE';
+  canManage(item: ParticipantDto): boolean {
+    return this.authorization.canManageParticipant(this.authService.currentUser(), item);
   }
 
-  canManage(item: any): boolean {
-    const currentUserId = this.getCurrentUserId();
-    const currentUserRole = this.getCurrentUserRole();
-
-    // Non puoi autogestirti
-    if (item.userId === currentUserId) return false;
-    
-    // Nessuno può gestire il SUPER_ADMIN
-    if (item.ruolo === 'SUPER_ADMIN') return false;
-
-    // Se l'utente corrente è SUPER_ADMIN, può gestire chiunque altro (ADMIN, CO_ADMIN, GIOCATORE)
-    if (currentUserRole === 'SUPER_ADMIN') return true;
-
-    // Se l'utente corrente è ADMIN, può gestire solo i CO_ADMIN e i GIOCATORE semplici (non può gestire altri ADMIN o il SUPER_ADMIN)
-    if (currentUserRole === 'ADMIN') {
-      return item.ruolo === 'CO_ADMIN' || item.ruolo === 'GIOCATORE';
-    }
-
-    // Se l'utente corrente è CO_ADMIN, può gestire solo i GIOCATORE semplici
-    if (currentUserRole === 'CO_ADMIN') {
-      return item.ruolo === 'GIOCATORE';
-    }
-
-    return false;
+  canChangeRole(item: ParticipantDto): boolean {
+    return this.authorization.canChangeParticipantRole(this.authService.currentUser(), item);
   }
 
-  canChangeRole(item: any): boolean {
-    if (!this.canManage(item)) return false;
-    const userRole = this.getCurrentUserRole();
-    return userRole === 'SUPER_ADMIN' || userRole === 'ADMIN';
-  }
-
-  onRoleSelectChange(item: any, newRole: string): void {
+  onRoleSelectChange(item: ParticipantDto, newRole: LeagueRole): void {
     if (newRole === item.ruolo) return;
     this.chiediConfermaCambioRuolo(item, newRole);
   }
@@ -147,7 +120,7 @@ export class GestisciPartecipantiComponent implements OnInit {
     });
   }
 
-  chiediConfermaCambioRuolo(item: any, nuovoRuolo: string): void {
+  chiediConfermaCambioRuolo(item: ParticipantDto, nuovoRuolo: LeagueRole): void {
     let title = '';
     let message = '';
     let confirmText = '';
@@ -179,7 +152,7 @@ export class GestisciPartecipantiComponent implements OnInit {
     });
   }
 
-  chiediConfermaRimozione(item: any): void {
+  chiediConfermaRimozione(item: ParticipantDto): void {
     this.openConfirmModal({
       title: 'Rimuovi Partecipante',
       message: `Sei sicuro di voler rimuovere definitivamente ${item.nome} ${item.cognome} da questa lega?`,
@@ -189,13 +162,11 @@ export class GestisciPartecipantiComponent implements OnInit {
     });
   }
 
-  eseguiCambioRuolo(item: any, nuovoRuolo: string): void {
+  eseguiCambioRuolo(item: ParticipantDto, nuovoRuolo: LeagueRole): void {
     const user = this.authService.currentUser();
     if (!user || !user.legaId || !this.canManage(item)) return;
 
-    // Controllo di sicurezza client-side: Solo SUPER_ADMIN e ADMIN possono modificare i ruoli
-    const ruoloUtente = this.getCurrentUserRole();
-    if (ruoloUtente !== 'SUPER_ADMIN' && ruoloUtente !== 'ADMIN') {
+    if (!this.authorization.canChangeParticipantRole(user, item)) {
       this.message.error('Solo il super admin o gli admin della lega possono modificare i ruoli.');
       return;
     }
@@ -216,13 +187,11 @@ export class GestisciPartecipantiComponent implements OnInit {
     });
   }
 
-  rimuoviPartecipante(item: any): void {
+  rimuoviPartecipante(item: ParticipantDto): void {
     const user = this.authService.currentUser();
     if (!user || !user.legaId || !this.canManage(item)) return;
 
-    // Controllo di sicurezza client-side: Solo SUPER_ADMIN, ADMIN e CO_ADMIN possono rimuovere
-    const ruoloUtente = this.getCurrentUserRole();
-    if (ruoloUtente !== 'SUPER_ADMIN' && ruoloUtente !== 'ADMIN' && ruoloUtente !== 'CO_ADMIN') {
+    if (!this.authorization.canManageParticipant(user, item)) {
       this.message.error('Non hai i permessi per rimuovere partecipanti da questa lega.');
       return;
     }
@@ -242,7 +211,7 @@ export class GestisciPartecipantiComponent implements OnInit {
     });
   }
 
-  getRoleColor(ruolo: string): string {
+  getRoleColor(ruolo: LeagueRole): string {
     switch (ruolo) {
       case 'SUPER_ADMIN':
         return '#722ed1'; // Viola premium

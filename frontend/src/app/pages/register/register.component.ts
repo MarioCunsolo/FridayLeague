@@ -49,10 +49,10 @@ export class RegisterComponent {
   submitForm(): void {
     if (this.registerForm.valid) {
       this.errorMessage.set(null);
-      this.authService.register(this.registerForm.value).subscribe({
+      this.authService.register(this.registerForm.getRawValue()).subscribe({
         next: () => {
-          // Reindirizza al login passando il parametro di successo
-          this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
+          // Il backend restituisce già una sessione valida: evitare un secondo login incoerente.
+          this.router.navigate(['/seleziona-lega']);
         },
         error: (err) => {
           console.error('Registration failed', err);

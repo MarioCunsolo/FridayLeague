@@ -13,10 +13,12 @@
           (click)="openAddOthersModal(modalTpl)">
           PRENOTA ALTRE PERSONE
         </button>
+        @if (isDevelopment) {
         <button nz-button nzType="default" nzBlock class="mt-2 text-success border-success"
           (click)="popolaFittizie()">
           <i class="fa fa-users me-1"></i> POPOLA PRENOTAZIONI FITTIZIE (10 GIOCATORI)
         </button>
+        }
         <p class="text-center text-muted small mt-2 mb-0">
           Le prenotazioni aprono Domenica alle 17:00
         </p>
@@ -31,7 +33,7 @@
                 <input nz-input class="custom-input" formControlName="nomeCognome" placeholder="Nome e Cognome"
                   id="person-name" [nzAutocomplete]="auto" />
                 <nz-autocomplete #auto>
-                  @for (option of filteredOptions; track option.id) {
+                  @for (option of filteredOptions(); track option.id) {
                   <nz-auto-option [nzValue]="option.nomeCognome">{{ option.nomeCognome }}</nz-auto-option>
                   }
                 </nz-autocomplete>
@@ -58,7 +60,7 @@
               <tr class="section-header-row">
                 <td colspan="3" class="section-divider-text">TITOLARI ({{ starters().length }}/14)</td>
               </tr>
-              @for (res of starters(); track $index) {
+              @for (res of starters(); track res.id) {
               <tr>
                 <td class="fw-bold text-nowrap">
                   <span class="position-badge starter-badge">{{ $index + 1 }}</span>
@@ -89,7 +91,7 @@
                 <td colspan="3" class="section-divider-text substitute-title">SOSTITUTI ({{ substitutes().length }})
                 </td>
               </tr>
-              @for (res of substitutes(); track $index) {
+              @for (res of substitutes(); track res.id) {
               <tr class="substitute-row">
                 <td class="fw-bold text-nowrap">
                   <span class="position-badge substitute-badge">{{ $index + 15 }}</span>

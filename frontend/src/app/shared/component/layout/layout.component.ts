@@ -1,4 +1,4 @@
-import { Component, signal, effect, inject } from '@angular/core';
+import { Component, DestroyRef, DOCUMENT, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -6,6 +6,9 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { AuthService } from '../../service/auth.service';
 import { LegaService } from '../../service/lega.service';
 import { MatchService } from '../../service/match.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Uuid } from '../../../models/api/core.models';
 
 @Component({
   selector: 'app-layout',
@@ -19,9 +22,13 @@ export class LayoutComponent {
   private legaService = inject(LegaService);
   private matchService = inject(MatchService);
   private router = inject(Router);
+  private document = inject(DOCUMENT);
+  private message = inject(NzMessageService);
+  private destroyRef = inject(DestroyRef);
 
   currentTheme = signal<'dark' | 'light'>('dark');
   isMobileMenuOpen = signal<boolean>(false);
+  isChangingLeague = signal(false);
 
   toggleMobileMenu() {
     this.isMobileMenuOpen.update(open => !open);
@@ -34,7 +41,7 @@ export class LayoutComponent {
   constructor() {
     // Apply theme to the DOM whenever the signal changes
     effect(() => {
-      document.documentElement.setAttribute('data-theme', this.currentTheme());
+      this.document.documentElement.setAttribute('data-theme', this.currentTheme());
     });
 
     // Sync theme from logged-in user profile (highest priority),
@@ -53,7 +60,7 @@ export class LayoutComponent {
     effect(() => {
       const legaId = this.authService.currentUser()?.legaId;
       if (legaId) {
-        this.matchService.loadMatches().subscribe();
+        this.matchService.loadMatches().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
       }
     });
   }
@@ -69,10 +76,19 @@ export class LayoutComponent {
     }
   }
 
-  onLeagueChange(idLega: string): void {
-    this.legaService.cambiaLega(idLega);
-    // Reindirizziamo alla homepage per rinfrescare i dati della lega attiva
-    this.router.navigate(['/home']);
+  onLeagueChange(idLega: Uuid): void {
+    if (this.isChangingLeague() || idLega === this.authService.currentUser()?.legaId) return;
+    this.isChangingLeague.set(true);
+    this.legaService.cambiaLega(idLega).subscribe({
+      next: () => {
+        this.isChangingLeague.set(false);
+        this.router.navigate(['/home']);
+      },
+      error: () => {
+        this.isChangingLeague.set(false);
+        this.message.error('Impossibile cambiare lega. Riprova.');
+      }
+    });
   }
 
   logout() {

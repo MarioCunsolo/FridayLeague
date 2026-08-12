@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { AuthService } from '../../shared/service/auth.service';
+import { AuthorizationService } from '../../shared/service/authorization.service';
 
 @Component({
   selector: 'app-impostazioni-lega',
@@ -13,22 +14,14 @@ import { AuthService } from '../../shared/service/auth.service';
 })
 export class ImpostazioniLegaComponent {
   public authService = inject(AuthService);
-
-  constructor() {
-    console.log('DEBUG [ImpostazioniLega]: Current User:', this.authService.currentUser());
-    console.log('DEBUG [ImpostazioniLega]: Active League:', this.getActiveLega());
-  }
+  private readonly authorization = inject(AuthorizationService);
+  readonly activeLega = computed(() => {
+    const user = this.authService.currentUser();
+    return user?.legaId ? user.leghe.find(league => league.id === user.legaId) ?? null : null;
+  });
 
   isAdminOrSuperAdmin(): boolean {
-    const user = this.authService.currentUser();
-    if (!user || !user.legaId || !user.leghe) return false;
-    const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
-    return activeLega && (activeLega.ruolo === 'SUPER_ADMIN' || activeLega.ruolo === 'ADMIN');
+    return this.authorization.canViewActivityLog(this.authService.currentUser());
   }
 
-  getActiveLega(): any {
-    const user = this.authService.currentUser();
-    if (!user || !user.legaId || !user.leghe) return null;
-    return user.leghe.find((l: any) => l.id === user.legaId);
-  }
 }

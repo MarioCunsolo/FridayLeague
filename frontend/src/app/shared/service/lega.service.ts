@@ -2,90 +2,52 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { ActivityLogDto, ParticipantDto } from '../../models/api/league.models';
+import { CreateLeagueRequest, JoinLeagueRequest, UserDto } from '../../models/api/auth.models';
+import { LeagueRole, Uuid } from '../../models/api/core.models';
 import { AuthService } from './auth.service';
+import { MatchService } from './match.service';
+import { ReservationService } from './reservation.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class LegaService {
-  private http = inject(HttpClient);
-  private authService = inject(AuthService);
-  private readonly BASE_URL = `${environment.apiUrl}/auth`;
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+  private readonly matchService = inject(MatchService);
+  private readonly reservationService = inject(ReservationService);
+  private readonly baseUrl = `${environment.apiUrl}/auth`;
 
-  /**
-   * Crea una nuova lega nel backend.
-   */
-  creaLega(nomeLega: string, descrizione?: string, tipoLegaId: number = 1, numeroSquadre?: number | null, numeroGironi?: number | null) {
-    return this.http.post<any>(`${this.BASE_URL}/crea-lega`, {
-      nomeLega,
-      descrizione,
-      tipoLegaId,
-      numeroSquadre,
-      numeroGironi
-    }).pipe(
+  creaLega(request: CreateLeagueRequest) {
+    return this.http.post<UserDto>(`${this.baseUrl}/crea-lega`, request).pipe(tap(user => this.authService.updateCurrentUser(user)));
+  }
+
+  partecipaLega(request: JoinLeagueRequest) {
+    return this.http.post<UserDto>(`${this.baseUrl}/partecipa-lega`, request).pipe(tap(user => this.authService.updateCurrentUser(user)));
+  }
+
+  cambiaLega(idLega: Uuid) {
+    return this.http.post<UserDto>(`${this.baseUrl}/cambia-lega`, { idLega }).pipe(
       tap(user => {
+        this.matchService.clear();
+        this.reservationService.clear();
         this.authService.updateCurrentUser(user);
       })
     );
   }
 
-  /**
-   * Partecipa ad una lega esistente tramite codice.
-   */
-  partecipaLega(codiceLega: string) {
-    return this.http.post<any>(`${this.BASE_URL}/partecipa-lega`, { codiceLega }).pipe(
-      tap(user => {
-        this.authService.updateCurrentUser(user);
-      })
-    );
+  getLegaPartecipanti(legaId: Uuid) {
+    return this.http.get<ParticipantDto[]>(`${this.baseUrl}/lega/${legaId}/partecipanti`);
   }
 
-  /**
-   * Cambia la lega attualmente attiva.
-   */
-  cambiaLega(idLega: string) {
-    this.http.post<any>(`${this.BASE_URL}/cambia-lega`, { idLega }).subscribe({
-      next: user => {
-        this.authService.updateCurrentUser(user);
-      },
-      error: err => {
-        console.error('Errore durante il cambio della lega', err);
-      }
-    });
+  cambiaRuoloPartecipante(legaId: Uuid, targetUserId: Uuid, nuovoRuolo: LeagueRole) {
+    return this.http.post<void>(`${this.baseUrl}/lega/cambia-ruolo-partecipante`, { legaId, targetUserId, nuovoRuolo });
   }
 
-  /**
-   * Recupera la lista dei partecipanti di una lega.
-   */
-  getLegaPartecipanti(legaId: string) {
-    return this.http.get<any[]>(`${this.BASE_URL}/lega/${legaId}/partecipanti`);
+  rimuoviPartecipante(legaId: Uuid, targetUserId: Uuid) {
+    return this.http.post<void>(`${this.baseUrl}/lega/rimuovi-partecipante`, { legaId, targetUserId });
   }
 
-  /**
-   * Modifica il ruolo di un partecipante.
-   */
-  cambiaRuoloPartecipante(legaId: string, targetUserId: string, nuovoRuolo: string) {
-    return this.http.post<void>(`${this.BASE_URL}/lega/cambia-ruolo-partecipante`, {
-      legaId,
-      targetUserId,
-      nuovoRuolo
-    });
-  }
-
-  /**
-   * Rimuove un partecipante dalla lega.
-   */
-  rimuoviPartecipante(legaId: string, targetUserId: string) {
-    return this.http.post<void>(`${this.BASE_URL}/lega/rimuovi-partecipante`, {
-      legaId,
-      targetUserId
-    });
-  }
-
-  /**
-   * Recupera il registro attività di una lega.
-   */
-  getRegistroAttivita(legaId: string) {
-    return this.http.get<any[]>(`${this.BASE_URL}/lega/${legaId}/registri-attivita`);
+  getRegistroAttivita(legaId: Uuid) {
+    return this.http.get<ActivityLogDto[]>(`${this.baseUrl}/lega/${legaId}/registri-attivita`);
   }
 }

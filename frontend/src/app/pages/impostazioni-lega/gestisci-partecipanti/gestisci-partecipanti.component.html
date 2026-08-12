@@ -56,9 +56,7 @@
                   [nzDropdownMatchSelectWidth]="false">
                   <nz-option nzValue="GIOCATORE" nzLabel="GIOCATORE"></nz-option>
                   <nz-option nzValue="CO_ADMIN" nzLabel="CO_ADMIN"></nz-option>
-                  @if (getCurrentUserRole() === 'SUPER_ADMIN' || getCurrentUserRole() === 'ADMIN') {
-                    <nz-option nzValue="ADMIN" nzLabel="ADMIN"></nz-option>
-                  }
+                  <nz-option nzValue="ADMIN" nzLabel="ADMIN"></nz-option>
                 </nz-select>
               } @else {
                 <nz-tag [nzColor]="getRoleColor(item.ruolo)" class="role-tag">

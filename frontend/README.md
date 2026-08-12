@@ -1,27 +1,40 @@
-# Angular16Base
+# LineUp frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.14.
+Frontend Angular 21 dell'applicazione LineUp. Usa componenti standalone, Signals, Ng-Zorro e una configurazione runtime dell'API per Railway.
 
-## Development server
+## Requisiti
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Node.js 22 o superiore
+- npm
+- Backend API in esecuzione su `http://localhost:8080` in locale
 
-## Code scaffolding
+## Avvio locale
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm ci
+npm start
+```
 
-## Build
+L'app è disponibile su `http://localhost:4200`. In sviluppo l'API è costruita automaticamente con l'host corrente e porta `8080`.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Comandi di qualità
 
-## Running unit tests
+```bash
+npm run typecheck
+npm run test:ci
+npm run build:production
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Architettura
 
-## Running end-to-end tests
+- `src/app/app.config.ts`: provider applicativi, inizializzazione sessione e router.
+- `src/app/app.routes.ts`: rotte standalone lazy-loaded.
+- `src/app/models/api`: contratti TypeScript che rispecchiano i DTO .NET.
+- `src/app/shared/service`: servizi API, sessione, autorizzazioni e stato di dominio.
+- `src/app/pages`: feature e pagine dell'interfaccia.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Gli identificativi di utenti e leghe sono UUID, quindi `string` in TypeScript. Ogni dato di dominio è associato alla lega attiva.
 
-## Further help
+## Railway
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+In produzione Nginx genera `assets/runtime-config.js` usando `API_URL`. Il valore deve essere l'URL pubblico dell'API completo di `/api`; non inserire segreti o token JWT in questa variabile.

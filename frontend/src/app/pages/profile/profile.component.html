@@ -26,7 +26,7 @@
             class="season-select"
             nzSize="large"
             [nzSuffixIcon]="'down-circle'">
-            @for (season of availableSeasons; track season) {
+            @for (season of availableSeasons(); track season) {
               <nz-option [nzValue]="season" [nzLabel]="season"></nz-option>
             }
           </nz-select>

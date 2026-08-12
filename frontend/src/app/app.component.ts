@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DOCUMENT, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -6,23 +6,32 @@ import { RouterOutlet } from '@angular/router';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     standalone: true,
-    imports: [RouterOutlet]
+    imports: [RouterOutlet],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit {
-  title = 'angular16-base';
+export class AppComponent implements OnInit, OnDestroy {
+  private readonly document = inject(DOCUMENT);
+  private preventMobileKeyboard?: (event: Event) => void;
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
-      const preventMobileKeyboard = (e: Event) => {
+      this.preventMobileKeyboard = (e: Event) => {
         const target = e.target as HTMLElement;
         if (target && target.matches('.ant-picker-input input, .ant-picker input, input.ant-calendar-picker-input')) {
           target.setAttribute('inputmode', 'none');
           target.setAttribute('readonly', 'readonly');
         }
       };
-      document.addEventListener('focusin', preventMobileKeyboard, true);
-      document.addEventListener('touchstart', preventMobileKeyboard, true);
-      document.addEventListener('click', preventMobileKeyboard, true);
+      this.document.addEventListener('focusin', this.preventMobileKeyboard, true);
+      this.document.addEventListener('touchstart', this.preventMobileKeyboard, true);
+      this.document.addEventListener('click', this.preventMobileKeyboard, true);
     }
+  }
+
+  ngOnDestroy(): void {
+    if (!this.preventMobileKeyboard) return;
+    this.document.removeEventListener('focusin', this.preventMobileKeyboard, true);
+    this.document.removeEventListener('touchstart', this.preventMobileKeyboard, true);
+    this.document.removeEventListener('click', this.preventMobileKeyboard, true);
   }
 }

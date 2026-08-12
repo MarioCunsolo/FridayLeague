@@ -35,12 +35,12 @@ Il progetto è suddiviso in due componenti principali:
 * **Creazione (Login)**: Durante il login, l'utente può selezionare la spunta **"Ricordami"**.
   * Se selezionata (`remember: true`), il token viene salvato in `localStorage` per persistere alla chiusura del browser.
   * Se non selezionata (`remember: false`), il token viene salvato in `sessionStorage` (rimane attivo durante i refresh ma si cancella alla chiusura della scheda/browser).
-* **Inizializzazione all'Avvio (`APP_INITIALIZER`)**:
-  * All'avvio dell'app Angular, `main.ts` esegue il metodo `initSession()` di `AuthService`.
+* **Inizializzazione all'Avvio (`provideAppInitializer`)**:
+  * All'avvio dell'app Angular, `app.config.ts` esegue il metodo `initSession()` di `AuthService` tramite `provideAppInitializer`.
   * Questo carica asincronamente i dettagli dell'utente (`getCurrentUser()`) *prima* che l'app esegua il bootstrap ed esamini le guardie delle rotte.
   * **Importante**: Evita problemi di razza (race conditions) per cui l'utente veniva erroneamente buttato fuori o reindirizzato a `/seleziona-lega` al refresh.
 * **Intercettore HTTP (`authInterceptor`)**:
-  * Legge direttamente il token JWT da `localStorage` o `sessionStorage` (senza iniettare `AuthService` per evitare dipendenze circolari all'avvio) e lo appende all'header `Authorization: Bearer <token>`.
+  * Legge il token da `TokenStorageService`/storage e lo appende all'header `Authorization: Bearer <token>` solo alle richieste dirette verso `environment.apiUrl`, evitando di inviarlo a CDN o host esterni.
 * **Logout**:
   * Il metodo `logout()` di `AuthService` distrugge il token e la configurazione della lega attiva sia in `localStorage` che in `sessionStorage`.
 
@@ -109,7 +109,7 @@ Introdotto seguendo il Repository Pattern descritto in [ARCHITECTURE.md](beckend
 * **Imposta Partita & Gestione Formazioni**: la funzionalità di impostazione formazioni da prenotazioni (`POST /api/matches/{id}/setup-lineup`), l'avvio partita (`PUT /api/matches/{id}/inizia`), la conclusione anticipata (`PUT /api/matches/{id}/concludi`), l'eliminazione ed l'annullamento della partita nella schermata di dettaglio sono **riservati esclusivamente ai ruoli `SUPER_ADMIN` e `ADMIN`** (`isAdminOrSuperAdmin()`).
 * **Avvio Partita & Registrazione Goal**: cliccando su **"Inizia Partita"**, lo stato passa da `Programmata` a `In Corso`. Quando la partita è `In Corso`, compaiono i pulsanti per aggiungere i goal (`POST /api/matches/{id}/goals`) ed il pulsante **"Concludi Partita"** (`PUT /api/matches/{id}/concludi`) per terminarla anticipatamente prima del timeout di 2 ore.
 * **Risoluzione automatica dei partecipanti**: quando viene registrato un gol (`POST /api/matches/{id}/goals`) con un nome che non è ancora nella formazione della partita, il sistema cerca un membro della lega con quel nome e lo aggiunge automaticamente come partecipante (lato marcatore/assist).
-* **Prenotazioni**: sempre riferite alla prossima partita con Stato `Programmata` della lega attiva (risolta lato server, il client non specifica l'ID partita). Finestra di prenotazione (sabato intero + domenica fino alle 17:00) validata sia FE (`isReservationDisabled`) che BE (`ReservationService.ValidaFinestraPrenotazione`).
+* **Prenotazioni**: sempre riferite alla prossima partita con Stato `Programmata` della lega attiva (risolta lato server, il client non specifica l'ID partita). Finestra di prenotazione (sabato intero + domenica fino alle 17:00) validata sia FE (`isReservationDisabled`) che BE (`ReservationService.ValidaFinestraPrenotazione`). La cancellazione usa l'ID numerico della prenotazione (`DELETE /api/reservations/{reservationId}`), con verifica lato server che la prenotazione appartenga alla partita programmata della lega attiva: ciò supporta anche prenotazioni con nome libero e senza `UserId`.
 * **MOTM**: un solo Man of the Match per partita (`PUT /api/matches/{id}/motm`, riservato ad ADMIN/SUPER_ADMIN). Endpoint predisposto ma non ancora collegato a un pulsante nel frontend.
 * **Classifiche/Statistiche**: calcolate on-the-fly (nessuna tabella aggregata) da `EventoGol`/`PartecipantePartita`, filtrabili per stagione. Colore e iniziali avatar sono generati deterministicamente lato BE (`PlayerDisplayExtensions`), non persistiti.
 * **Nota migrazione DB**: non essendo in uso EF Core Migrations, le nuove tabelle vengono create in `Program.cs` con `CREATE TABLE IF NOT EXISTS` (stesso pattern già usato per `ActivityLogs`). Se si aggiungono nuove entità, aggiornare sia `OnModelCreating` che questo blocco fail-safe.
@@ -145,6 +145,7 @@ Il sistema supporta 3 tipologie di competizione per le leghe, memorizzate tramit
 * **Controllo Preventivo**: Leggere e comprendere questo file all'inizio di ogni attività per mantenere intatta la coerenza dell'architettura e dei flussi.
 * **Manutenzione del File**: Se una richiesta introduce modifiche architetturali, aggiornamenti a endpoint chiave, nuovi ruoli o nuovi componenti condivisi, questo file deve essere aggiornato tempestivamente.
 * **SDK .NET**: il repository richiede .NET SDK 10. Il file `global.json` richiede la feature band `10.0.100` e consente l'avanzamento automatico all'ultima feature band stabile di .NET 10 installata.
+* **Frontend moderno**: il bootstrap usa `app.config.ts`, `provideAppInitializer` e `app.routes.ts`. Le pagine standalone sono lazy-loaded e i contratti API sono in `frontend/src/app/models/api`; UUID sono sempre `string`. I permessi frontend sono centralizzati in `AuthorizationService`, mentre la validazione backend rimane l'autorità finale.
 
 ---
 

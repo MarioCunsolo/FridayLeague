@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal, OnInit, effect } from '@angular/core';
+import { Component, DestroyRef, inject, computed, signal, OnInit, effect } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatchService } from 'src/app/shared/service/match.service';
 import { StatsService } from 'src/app/shared/service/stats.service';
@@ -8,6 +8,7 @@ import { DatePipe, TitleCasePipe, CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { PlayerStats } from 'src/app/models/interface/player-stats.interface';
 import { UserStats } from 'src/app/models/interface/user-stats.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-homepage',
@@ -22,6 +23,7 @@ export class HomepageComponent implements OnInit {
   private playerService = inject(PlayerService);
   private router = inject(Router);
   public authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   scorers = signal<PlayerStats[]>([]);
   assists = signal<PlayerStats[]>([]);
@@ -61,7 +63,7 @@ export class HomepageComponent implements OnInit {
     effect(() => {
       const user = this.authService.currentUser();
       if (user?.id) {
-        this.playerService.getPlayerStats(user.id).subscribe({
+        this.playerService.getPlayerStats(user.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: (stats) => this.userStats.set(stats),
           error: () => this.userStats.set([])
         });
@@ -70,12 +72,14 @@ export class HomepageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.statsService.getScorers().subscribe({
+    this.matchService.loadMatches().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+
+    this.statsService.getScorers().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => this.scorers.set(data),
       error: () => this.scorers.set([])
     });
 
-    this.statsService.getAssists().subscribe({
+    this.statsService.getAssists().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => this.assists.set(data),
       error: () => this.assists.set([])
     });

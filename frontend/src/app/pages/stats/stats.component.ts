@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -10,10 +10,12 @@ import { trigger, transition, style, animate, keyframes } from '@angular/animati
 
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-stats',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, NzSegmentedModule, NzIconModule, NzAvatarModule],
   templateUrl: './stats.component.html',
   styleUrls: ['./stats.component.scss'],
@@ -35,6 +37,7 @@ import { ActivatedRoute } from '@angular/router';
 export class StatsComponent implements OnInit {
   private statsService = inject(StatsService);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   options = ['GOL', 'ASSIST'];
   activeOption = signal('GOL');
@@ -43,7 +46,7 @@ export class StatsComponent implements OnInit {
   assists = signal<PlayerStats[]>([]);
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['tab']) {
         const tabUpper = params['tab'].toUpperCase();
         if (this.options.includes(tabUpper)) {
@@ -61,19 +64,15 @@ export class StatsComponent implements OnInit {
     this.activeOption.set(selected);
   }
 
-  get activeList() {
+  readonly activeList = computed(() => {
     switch (this.activeOption()) {
       case 'GOL': return this.scorers();
       case 'ASSIST': return this.assists();
       default: return this.scorers();
     }
-  }
+  });
 
-  get top3() {
-    return this.activeList.slice(0, 3);
-  }
+  readonly top3 = computed(() => this.activeList().slice(0, 3));
 
-  get others() {
-    return this.activeList.slice(3);
-  }
+  readonly others = computed(() => this.activeList().slice(3));
 }

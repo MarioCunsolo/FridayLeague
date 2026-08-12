@@ -58,9 +58,10 @@ export class LoginComponent {
   submitForm(): void {
     if (this.loginForm.valid) {
       this.errorMessage.set(null);
-      this.authService.login(this.loginForm.value).subscribe({
+      this.authService.login(this.loginForm.getRawValue()).subscribe({
         next: () => {
-          this.router.navigate(['/home']);
+          // Sostituisce la route di login dopo che AuthService ha pubblicato l'utente.
+          void this.router.navigateByUrl('/home', { replaceUrl: true });
         },
         error: (err) => {
           console.error('Login failed', err);

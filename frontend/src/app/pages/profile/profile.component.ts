@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, computed, inject, effect, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
 import { UserStats } from 'src/app/models/interface/user-stats.interface';
@@ -7,30 +7,32 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { AuthService } from 'src/app/shared/service/auth.service';
 import { PlayerService } from 'src/app/shared/service/player.service';
 import { MatchService } from 'src/app/shared/service/match.service';
+import { AuthorizationService } from 'src/app/shared/service/authorization.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
   standalone: true,
-  imports: [CommonModule, MatchDetailComponent, NzSelectModule, FormsModule]
+  imports: [CommonModule, MatchDetailComponent, NzSelectModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileComponent {
   public authService = inject(AuthService);
   private playerService = inject(PlayerService);
   private matchService = inject(MatchService);
+  private authorization = inject(AuthorizationService);
+  private destroyRef = inject(DestroyRef);
 
   showMatchDetails = signal(false);
 
-  availableSeasons = ['2024', '2025', '2026'];
-  selectedSeason = signal('2026');
+  availableSeasons = this.matchService.availableSeasons;
+  selectedSeason = signal(String(new Date().getFullYear()));
 
   // Calcolo del ruolo attivo nella lega
   userRuolo = computed(() => {
-    const user = this.authService.currentUser();
-    if (!user || !user.legaId || !user.leghe) return 'GIOCATORE';
-    const activeLega = user.leghe.find((l: any) => l.id === user.legaId);
-    return activeLega ? activeLega.ruolo : 'GIOCATORE';
+    return this.authorization.activeRole(this.authService.currentUser()) ?? 'GIOCATORE';
   });
 
   userStats = signal<UserStats[]>([]);
@@ -41,14 +43,14 @@ export class ProfileComponent {
       const season = this.selectedSeason();
       if (!userId) return;
 
-      this.playerService.getPlayerStats(userId, season).subscribe(stats => {
+      this.playerService.getPlayerStats(userId, season).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(stats => {
         this.userStats.set(stats);
       });
     });
   }
 
   onSeasonChange(index: number | string) {
-    const season = typeof index === 'number' ? this.availableSeasons[index] : index;
+    const season = typeof index === 'number' ? this.availableSeasons()[index] : index;
     this.selectedSeason.set(season);
   }
 

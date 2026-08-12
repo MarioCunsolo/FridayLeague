@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
 
 /**
@@ -7,12 +7,12 @@ import { AuthService } from '../service/auth.service';
  * Se l'utente non ha una lega attiva, viene reindirizzato a '/seleziona-lega'.
  * Se l'utente ha già una lega attiva e cerca di accedere a '/seleziona-lega', viene reindirizzato a '/'.
  */
-export const leagueGuard = (route: any, state: any) => {
+export const leagueGuard: CanActivateFn = (_route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
   const currentUser = authService.currentUser();
-  const hasLeague = currentUser && currentUser.legaId !== null && currentUser.legaId !== undefined;
+  const hasLeague = currentUser?.legaId !== null && currentUser?.legaId !== undefined;
   const isTargetingSelectLeague = state.url.startsWith('/seleziona-lega');
 
   if (!hasLeague) {

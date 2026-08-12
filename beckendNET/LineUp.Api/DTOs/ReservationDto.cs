@@ -6,6 +6,7 @@ public class ReservationDto
     public string NomeCognome { get; set; } = string.Empty;
     public DateTime DataOra { get; set; }
     public Guid? PlayerId { get; set; }
+    public Guid PrenotatoDaUserId { get; set; }
 }
 
 public class CreateReservationRequest

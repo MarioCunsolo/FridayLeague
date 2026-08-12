@@ -1,12 +1,13 @@
-import { Component, output } from '@angular/core';
+import { Component, DestroyRef, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ReactiveFormsModule, NonNullableFormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { MatchStatus } from '../../../models/interface/match.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface NewMatchData {
   homeTeam: string;
@@ -31,7 +32,6 @@ function squadreDiverseValidator(control: AbstractControl): ValidationErrors | n
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
     NzFormModule,
     NzInputModule,
@@ -46,26 +46,26 @@ export class AddMatchModalComponent {
   submit = output<NewMatchData>();
   cancel = output<void>();
 
-  matchForm: FormGroup;
+  private readonly fb = inject(NonNullableFormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly matchForm = this.fb.group({
+    homeTeam: ['', [Validators.required]],
+    awayTeam: ['', [Validators.required, squadreDiverseValidator]],
+    date: [null as Date | null, [Validators.required]]
+  });
   isConfirmLoading = false;
 
-  constructor(private fb: FormBuilder) {
-    this.matchForm = this.fb.group({
-      homeTeam: [null, [Validators.required]],
-      awayTeam: [null, [Validators.required, squadreDiverseValidator]],
-      date: [null, [Validators.required]]
-    });
-
+  constructor() {
     // Il validatore su awayTeam confronta col valore di homeTeam: va ricalcolato quando homeTeam cambia
-    this.matchForm.get('homeTeam')?.valueChanges.subscribe(() => {
-      this.matchForm.get('awayTeam')?.updateValueAndValidity({ onlySelf: true });
-    });
+    this.matchForm.controls.homeTeam.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() =>
+      this.matchForm.controls.awayTeam.updateValueAndValidity({ onlySelf: true }));
   }
 
   handleOk(): void {
     if (this.matchForm.valid) {
       this.isConfirmLoading = true;
-      const value = this.matchForm.value;
+      const value = this.matchForm.getRawValue();
+      if (!value.date) return;
       this.submit.emit({
         homeTeam: value.homeTeam.trim(),
         awayTeam: value.awayTeam.trim(),

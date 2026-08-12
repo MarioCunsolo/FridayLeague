@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular16-base": {
+    "lineup-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -18,7 +18,7 @@
           "builder": "@angular/build:application",
           "options": {
             "outputPath": {
-              "base": "dist/angular16-base"
+              "base": "dist/lineup-frontend"
             },
             "index": "src/index.html",
             "polyfills": [
@@ -78,10 +78,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angular16-base:build:production"
+              "buildTarget": "lineup-frontend:build:production"
             },
             "development": {
-              "buildTarget": "angular16-base:build:development"
+              "buildTarget": "lineup-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -89,7 +89,7 @@
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
           "options": {
-            "buildTarget": "angular16-base:build"
+            "buildTarget": "lineup-frontend:build"
           }
         },
         "test": {
@@ -111,12 +111,27 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "d800fdb5-e1f3-4478-a5b1-39940a096929"
+    "analytics": "d800fdb5-e1f3-4478-a5b1-39940a096929",
+    "cache": {
+      "path": ".angular/cache-lineup"
+    },
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   },
   "schematics": {
     "@schematics/angular:component": {

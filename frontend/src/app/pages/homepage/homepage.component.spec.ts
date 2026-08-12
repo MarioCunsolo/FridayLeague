@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { HomepageComponent } from './homepage.component';
 
 describe('HomepageComponent', () => {
@@ -8,11 +10,11 @@ describe('HomepageComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-    imports: [HomepageComponent]
-});
+      imports: [HomepageComponent, RouterTestingModule],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
     fixture = TestBed.createComponent(HomepageComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

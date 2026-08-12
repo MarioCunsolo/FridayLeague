@@ -64,14 +64,21 @@ public class ReservationService : IReservationService
         return MappaDto(prenotazione);
     }
 
-    public async Task DeleteReservationAsync(Guid userId, Guid playerId)
+    public async Task DeleteReservationAsync(Guid userId, int reservationId)
     {
         var legaId = await GetLegaAttivaAsync(userId);
         var partita = await _proxy.GetNextScheduledAsync(legaId)
             ?? throw new NotFoundException("Nessuna partita in programma.");
 
-        var prenotazione = await _proxy.GetByPartitaAndUserIdAsync(partita.Id, playerId)
+        var prenotazione = await _proxy.GetByIdAsync(reservationId)
             ?? throw new NotFoundException("Prenotazione non trovata.");
+
+        // L'ID della prenotazione deve appartenere alla prossima partita della lega attiva.
+        // In questo modo un ID di un'altra lega non può essere usato per rimuovere dati altrui.
+        if (prenotazione.PartitaId != partita.Id)
+        {
+            throw new NotFoundException("Prenotazione non trovata.");
+        }
 
         var isProprietarioOChiHaPrenotato = prenotazione.UserId == userId || prenotazione.PrenotatoDaUserId == userId;
         if (!isProprietarioOChiHaPrenotato && !await _authorizationHelper.IsAdminOrCoAdminAsync(userId, legaId))
@@ -132,7 +139,8 @@ public class ReservationService : IReservationService
         Id = p.Id,
         NomeCognome = p.NomeCognome,
         DataOra = p.DataOra,
-        PlayerId = p.UserId
+        PlayerId = p.UserId,
+        PrenotatoDaUserId = p.PrenotatoDaUserId
     };
 
     private async Task<Guid> GetLegaAttivaAsync(Guid userId) =>

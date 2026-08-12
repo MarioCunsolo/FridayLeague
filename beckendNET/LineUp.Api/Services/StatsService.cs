@@ -17,15 +17,17 @@ public class StatsService : IStatsService
     public async Task<List<PlayerStatsDto>> GetScorersAsync(Guid userId, string? season)
     {
         var legaId = await GetLegaAttivaAsync(userId);
+        var membri = await _proxy.GetMembriAsync(legaId);
         var gol = await _proxy.GetGolLegaAsync(legaId, season);
         var partecipazioni = await _proxy.GetPartecipazioniAsync(legaId, season);
 
-        return CostruisciClassifica(gol.GroupBy(g => g.MarcatoreUserId), partecipazioni);
+        return CostruisciClassifica(membri, gol.GroupBy(g => g.MarcatoreUserId), partecipazioni);
     }
 
     public async Task<List<PlayerStatsDto>> GetAssistsAsync(Guid userId, string? season)
     {
         var legaId = await GetLegaAttivaAsync(userId);
+        var membri = await _proxy.GetMembriAsync(legaId);
         var gol = await _proxy.GetGolLegaAsync(legaId, season);
         var partecipazioni = await _proxy.GetPartecipazioniAsync(legaId, season);
 
@@ -33,63 +35,74 @@ public class StatsService : IStatsService
             .Where(g => g.AssistUserId.HasValue)
             .GroupBy(g => g.AssistUserId!.Value);
 
-        return CostruisciClassifica(raggruppati, partecipazioni);
+        return CostruisciClassifica(membri, raggruppati, partecipazioni);
     }
 
     public async Task<List<PlayerStatsDto>> GetMotmAsync(Guid userId, string? season)
     {
         var legaId = await GetLegaAttivaAsync(userId);
+        var membri = await _proxy.GetMembriAsync(legaId);
         var partecipazioni = await _proxy.GetPartecipazioniAsync(legaId, season);
 
         var raggruppati = partecipazioni
             .Where(p => p.Motm)
             .GroupBy(p => p.UserId);
 
-        return CostruisciClassifica(raggruppati, partecipazioni);
+        return CostruisciClassifica(membri, raggruppati, partecipazioni);
     }
 
-    private static List<PlayerStatsDto> CostruisciClassifica(IEnumerable<IGrouping<Guid, EventoGol>> raggruppati, List<PartecipantePartita> partecipazioni)
+    private static List<PlayerStatsDto> CostruisciClassifica(
+        List<User> membri,
+        IEnumerable<IGrouping<Guid, EventoGol>> raggruppati,
+        List<PartecipantePartita> partecipazioni)
     {
-        return raggruppati
-            .Select(g => Costruisci(g.Key, g.Count(), partecipazioni))
-            .Where(dto => dto != null)
-            .OrderByDescending(dto => dto!.Value)
-            .Select(dto => dto!)
+        var valori = raggruppati.ToDictionary(g => g.Key, g => g.Count());
+        return CostruisciClassifica(membri, valori, partecipazioni);
+    }
+
+    private static List<PlayerStatsDto> CostruisciClassifica(
+        List<User> membri,
+        IEnumerable<IGrouping<Guid, PartecipantePartita>> raggruppati,
+        List<PartecipantePartita> partecipazioni)
+    {
+        var valori = raggruppati.ToDictionary(g => g.Key, g => g.Count());
+        return CostruisciClassifica(membri, valori, partecipazioni);
+    }
+
+    private static List<PlayerStatsDto> CostruisciClassifica(
+        List<User> membri,
+        IReadOnlyDictionary<Guid, int> valori,
+        List<PartecipantePartita> partecipazioni)
+    {
+        return membri
+            .Select(membro => Costruisci(membro, valori.GetValueOrDefault(membro.Id), partecipazioni))
+            .OrderByDescending(dto => dto.Value)
+            .ThenBy(dto => dto.Name)
             .ToList();
     }
 
-    private static List<PlayerStatsDto> CostruisciClassifica(IEnumerable<IGrouping<Guid, PartecipantePartita>> raggruppati, List<PartecipantePartita> partecipazioni)
+    private static PlayerStatsDto Costruisci(User membro, int value, List<PartecipantePartita> partecipazioni)
     {
-        return raggruppati
-            .Select(g => Costruisci(g.Key, g.Count(), partecipazioni))
-            .Where(dto => dto != null)
-            .OrderByDescending(dto => dto!.Value)
-            .Select(dto => dto!)
-            .ToList();
-    }
-
-    private static PlayerStatsDto? Costruisci(Guid userId, int value, List<PartecipantePartita> partecipazioni)
-    {
-        // La squadra mostrata è quella dell'ultima partita giocata nel periodo filtrato (un giocatore può cambiare squadra ogni partita)
+        // La squadra mostrata è quella dell'ultima partita giocata nel periodo filtrato.
+        // Chi non ha ancora partecipato compare comunque con una squadra vuota e valore zero.
         var ultimaPartecipazione = partecipazioni
-            .Where(p => p.UserId == userId)
+            .Where(p => p.UserId == membro.Id)
             .OrderByDescending(p => p.Partita.DataOra)
             .FirstOrDefault();
 
-        if (ultimaPartecipazione == null) return null;
-
-        var user = ultimaPartecipazione.User;
-        var squadra = ultimaPartecipazione.InCasa
-            ? ultimaPartecipazione.Partita.SquadraCasa.Nome
-            : ultimaPartecipazione.Partita.SquadraTrasferta.Nome;
+        var squadra = ultimaPartecipazione is null
+            ? string.Empty
+            : ultimaPartecipazione.InCasa
+                ? ultimaPartecipazione.Partita.SquadraCasa.Nome
+                : ultimaPartecipazione.Partita.SquadraTrasferta.Nome;
 
         return new PlayerStatsDto
         {
-            Name = $"{user.Nome} {user.Cognome}",
+            Name = $"{membro.Nome} {membro.Cognome}",
             Team = squadra,
             Value = value,
-            Avatar = PlayerDisplayExtensions.GetInitials(user.Nome, user.Cognome),
-            Color = PlayerDisplayExtensions.GetAvatarColor(user.Id.ToString())
+            Avatar = PlayerDisplayExtensions.GetInitials(membro.Nome, membro.Cognome),
+            Color = PlayerDisplayExtensions.GetAvatarColor(membro.Id.ToString())
         };
     }
 

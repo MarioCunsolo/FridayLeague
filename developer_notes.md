@@ -174,8 +174,9 @@ Le entità principali sono `Squadra`, `Partita`, `StatoPartitaLookup`, `Partecip
 
 - Setup formazioni, inizio, conclusione, annullamento, eliminazione e MOTM sono riservati a `SUPER_ADMIN`/`ADMIN`.
 - Un gol può risolvere e aggiungere automaticamente un membro della lega non ancora presente nella formazione.
-- Le classifiche sono calcolate on-the-fly da gol e partecipazioni, filtrabili per stagione. Colori e iniziali degli avatar sono generati deterministicamente dal backend.
+- Le classifiche sono calcolate on-the-fly da gol e partecipazioni, filtrabili per stagione. Ogni classifica include tutti i membri attuali della lega attiva: chi non ha ancora gol, assist o MOTM compare con valore `0`. Colori e iniziali degli avatar sono generati deterministicamente dal backend.
 - Il frontend apre il dettaglio di una partita anche con `?matchId=<id>` e non usa più query del DOM o timeout per farlo.
+- Il profilo usa `GET /api/players/{id}/profile/{season?}` per ottenere in una sola risposta KPI personali, confronto con la lega, ultime partite personali, andamento e stato della prossima prenotazione. Per evitare false presenze, le statistiche del profilo considerano solo partite `Conclusa`.
 
 ### Prenotazioni
 

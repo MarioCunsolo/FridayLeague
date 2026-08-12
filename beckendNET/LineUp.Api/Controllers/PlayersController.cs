@@ -33,4 +33,12 @@ public class PlayersController : ApiControllerBase
     [HttpGet("{id}/stats/{season}")]
     public Task<ActionResult<List<UserStatsDto>>> GetStatsPerStagione(Guid id, string season) =>
         ExecuteAsync(() => _playerService.GetPlayerStatsAsync(User.GetUserId(), id, season));
+
+    [HttpGet("{id}/profile")]
+    public Task<ActionResult<PlayerProfileDto>> GetProfile(Guid id) =>
+        ExecuteAsync(() => _playerService.GetPlayerProfileAsync(User.GetUserId(), id, null));
+
+    [HttpGet("{id}/profile/{season}")]
+    public Task<ActionResult<PlayerProfileDto>> GetProfilePerStagione(Guid id, string season) =>
+        ExecuteAsync(() => _playerService.GetPlayerProfileAsync(User.GetUserId(), id, season));
 }

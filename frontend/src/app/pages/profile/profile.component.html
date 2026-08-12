@@ -1,94 +1,125 @@
-<div class="container py-4">
-  @if (!showMatchDetails()) {
-    <div class="row justify-content-center">
-      <!-- Profile Header -->
-      <div class="col-12 d-flex flex-column align-items-center mb-5">
-        <div class="profile-circle shadow">
-          <i class="fa fa-user" style="font-size: 4.5rem; color: var(--text-grey);"></i>
-        </div>
-        <h2 class="mt-4 mb-1">
-          {{ authService.currentUser()?.nome }} {{ authService.currentUser()?.cognome }}
-        </h2>
-        <div class="mt-2">
-          <span class="role-badge" [class]="'role-' + userRuolo().toLowerCase()">
-            {{ userRuolo() }}
-          </span>
-        </div>
-      </div>
+<div class="container profile-page py-4">
+  <section class="profile-hero">
+    <div class="profile-circle shadow">
+      <i class="fa fa-user" aria-hidden="true"></i>
+    </div>
+    <div class="profile-identity">
+      <p class="eyebrow">Il tuo profilo di lega</p>
+      <h1>{{ authService.currentUser()?.nome }} {{ authService.currentUser()?.cognome }}</h1>
+      <span class="role-badge" [class]="'role-' + userRuolo().toLowerCase()">{{ userRuolo() }}</span>
+    </div>
+    <div class="season-select-container">
+      <span class="season-label">Stagione</span>
+      <nz-select [ngModel]="selectedSeason()" (ngModelChange)="onSeasonChange($event)" class="season-select" nzSize="large" [nzSuffixIcon]="'down-circle'">
+        @for (season of availableSeasons(); track season) {
+          <nz-option [nzValue]="season" [nzLabel]="season"></nz-option>
+        }
+      </nz-select>
+    </div>
+  </section>
 
-      <!-- Season Selector -->
-      <div class="col-12 d-flex justify-content-center mb-4">
-        <div class="season-select-container d-flex align-items-center gap-2">
-          <span class="text-secondary fw-bold small text-uppercase">Stagione:</span>
-          <nz-select 
-            [ngModel]="selectedSeason()" 
-            (ngModelChange)="onSeasonChange($event)"
-            class="season-select"
-            nzSize="large"
-            [nzSuffixIcon]="'down-circle'">
-            @for (season of availableSeasons(); track season) {
-              <nz-option [nzValue]="season" [nzLabel]="season"></nz-option>
+  @if (state() === 'loading') {
+    <div class="profile-feedback"><nz-spin nzSimple nzSize="large"></nz-spin><span>Caricamento del profilo...</span></div>
+  } @else if (state() === 'error') {
+    <div class="profile-feedback error"><i class="fa fa-exclamation-circle"></i><span>{{ errorMessage() }}</span></div>
+  } @else if (profile(); as data) {
+    @if (summary(); as totals) {
+      <section class="stats-grid" aria-label="Statistiche personali">
+        @for (stat of stats(); track stat.label) {
+          <article class="stat-card shadow-sm">
+            @if (stat.rank) {
+              <span class="stat-rank" [class]="'rank-' + stat.rank">#{{ stat.rank }} lega</span>
             }
-          </nz-select>
-        </div>
-      </div>
+            <i [class]="'fa ' + stat.icon + ' stat-icon ' + stat.colorClass" aria-hidden="true"></i>
+            <div><span class="stat-title">{{ stat.label }}</span><strong>{{ stat.value }}</strong></div>
+          </article>
+        }
+      </section>
 
-      <!-- Stats Grid -->
-      <div class="col-12 col-md-10 col-lg-9">
-        <div class="row g-3">
-          @for (stat of userStats(); track stat.label) {
-            <div class="col-6 col-md-6 col-xl-3">
-              <div class="stat-card shadow-sm">
-                @if (stat.rank) {
-                  <div class="stat-rank shadow-sm" [class]="'rank-' + stat.rank">
-                    #{{ stat.rank }}
-                  </div>
-                }
-                <div class="stat-content">
-                  <i [class]="'fa ' + stat.icon + ' stat-icon ' + stat.colorClass"></i>
-                  <div class="stat-details">
-                    <span class="stat-title">{{ stat.label }}</span>
-                    <span class="stat-value">{{ stat.value }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <section class="insights-grid" aria-label="Rendimento e confronto con la lega">
+        <article class="insight-card participation-card">
+          <div class="insight-icon"><i class="fa fa-calendar-check-o"></i></div>
+          <div><span>Presenze</span><strong>{{ totals.matchesPlayed }} / {{ totals.totalLeagueMatches }}</strong><small>{{ totals.participationRate }}% delle partite concluse</small></div>
+        </article>
+        <article class="insight-card">
+          <div class="insight-icon"><i class="fa fa-line-chart"></i></div>
+          <div><span>Media personale</span><strong>{{ totals.goalsPerMatch | number:'1.1-1' }} gol / partita</strong><small>{{ totals.assistsPerMatch | number:'1.1-1' }} assist / partita</small></div>
+        </article>
+        <article class="insight-card">
+          <div class="insight-icon"><i class="fa fa-users"></i></div>
+          <div><span>Media della lega</span><strong>{{ totals.leagueAverageGoals | number:'1.1-1' }} gol / giocatore</strong><small>{{ totals.leagueAverageAssists | number:'1.1-1' }} assist / giocatore</small></div>
+        </article>
+      </section>
+    }
+
+    <section class="next-match-card" [class.is-reserved]="data.nextMatch?.isReserved">
+      @if (data.nextMatch; as nextMatch) {
+        <div class="next-match-icon"><i [class]="nextMatch.isReserved ? 'fa fa-check-circle' : 'fa fa-calendar-plus-o'"></i></div>
+        <div class="next-match-copy">
+          <span>{{ nextMatch.isReserved ? 'Sei prenotato per la prossima partita' : 'Non sei ancora prenotato' }}</span>
+          <strong>{{ nextMatch.homeTeam }} <em>vs</em> {{ nextMatch.awayTeam }}</strong>
+          <small>{{ nextMatch.date | date:'EEEE d MMMM, HH:mm' }}</small>
+        </div>
+        <a routerLink="/prenotazioni" class="next-match-action">{{ nextMatch.isReserved ? 'Gestisci' : 'Prenotati' }} <i class="fa fa-arrow-right"></i></a>
+      } @else {
+        <div class="next-match-icon"><i class="fa fa-calendar-o"></i></div>
+        <div class="next-match-copy"><span>Prossima partita</span><strong>Nessuna partita in programma</strong><small>Quando verrà programmata, potrai prenotarti da qui.</small></div>
+      }
+    </section>
+
+    <div class="profile-content-grid">
+      <section class="content-card performance-card">
+        <header class="section-header"><div><p class="eyebrow">Andamento</p><h2>Le tue ultime prestazioni</h2></div><span>Gol + assist</span></header>
+        @if (performance().length) {
+          <div class="performance-chart" aria-label="Grafico gol e assist delle ultime partite">
+            @for (point of performance(); track point.matchId) {
+              <button type="button" class="performance-column" (click)="goToMatch(point.matchId)" [attr.aria-label]="'Apri partita del ' + (point.date | date:'d MMMM')">
+                <span class="performance-value">{{ point.goals + point.assists }}</span>
+                <span class="performance-bar" [style.height.%]="performanceHeight(point.goals, point.assists)">
+                  <span class="goal-segment" [style.height.%]="point.goals + point.assists ? (point.goals / (point.goals + point.assists)) * 100 : 0"></span>
+                </span>
+                <span class="performance-date">{{ point.date | date:'d MMM' }}</span>
+              </button>
+            }
+          </div>
+          <div class="chart-legend"><span><i class="legend-dot goals"></i> Gol</span><span><i class="legend-dot assists"></i> Assist</span><small>Seleziona una colonna per aprire la partita.</small></div>
+        } @else {
+          <div class="empty-state"><i class="fa fa-line-chart"></i><p>Non hai ancora partite concluse in questa stagione.</p></div>
+        }
+      </section>
+
+      <section class="content-card last-match-card">
+        <header class="section-header"><div><p class="eyebrow">In evidenza</p><h2>La tua ultima partita</h2></div></header>
+        @if (lastMatch(); as match) {
+          <button type="button" class="personal-match" (click)="goToMatch(match.id)">
+            <span class="match-date">{{ match.date | date:'d MMMM y' }}</span>
+            <strong>{{ match.homeTeam }} <em>{{ match.homeScore }} - {{ match.awayScore }}</em> {{ match.awayTeam }}</strong>
+            <span class="player-team">Hai giocato con {{ match.playerTeam }}</span>
+            <span class="match-contributions"><b>⚽ {{ match.goals }}</b><b>🤝 {{ match.assists }}</b>@if (match.isMotm) { <b class="motm">🏆 MOTM</b> }</span>
+          </button>
+        } @else {
+          <div class="empty-state"><i class="fa fa-futbol-o"></i><p>La tua prima partita conclusa comparirà qui.</p></div>
+        }
+      </section>
+    </div>
+
+    <section class="content-card history-card">
+      <header class="section-header"><div><p class="eyebrow">Storico</p><h2>Le tue partite recenti</h2></div><span>Ultime {{ data.recentMatches.length }}</span></header>
+      @if (data.recentMatches.length) {
+        <div class="match-history-list">
+          @for (match of data.recentMatches; track match.id) {
+            <button type="button" class="history-row" (click)="goToMatch(match.id)">
+              <span class="history-date">{{ match.date | date:'d MMM' }}</span>
+              <span class="history-teams">{{ match.homeTeam }} <b>{{ match.homeScore }} - {{ match.awayScore }}</b> {{ match.awayTeam }}</span>
+              <span class="history-team">{{ match.playerTeam }}</span>
+              <span class="history-stats">⚽ {{ match.goals }} <span>🤝 {{ match.assists }}</span>@if (match.isMotm) { <span class="motm-label">MOTM</span> }</span>
+              <i class="fa fa-chevron-right" aria-hidden="true"></i>
+            </button>
           }
         </div>
-      </div>
-
-      <!-- Recent Match Card -->
-      @if (selectedMatch(); as match) {
-        <div class="col-12 col-md-10 col-lg-9 mt-5" (click)="openMatchDetails()" style="cursor: pointer;">
-          <div class="match-card shadow-sm">
-            <h3 class="match-title">Ultima Partita Giocata</h3>
-            <div class="match-content">
-              <div class="team-container">
-                <div class="team-logo shadow-sm">
-                  <i class="fa fa-shield" style="font-size: 1.8rem; color: #ff4444;"></i>
-                </div>
-                <span class="team-name text-truncate w-100">{{ match.homeTeam }}</span>
-              </div>
-              <div class="score-container">
-                <span class="score-text">{{ match.homeScore }} - {{ match.awayScore }}</span>
-                <span class="match-status text-success">{{ match.status }}</span>
-              </div>
-              <div class="team-container">
-                <div class="team-logo shadow-sm">
-                  <i class="fa fa-star" style="font-size: 1.8rem; color: #ffcc00;"></i>
-                </div>
-                <span class="team-name text-truncate w-100">{{ match.awayTeam }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      } @else {
+        <div class="empty-state compact"><i class="fa fa-history"></i><p>Nessuna partita personale disponibile per la stagione selezionata.</p></div>
       }
-    </div>
-  } @else if (selectedMatch(); as match) {
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-10 col-lg-9">
-        <app-match-detail [match]="match" [isModal]="false" (close)="closeMatchDetails()"></app-match-detail>
-      </div>
-    </div>
+    </section>
   }
 </div>

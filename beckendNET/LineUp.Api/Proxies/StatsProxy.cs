@@ -21,6 +21,8 @@ public class StatsProxy : IStatsProxy
 
     public Task<Guid?> GetActiveLegaIdAsync(Guid userId) => _userLegaRepository.GetActiveLegaIdAsync(userId);
 
+    public Task<List<User>> GetMembriAsync(Guid legaId) => _userLegaRepository.GetMembriAsync(legaId);
+
     public Task<List<PartecipantePartita>> GetPartecipazioniAsync(Guid legaId, string? stagione) =>
         _partecipanteRepository.GetByLegaAsync(legaId, stagione);
 

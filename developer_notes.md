@@ -1,161 +1,237 @@
-# LineUp - Developer Notes & Knowledge Base
+# LineUp — Developer Notes & Knowledge Base
 
-Questo file contiene gli appunti di sviluppo, l'architettura del progetto LineUp e le regole di business da consultare ad ogni richiesta e aggiornare nel tempo.
-
----
-
-## 1. Struttura del Progetto & Tecnologie
-
-Il progetto è suddiviso in due componenti principali:
-* **Backend (ASP.NET Core su .NET 10)**: Situato nella cartella `beckendNET`.
-  * **API Project**: [LineUp.Api](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api)
-  * **Database**: MySQL 8.0 avviato tramite Docker Compose ([docker-compose.yml](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/docker-compose.yml)) sulla porta `3306`.
-* **ORM & Data Types**: Entity Framework Core 9 con il provider MySQL Pomelo 9, in esecuzione su .NET 10. Pomelo non dispone ancora di una release stabile per EF Core 10: non aggiornare EF Core a 10 né sostituire il provider senza una migrazione dedicata e verificata. Le entità **User** e **Lega** (e tutte le chiavi esterne correlate `UserId`, `LegaId`, `EsecutoreId`, `TargetUserId`, `PrenotatoDaUserId`) utilizzano **UUID** (`Guid` in C#, `VARCHAR(36)` in MySQL, `string` in TypeScript) per garantire identificatori univoci e sicurezza dei riferimenti.
-* **Frontend (Angular)**: Situato nella cartella `frontend`.
-  * **Framework**: Angular 21 (standalone components, control flow syntax `@if`, `@for`, ecc.).
-  * **UI Library**: Ng-Zorro-Antd (Ant Design per Angular).
-  * **Styling**: CSS custom per Light e Dark mode.
+Questa guida descrive lo stato effettivo del repository. Va letta prima di intervenire e aggiornata quando cambiano architettura, contratti API, regole di business o configurazione di deploy.
 
 ---
 
-## 2. Configurazione Porte e URL
+## 1. Struttura del repository e stack
 
-* **Backend API URL**: `http://localhost:8080/api` (in sviluppo locale).
-* **Documentazione API (Swagger)**:
-  * **HTTP**: `http://localhost:8080/swagger`
-  * **HTTPS**: `https://localhost:7059/swagger`
-* **Frontend Default URL**: `http://localhost:4200` (CORS configurato per questa origine sul BE).
-* **Nota su conflitti di porta locali**: se sulla propria macchina le porte `8080` o `3306` risultano già occupate (es. da un antivirus o da un'installazione MySQL di sistema), è sufficiente cambiare le porte solo in locale in `launchSettings.json`, `appsettings.json` e `docker-compose.yml` (aggiornando anche `environment.development.ts` nel frontend) e marcare questi file con `git update-index --skip-worktree` per evitare di propagare la modifica agli altri sviluppatori (`--no-skip-worktree` per annullare).
+Il repository contiene due applicazioni e i documenti operativi principali:
 
----
+```text
+FridayLeague/
+├── beckendNET/
+│   ├── LineUp.Api/       # API ASP.NET Core
+│   ├── docker-compose.yml # MySQL 8 locale
+│   └── ARCHITECTURE.md    # regole del backend a livelli
+├── frontend/              # SPA Angular
+├── RAILWAY_DEPLOY.md      # procedura di deploy Railway
+├── FRONTEND_REFACTORING_PLAN.md
+├── global.json            # SDK .NET richiesto
+└── developer_notes.md     # questo file
+```
 
-## 3. Gestione della Sessione & Autenticazione (JWT)
+- **Backend:** ASP.NET Core `net10.0`, in `beckendNET/LineUp.Api`.
+- **SDK richiesto:** `global.json` richiede `10.0.100`, con `rollForward: latestFeature`. È quindi necessario avere installato un SDK .NET 10 (`dotnet --list-sdks`).
+- **Database:** MySQL 8.0, avviabile con `beckendNET/docker-compose.yml`; in locale espone la porta `3306`.
+- **ORM:** Pomelo `9.0.0`, che porta EF Core 9. Il progetto gira su .NET 10, ma non va aggiornato a EF Core/Pomelo 10 senza una migrazione dedicata e verificata.
+- **Frontend:** Angular `21.2`, componenti standalone, Signals e control flow nativo (`@if`, `@for`), con Ng-Zorro, Bootstrap e Font Awesome locali.
+- **Stile:** SCSS e variabili CSS per tema chiaro/scuro.
 
-### Ciclo di Vita del Token
-* **Creazione (Login)**: Durante il login, l'utente può selezionare la spunta **"Ricordami"**.
-  * Se selezionata (`remember: true`), il token viene salvato in `localStorage` per persistere alla chiusura del browser.
-  * Se non selezionata (`remember: false`), il token viene salvato in `sessionStorage` (rimane attivo durante i refresh ma si cancella alla chiusura della scheda/browser).
-* **Inizializzazione all'Avvio (`provideAppInitializer`)**:
-  * All'avvio dell'app Angular, `app.config.ts` esegue il metodo `initSession()` di `AuthService` tramite `provideAppInitializer`.
-  * Questo carica asincronamente i dettagli dell'utente (`getCurrentUser()`) *prima* che l'app esegua il bootstrap ed esamini le guardie delle rotte.
-  * **Importante**: Evita problemi di razza (race conditions) per cui l'utente veniva erroneamente buttato fuori o reindirizzato a `/seleziona-lega` al refresh.
-* **Intercettore HTTP (`authInterceptor`)**:
-  * Legge il token da `TokenStorageService`/storage e lo appende all'header `Authorization: Bearer <token>` solo alle richieste dirette verso `environment.apiUrl`, evitando di inviarlo a CDN o host esterni.
-* **Logout**:
-  * Il metodo `logout()` di `AuthService` distrugge il token e la configurazione della lega attiva sia in `localStorage` che in `sessionStorage`.
-
----
-
-## 4. Sistema dei Ruoli e Permessi della Lega
-
-Le autorizzazioni all'interno di una lega seguono questa gerarchia:
-1. **SUPER_ADMIN** (ID = 4): Il creatore della lega. Ha accesso a tutte le impostazioni. Ha pieni poteri per modificare i ruoli di chiunque (promuovere/declassare ad `ADMIN`, `CO_ADMIN`, `GIOCATORE`) e per rimuovere qualsiasi partecipante (eccetto se stesso).
-2. **ADMIN** (ID = 1): Amministratore delegato. Ha accesso alle impostazioni. Può modificare i ruoli di Co-Admin e Giocatori (assegnando loro `ADMIN`, `CO_ADMIN` o `GIOCATORE`), ma **non può gestire il Super Admin o altri Admin**. Può anche rimuovere membri Co-Admin o Giocatori (ma non Super Admin o altri Admin).
-3. **CO_ADMIN** (ID = 2): Co-Amministratore. Può accedere alla sezione impostazioni di lega, ma nella gestione dei partecipanti **non ha i permessi per modificare i ruoli (non può promuovere/declassare nessuno)**. Può invece rimuovere i membri della lega, ma **solo ed esclusivamente se hanno il ruolo di `GIOCATORE`** (non può rimuovere Super Admin, Admin o altri Co-Admin).
-4. **GIOCATORE** (ID = 3): Giocatore semplice. Non ha alcun accesso alle sezioni di amministrazione o impostazioni di lega.
-
-### Regole Importanti:
-* Nessun utente può autogestirsi (es. non può modificare o eliminare se stesso).
-* Se un utente viene rimosso dalla sua lega attiva corrente, il suo `LegaId` nel database viene impostato a `null` in modo che debba selezionare o creare una nuova lega al successivo accesso.
-* **Sicurezza FE (Route Guard)**: La rotta `/impostazioni` (e i suoi figli) è protetta da **`adminOrCoAdminGuard`** ([admin-or-co-admin.guard.ts](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/shared/guard/admin-or-co-admin.guard.ts)), impedendo l'accesso diretto via URL a utenti con ruolo semplice `GIOCATORE` (la guardia autorizza `SUPER_ADMIN`, `ADMIN` e `CO_ADMIN`).
-* **Sicurezza FE (Component Controller)**: All'interno di `GestisciPartecipantiComponent`, i metodi `eseguiCambioRuolo` e `rimuoviPartecipante` effettuano un ulteriore controllo di sicurezza preventivo sul ruolo dell'utente corrente (`getCurrentUserRole()`), bloccando la chiamata e mostrando un messaggio di errore se l'utente non è autorizzato (rispettivamente `SUPER_ADMIN`/`ADMIN` per il ruolo, e `SUPER_ADMIN`/`ADMIN`/`CO_ADMIN` per l'eliminazione).
-* **Sicurezza BE (API Controller)**: I controlli sui ruoli per le azioni amministrative (`cambia-ruolo-partecipante` e `rimuovi-partecipante`) sono validati a livello di controller in `AuthController.cs`.
-  * `cambia-ruolo-partecipante` permette l'esecuzione a utenti `SUPER_ADMIN` e `ADMIN` (gli `ADMIN` non possono agire su `SUPER_ADMIN` o altri `ADMIN`).
-  * `rimuovi-partecipante` permette l'esecuzione a utenti `SUPER_ADMIN` (su chiunque), `ADMIN` (solo su `CO_ADMIN` e `GIOCATORE`), e `CO_ADMIN` (solo su target con ruolo `GIOCATORE`).
+Gli ID di `User`, `Lega` e tutte le FK utente/lega sono UUID: `Guid` in C#, `VARCHAR(36)` in MySQL e `string` in TypeScript. Le partite e le prenotazioni mantengono invece ID numerici.
 
 ---
 
-## 5. Componenti Condivisi ed Elementi UI Notevoli
+## 2. Avvio e configurazione locale
 
-* **[ConfirmModalComponent](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/shared/component/confirm-modal/confirm-modal.component.ts)**:
-  * Componente modale riutilizzabile per le richieste di conferma.
-  * Supporta la visualizzazione adattiva per Light e Dark mode tramite le variabili CSS globali (es. `--card-bg`, `--text-primary`, `--input-bg`).
-  * Supporta lo stato `isDanger` (pulsante e icona rossi pulsanti per le eliminazioni/declassamenti) o standard (blu).
-  * Mostra testi personalizzabili ed emette eventi `confirm` e `cancel`.
-  * **Invocazione Programmatica (TS)**: La modale non è configurata nel template HTML dei singoli componenti. Viene caricata in memoria dinamicamente da codice TypeScript (es. tramite `ViewContainerRef.createComponent()`), configurata con i parametri desiderati (`title`, `message`, `confirmText`, `isDanger`), sottoscritta agli eventi di output (confirm/cancel) e infine distrutta esplicitamente (`componentRef.destroy()`) una volta terminata l'azione, ottimizzando il DOM ed evitando di sporcare i template HTML.
-* **Rotta `/home`**:
-  * La homepage è configurata esplicitamente sul percorso `/home` in [app-routing.module.ts](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/app-routing.module.ts).
-  * La rotta vuota `""` esegue un redirect automatico a `/home`.
-  * Tutti i reindirizzamenti di navigazione (post-login, post-seleziona lega, cambio lega attiva) puntano a `/home`.
-* **Codice Invito della Lega**:
-  * Esposto dal backend arricchendo `LegaDto` con i campi `CodiceInvito` e `Descrizione` in [UserDto.cs](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api/DTOs/UserDto.cs).
-  * Mostrato nella dashboard di **[ImpostazioniLegaComponent](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/pages/impostazioni-lega/impostazioni-lega.component.ts)** tramite un banner informativo premium (`.league-info-banner`).
-  * Include la funzionalità "Copia Codice" con riscontro visivo tramite toast message di successo (`NzMessageService`) sfruttando le Clipboard API del browser (`navigator.clipboard`).
+- **API HTTP:** `http://localhost:8080/api`
+- **Swagger:** `http://localhost:8080/swagger` (oppure `https://localhost:7059/swagger` con il profilo HTTPS)
+- **Frontend:** `http://localhost:4200`
+- **CORS in sviluppo:** il backend accetta origini locali, inclusi dispositivi sulla stessa rete Wi-Fi.
+
+Il frontend di sviluppo determina l'API con l'host corrente e la porta `8080`; ciò consente l'uso da un dispositivo mobile senza modificare l'URL dell'API. Se le porte `8080` o `3306` sono occupate, aggiornare coerentemente `launchSettings.json`, `appsettings.json`, `docker-compose.yml` e `frontend/src/environments/environment.development.ts`. Le eventuali personalizzazioni strettamente locali non vanno committate.
+
+`appsettings.Development.json` contiene una chiave JWT di solo sviluppo e abilita dati demo. In produzione la chiave non è nel repository: deve essere fornita con `JwtSettings__TokenKey`.
 
 ---
 
-## 6. Registro Attività (Audit Logging)
+## 3. Backend: bootstrap, sicurezza e persistenza
 
-Il sistema di tracciamento e log di audit memorizza le azioni amministrative in modo indipendente per ciascuna lega:
-* **Entità nel Database (`ActivityLog`)**: [ActivityLog.cs](file:///Users/salvovitale/Desktop/Prova/LineUp/beckendNET/LineUp.Api/Data/ActivityLog.cs)
-  * Campi: `Id`, `LegaId`, `EsecutoreId`, `EsecutoreNome`, `EsecutoreRuolo`, `Azione` (`CREAZIONE_LEGA`, `ACCESSO_LEGA`, `CAMBIO_RUOLO`, `RIMOZIONE_UTENTE`), `TargetUserId`, `TargetUserNome`, `Dettagli`, `Timestamp`.
-* **Tenant Isolation & Sicurezza (Separazione Log)**:
-  * L'endpoint `GET /api/auth/lega/{legaId}/registri-attivita` è filtrato rigorosamente su `LegaId == legaId`.
-  * Il backend convalida che l'utente appartenga alla lega `{legaId}` richiesta e abbia ruolo amministrativo di **`SUPER_ADMIN` o `ADMIN`** (escludendo quindi i Co-Admin). Altri ruoli ricevono `403 Forbidden`.
-* **Visualizzazione (FE)**:
-  * Pagina ad accesso riservato: **[RegistroAttivitaComponent](file:///Users/salvovitale/Desktop/Prova/LineUp/frontend/src/app/pages/impostazioni-lega/registro-attivita/registro-attivita.component.ts)**.
-  * Navigabile da `/impostazioni/registro-attivita`, protetta da **`adminOnlyGuard`** (che concede l'accesso solo a `SUPER_ADMIN` e `ADMIN`).
-  * La card di navigazione in `ImpostazioniLegaComponent` è nascosta per i `CO_ADMIN` tramite direttiva `@if (isAdminOrSuperAdmin())`.
-  * Tabella con badge per identificare i ruoli ed i tipi di azione con colori standardizzati coerenti sia in tema dark che light.
+### Configurazione applicativa
 
----
+`Program.cs` registra EF Core/MySQL, JWT, CORS, controller, repository, proxy e servizi di dominio. Espone inoltre `GET /health` anonimo, usato dal deploy Railway.
 
-## 7. Dominio Partite, Giocatori, Prenotazioni e Classifiche
+- La chiave `JwtSettings:TokenKey` è obbligatoria anche in locale ed è validata all'avvio.
+- Per HMAC-SHA512 deve contenere **almeno 64 byte UTF-8**; chiavi più corte causano un errore esplicito invece di fallire al login.
+- In produzione `Cors:AllowedOrigins` deve contenere almeno un'origine; Railway la passa tramite `Cors__AllowedOrigins__0`.
+- Il token JWT è firmato HMAC-SHA512, contiene i claim dell'utente e scade dopo 7 giorni.
 
-Introdotto seguendo il Repository Pattern descritto in [ARCHITECTURE.md](beckendNET/ARCHITECTURE.md). Tutte le entità sono scoped per Lega.
+### Database
 
-* **Entità (`Data/`)**: `Squadra` (nome squadra per lega, creata automaticamente al primo utilizzo), `Partita` (Stato gestito tramite tabella di lookup `StatiPartita` e `StatoId`: `Programmata`, `In Corso`, `Conclusa`, `Annullata`, punteggio, stagione), `StatoPartitaLookup` (`StatiPartita`), `PartecipantePartita` (formazione di una partita + flag MOTM), `EventoGol` (marcatore/assist per partita), `Prenotazione` (per la prossima partita programmata della lega).
-* **Giocatori**: non esiste un'anagrafica separata — un "giocatore" è semplicemente uno `User` iscritto alla Lega (tabella `UserLeghe`).
-* **Imposta Partita & Gestione Formazioni**: la funzionalità di impostazione formazioni da prenotazioni (`POST /api/matches/{id}/setup-lineup`), l'avvio partita (`PUT /api/matches/{id}/inizia`), la conclusione anticipata (`PUT /api/matches/{id}/concludi`), l'eliminazione ed l'annullamento della partita nella schermata di dettaglio sono **riservati esclusivamente ai ruoli `SUPER_ADMIN` e `ADMIN`** (`isAdminOrSuperAdmin()`).
-* **Avvio Partita & Registrazione Goal**: cliccando su **"Inizia Partita"**, lo stato passa da `Programmata` a `In Corso`. Quando la partita è `In Corso`, compaiono i pulsanti per aggiungere i goal (`POST /api/matches/{id}/goals`) ed il pulsante **"Concludi Partita"** (`PUT /api/matches/{id}/concludi`) per terminarla anticipatamente prima del timeout di 2 ore.
-* **Risoluzione automatica dei partecipanti**: quando viene registrato un gol (`POST /api/matches/{id}/goals`) con un nome che non è ancora nella formazione della partita, il sistema cerca un membro della lega con quel nome e lo aggiunge automaticamente come partecipante (lato marcatore/assist).
-* **Prenotazioni**: sempre riferite alla prossima partita con Stato `Programmata` della lega attiva (risolta lato server, il client non specifica l'ID partita). Finestra di prenotazione (sabato intero + domenica fino alle 17:00) validata sia FE (`isReservationDisabled`) che BE (`ReservationService.ValidaFinestraPrenotazione`). La cancellazione usa l'ID numerico della prenotazione (`DELETE /api/reservations/{reservationId}`), con verifica lato server che la prenotazione appartenga alla partita programmata della lega attiva: ciò supporta anche prenotazioni con nome libero e senza `UserId`.
-* **MOTM**: un solo Man of the Match per partita (`PUT /api/matches/{id}/motm`, riservato ad ADMIN/SUPER_ADMIN). Endpoint predisposto ma non ancora collegato a un pulsante nel frontend.
-* **Classifiche/Statistiche**: calcolate on-the-fly (nessuna tabella aggregata) da `EventoGol`/`PartecipantePartita`, filtrabili per stagione. Colore e iniziali avatar sono generati deterministicamente lato BE (`PlayerDisplayExtensions`), non persistiti.
-* **Nota migrazione DB**: non essendo in uso EF Core Migrations, le nuove tabelle vengono create in `Program.cs` con `CREATE TABLE IF NOT EXISTS` (stesso pattern già usato per `ActivityLogs`). Se si aggiungono nuove entità, aggiornare sia `OnModelCreating` che questo blocco fail-safe.
+Non sono in uso EF Core Migrations. All'avvio l'app esegue `EnsureCreated()` e blocchi SQL fail-safe (`CREATE TABLE IF NOT EXISTS` e aggiornamenti di schema mirati) per le tabelle principali, lookup, dominio partite e prenotazioni. Quando si aggiunge un'entità o una colonna, allineare:
 
----
+1. modello e mapping in `LineUpDbContext`;
+2. creazione/compatibilità in `Program.cs`;
+3. DTO, repository/proxy/service e client Angular interessati.
 
-## 8. Cambio Password
+`Database:RemoveLegacyTables` e `SeedDemoData` sono impostazioni di sviluppo. Devono rimanere `false` in produzione.
 
-Il flusso di cambio password (`account.component.ts` → `apriModificaPassword()`) usa l'endpoint dedicato `POST /auth/cambia-password` (`AuthService.cambiaPassword`). Non riutilizzare `aggiorna-profilo` per la password: il DTO `AggiornaProfiloRequest` ha un campo `Password` legacy che il backend ignora silenziosamente.
+### Architettura backend
+
+Per il dominio partite, giocatori, statistiche e prenotazioni è applicato il flusso:
+
+```text
+Controller → Service → Proxy → Repository → DbContext → MySQL
+```
+
+Le regole complete sono in [ARCHITECTURE.md](beckendNET/ARCHITECTURE.md). `AuthController` è codice preesistente e accede ancora direttamente al `LineUpDbContext`: non estendere questo approccio per nuove feature; allinearlo gradualmente quando viene modificato in modo sostanziale.
 
 ---
 
-## 10. Tipologie di Lega e Formati di Competizione
+## 4. Frontend: bootstrap, routing e stato
 
-Il sistema supporta 3 tipologie di competizione per le leghe, memorizzate tramite la tabella di lookup `TipiLega` e le colonne di configurazione in `Leghe`:
+### Bootstrap e routing
 
-* **Entità Lookup (`TipoLegaLookup`)**: [TipoLegaLookup.cs](file:///Users/salvovitale/Desktop/Prova/FridayLeague/beckendNET/LineUp.Api/Data/TipoLegaLookup.cs)
-  * `1` - `PARTITA_SINGOLA`: "Partita Singola". Lega classica basata sulla prenotazione individuale dei giocatori e formazione di 2 squadre per match.
-  * `2` - `CAMPIONATO`: "Campionato". Campionato a girone unico a scontri diretti con numero di squadre stabilito alla creazione (`NumeroSquadre`).
-  * `3` - `TORNEO`: "Torneo". Torneo a gironi con numero di gironi stabilito alla creazione (`NumeroGironi`) con successiva fase finale ad eliminazione diretta.
-* **Proprietà in `Lega`**:
-  * `TipoLegaId` (`int`, FK a `TipiLega`, default `1`).
-  * `NumeroSquadre` (`int?`, obbligatorio solo per Campionato).
-  * `NumeroGironi` (`int?`, obbligatorio solo per Torneo).
-* **Creazione Lega (FE/BE)**:
-  * Durante la creazione in `SelezionaLegaComponent`, l'utente visualizza le card interattive con le descrizioni per ciascun formato di competizione.
-  * I parametri `NumeroSquadre` e `NumeroGironi` compaiono in modo dinamico e sono validati sia lato frontend che nel controller .NET (`CreaLega`).
+Il frontend non usa più `AppModule` né `app-routing.module.ts`.
+
+- `main.ts` esegue `bootstrapApplication(AppComponent, appConfig)`.
+- `app.config.ts` registra router, HTTP interceptor, animazioni, locale italiano Ng-Zorro, preloading e inizializzazione della sessione.
+- `app.routes.ts` contiene tutte le route standalone.
+- `LayoutComponent` e `HomepageComponent` sono **eager**: costituiscono il percorso primario subito dopo login e devono restare tali per evitare un outlet vuoto durante la prima navigazione a `/home`.
+- Le altre pagine di feature restano lazy-loaded.
+
+La struttura protetta è:
+
+```text
+/login, /register                         pubbliche
+/seleziona-lega                           authGuard + leagueGuard
+/home, /prenotazioni, /calendario, ...    authGuard + leagueGuard, sotto LayoutComponent
+/impostazioni                             anche adminOrCoAdminGuard
+/impostazioni/registro-attivita           anche adminOnlyGuard
+```
+
+La rotta vuota reindirizza a `/home`; le route sconosciute reindirizzano alla radice. Dopo il login la navigazione usa `navigateByUrl('/home', { replaceUrl: true })`, così la pagina di login non resta nella cronologia. Riavviare il dev server quando si cambiano route o provider principali.
+
+### Contratti e stato di dominio
+
+I contratti API TypeScript sono in `frontend/src/app/models/api`:
+
+- `core.models.ts`: UUID, ruoli, tema, tipi di lega e azioni audit.
+- `auth.models.ts`: utente, leghe, autenticazione, profilo e creazione/adesione lega.
+- `league.models.ts`: partecipanti e registro attività.
+- `match.models.ts` e `reservation.models.ts`: DTO e richieste del dominio.
+
+Non usare `number` per UUID. Le vecchie interfacce in `models/interface` restano come modelli di visualizzazione dove necessario; i servizi eseguono il mapping dai DTO API, incluso `string` ISO → `Date`.
+
+`MatchService` e `ReservationService` sono la fonte di verità lato client: espongono Signals immutabili con dati e `LoadState` (`idle`, `loading`, `success`, `empty`, `error`). Non introdurre dati mock nei componenti. Al cambio della lega attiva `LegaService` svuota entrambi gli store, aggiorna l'utente e il `LayoutComponent` ricarica le partite della nuova lega.
 
 ---
 
-## 9. Linee Guida per gli Aggiornamenti Futuri
+## 5. Sessione e autenticazione frontend
 
-* **Controllo Preventivo**: Leggere e comprendere questo file all'inizio di ogni attività per mantenere intatta la coerenza dell'architettura e dei flussi.
-* **Manutenzione del File**: Se una richiesta introduce modifiche architetturali, aggiornamenti a endpoint chiave, nuovi ruoli o nuovi componenti condivisi, questo file deve essere aggiornato tempestivamente.
-* **SDK .NET**: il repository richiede .NET SDK 10. Il file `global.json` richiede la feature band `10.0.100` e consente l'avanzamento automatico all'ultima feature band stabile di .NET 10 installata.
-* **Frontend moderno**: il bootstrap usa `app.config.ts`, `provideAppInitializer` e `app.routes.ts`. Le pagine standalone sono lazy-loaded e i contratti API sono in `frontend/src/app/models/api`; UUID sono sempre `string`. I permessi frontend sono centralizzati in `AuthorizationService`, mentre la validazione backend rimane l'autorità finale.
+### Ciclo di vita del token
+
+1. Login e registrazione ricevono `AuthResponse` (`user` e `token`).
+2. `AuthService` aggiorna subito il Signal `currentUser` e delega la persistenza a `TokenStorageService`.
+3. Con “Ricordami” il token è in `localStorage`; altrimenti è in `sessionStorage`.
+4. All'avvio `provideAppInitializer` attende `AuthService.initSession()`, che richiama `GET /api/auth/current-user` prima che le guardie valutino le route.
+5. Se il ripristino fallisce, token e utente in memoria vengono rimossi per non lasciare una sessione ambigua.
+
+`authInterceptor` aggiunge `Authorization: Bearer <token>` **solo** alle richieste il cui URL inizia con `environment.apiUrl`. Il token non può quindi essere inviato per errore a CDN o host esterni.
+
+Il logout è effettivamente client-side: `AuthService` rimuove token e utente prima della richiesta. Tenta anche `POST /api/auth/logout` per compatibilità, ma l'API non espone al momento quell'endpoint; l'errore viene assorbito e il client torna comunque a `/login`.
+
+### Flussi utente
+
+- Un nuovo utente registrato è già autenticato e viene inviato a `/seleziona-lega` per creare o raggiungere una lega.
+- `leagueGuard` porta un utente autenticato senza lega attiva a `/seleziona-lega`.
+- Tema e lega attiva sono proprietà dell'utente restituite dall'API; il tema viene applicato dal `LayoutComponent` e sincronizzato con il backend.
 
 ---
 
-## 11. Deploy Railway
+## 6. Ruoli e autorizzazioni
 
-Il deploy Railway usa tre servizi nello stesso ambiente: `mysql` (privato), `api` (ASP.NET Core) e `frontend` (Angular/Nginx). Le configurazioni dei singoli servizi sono co-locate con il codice (`Dockerfile`, `railway.toml` e `.dockerignore`).
+La gerarchia della lega è:
 
-* **API**: richiede le variabili `ASPNETCORE_ENVIRONMENT=Production`, `ASPNETCORE_URLS=http://+:${PORT}`, `ConnectionStrings__DefaultConnection`, `JwtSettings__TokenKey` e `Cors__AllowedOrigins__0`. Espone `GET /health` per Railway.
-* **Database**: la connection string usa le variabili referenziate del servizio `mysql` (`MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`), senza esporre il database pubblicamente.
-* **Frontend**: legge `API_URL` al runtime da `assets/runtime-config.js`, generato dall'entrypoint Nginx. Il valore deve essere l'URL pubblico dell'API, completo di `/api`.
-* **Sicurezza produzione**: `SeedDemoData` e `Database__RemoveLegacyTables` devono rimanere `false`; in produzione il CORS viene avviato solo con un'origine esplicita e non è presente alcuna chiave JWT nel repository.
+1. **SUPER_ADMIN**: creatore della lega; può gestire tutti gli altri membri.
+2. **ADMIN**: può gestire solo `CO_ADMIN` e `GIOCATORE`.
+3. **CO_ADMIN**: può rimuovere solo `GIOCATORE`; non può modificare ruoli.
+4. **GIOCATORE**: non accede alle impostazioni amministrative.
 
-La procedura operativa completa e le variabili da inserire sono documentate in [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md).
+Nessuno può modificare o rimuovere se stesso. Se un membro viene rimosso dalla sua lega attiva, il backend imposta `LegaId` a `null`.
+
+Sul frontend le regole non devono essere duplicate nei componenti: `AuthorizationService` centralizza il ruolo attivo e i permessi per impostazioni, registro attività, partecipanti, prenotazioni e partite. Le guardie proteggono le route, mentre pulsanti e azioni invocano lo stesso servizio per la visibilità/abilitazione.
+
+Il backend resta sempre l'autorità finale: `AuthController` valida ruoli e appartenenza alla lega per cambio ruolo, rimozione partecipante e registro attività. Il registro (`/api/auth/lega/{legaId}/registri-attivita`) è visibile solo a `SUPER_ADMIN` e `ADMIN`.
+
+---
+
+## 7. Leghe, partite, prenotazioni e statistiche
+
+### Leghe e audit
+
+Una lega ha codice invito, descrizione e tipo di competizione. I tipi sono lookup in `TipiLega`:
+
+- `PARTITA_SINGOLA` (ID 1);
+- `CAMPIONATO` (ID 2, richiede almeno due squadre);
+- `TORNEO` (ID 3, richiede almeno un girone).
+
+Creazione e adesione aggiornano l'utente autenticato con la lega attiva. Il codice invito è mostrato nelle impostazioni della lega e può essere copiato tramite Clipboard API. `ActivityLog` registra creazione della lega, accesso, cambi ruolo e rimozioni.
+
+### Partite e statistiche
+
+Le entità principali sono `Squadra`, `Partita`, `StatoPartitaLookup`, `PartecipantePartita`, `EventoGol` e `Prenotazione`; sono tutte isolate dalla lega attiva. Lo stato partita è `Programmata`, `In Corso`, `Conclusa` o `Annullata`.
+
+- Setup formazioni, inizio, conclusione, annullamento, eliminazione e MOTM sono riservati a `SUPER_ADMIN`/`ADMIN`.
+- Un gol può risolvere e aggiungere automaticamente un membro della lega non ancora presente nella formazione.
+- Le classifiche sono calcolate on-the-fly da gol e partecipazioni, filtrabili per stagione. Colori e iniziali degli avatar sono generati deterministicamente dal backend.
+- Il frontend apre il dettaglio di una partita anche con `?matchId=<id>` e non usa più query del DOM o timeout per farlo.
+
+### Prenotazioni
+
+Una prenotazione riguarda sempre la prossima partita `Programmata` della lega attiva; il client invia solo `nomeCognome`, non l'ID della partita né data/utente. Il server risolve i dati e restituisce anche `prenotatoDaUserId`.
+
+- La finestra è chiusa dal sabato fino alla domenica alle 17:00; la regola è validata sia da frontend sia dal backend.
+- `DELETE /api/reservations/{reservationId}` usa l'ID numerico della prenotazione, non l'UUID del giocatore.
+- Il server verifica che la prenotazione appartenga alla prossima partita della lega attiva e autorizza chi è prenotato, chi ha creato la prenotazione oppure un amministratore della lega.
+- `POST /api/reservations/seed-dummy` è disponibile esclusivamente in Development; in produzione restituisce 404 e la UI non espone l'azione.
+
+---
+
+## 8. Componenti UI condivisi
+
+`ConfirmModalComponent` è una modale riutilizzabile, con tema adattivo, azione standard o pericolosa e output `confirm`/`cancel`. Nella gestione partecipanti viene istanziata dinamicamente con `ViewContainerRef.createComponent()`, configurata, sottoscritta e distrutta dopo l'azione.
+
+Il layout include navigazione desktop/mobile, selettore della lega, logout e cambio tema. Componenti con richieste o sottoscrizioni di durata pagina devono usare `takeUntilDestroyed` (o un equivalente appropriato) per evitare leak.
+
+---
+
+## 9. Qualità del frontend
+
+Dal percorso `frontend` sono disponibili:
+
+```bash
+npm ci
+npm start
+npm run typecheck
+npm run lint
+npm run test:ci
+npm run build:production
+```
+
+ESLint è configurato in `eslint.config.js` con regole Angular e TypeScript. Parte del debito storico e delle verifiche di accessibilità è attualmente classificata come warning per consentire il refactoring incrementale; i nuovi interventi non devono aggiungere warning né aggirare i controlli.
+
+La build di produzione usa budget iniziale di 1 MB (warning) e 3 MB (errore), output hash e output in `dist/lineup-frontend/browser`.
+
+---
+
+## 10. Deploy Railway
+
+Il deploy usa tre servizi nello stesso ambiente: `mysql` privato, `api` ASP.NET Core e `frontend` Angular/Nginx. Le configurazioni Railway e Docker sono co-locate con i relativi progetti.
+
+- **API:** Docker .NET 10, health check `/health`; richiede `ASPNETCORE_ENVIRONMENT=Production`, `ASPNETCORE_URLS=http://+:${PORT}`, connection string MySQL, impostazioni JWT e `Cors__AllowedOrigins__0`.
+- **Frontend:** Docker Node 22 per build e Nginx 1.27 per servire la SPA. Nginx gestisce i refresh delle route Angular con `try_files`.
+- **API runtime del frontend:** l'entrypoint genera `assets/runtime-config.js` a ogni avvio da `API_URL`. Il valore deve essere l'URL pubblico dell'API, completo di `/api`; non contiene token o segreti e non richiede una nuova build per cambiare dominio.
+- **Sicurezza:** in produzione `SeedDemoData=false` e `Database__RemoveLegacyTables=false`. La JWT key non va mai committata e deve avere almeno 64 byte.
+
+La procedura completa e le variabili Railway sono in [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md).
+
+---
+
+## 11. Regole di manutenzione
+
+1. Leggere questa guida e la documentazione di architettura pertinente prima di modificare una feature.
+2. Mantenere coerenti backend, contratti TypeScript, stato client e UI quando un endpoint o DTO cambia.
+3. Usare UUID come `string` in Angular e non reinserire mock nei servizi di dominio.
+4. Centralizzare i nuovi permessi in `AuthorizationService`, ma replicare sempre l'autorizzazione sul backend.
+5. Aggiornare questo file, `RAILWAY_DEPLOY.md` e/o `ARCHITECTURE.md` nella stessa modifica quando cambiano rispettivamente comportamento generale, deploy o convenzioni backend.

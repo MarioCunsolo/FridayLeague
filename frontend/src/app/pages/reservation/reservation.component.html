@@ -1,128 +1,168 @@
-<div class="container py-4">
-  <div class="row justify-content-center h-100">
-    <div class="col-12 col-md-10 col-lg-9 d-flex flex-column h-100">
-      <!-- Section Header -->
-      <h2 class="section-title mb-4">Prenotazioni</h2>
+<main class="reservation-page">
+  <header class="page-header">
+    <p class="page-eyebrow">
+      <span nz-icon nzType="calendar" nzTheme="outline"></span>
+      Prossima partita
+    </p>
+    <h1>Prenotazioni</h1>
+    <p>Conferma la tua presenza e tieni sotto controllo la formazione della prossima settimana.</p>
+  </header>
 
-      <div class="mb-4">
-        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow" [disabled]="isReservationDisabled()"
-          (click)="prenotaMe()">
-          PRENOTATI
-        </button>
-        <button nz-button nzType="primary" nzBlock class="btn-prenota shadow mt-2" [disabled]="isReservationDisabled()"
-          (click)="openAddOthersModal(modalTpl)">
-          PRENOTA ALTRE PERSONE
-        </button>
-        @if (isDevelopment) {
-        <button nz-button nzType="default" nzBlock class="mt-2 text-success border-success"
-          (click)="popolaFittizie()">
-          <i class="fa fa-users me-1"></i> POPOLA PRENOTAZIONI FITTIZIE (10 GIOCATORI)
-        </button>
-        }
-        <p class="text-center text-muted small mt-2 mb-0">
-          Le prenotazioni aprono Domenica alle 17:00
-        </p>
+  <section class="booking-panel" aria-label="Azioni di prenotazione">
+    <div class="booking-panel__intro">
+      <div class="booking-panel__icon" aria-hidden="true">
+        <span nz-icon nzType="team" nzTheme="outline"></span>
       </div>
-
-      <ng-template #modalTpl>
-        <div class="modal-form-container">
-          <form nz-form [formGroup]="validateForm" nzLayout="vertical">
-            <nz-form-item class="mb-3">
-              <nz-form-label class="modal-label" nzFor="person-name">Nome e Cognome</nz-form-label>
-              <nz-form-control nzErrorTip="Inserisci il nome e cognome">
-                <input nz-input class="custom-input" formControlName="nomeCognome" placeholder="Nome e Cognome"
-                  id="person-name" [nzAutocomplete]="auto" />
-                <nz-autocomplete #auto>
-                  @for (option of filteredOptions(); track option.id) {
-                  <nz-auto-option [nzValue]="option.nomeCognome">{{ option.nomeCognome }}</nz-auto-option>
-                  }
-                </nz-autocomplete>
-              </nz-form-control>
-            </nz-form-item>
-          </form>
+      <div>
+        <div class="booking-panel__title-row">
+          <h2>Lista convocati</h2>
+          @if (isReservationDisabled()) {
+            <span class="status-badge status-badge--closed">Prenotazioni chiuse</span>
+          } @else {
+            <span class="status-badge">Prenotazioni aperte</span>
+          }
         </div>
-      </ng-template>
+        <p>{{ starters().length }} di 14 posti da titolare già occupati.</p>
+      </div>
+    </div>
 
-      <div class="reservation-card shadow-sm d-flex flex-column flex-grow-1">
-        <p class="text-muted small mb-3 text-uppercase fw-bold">PROSSIMA SETTIMANA</p>
+    <div class="booking-actions">
+      <button nz-button nzType="primary" class="booking-action booking-action--primary" [disabled]="isReservationDisabled()"
+        (click)="prenotaMe()">
+        <span nz-icon nzType="check-circle" nzTheme="outline"></span>
+        Prenota il mio posto
+      </button>
+      <button nz-button nzType="default" class="booking-action booking-action--secondary" [disabled]="isReservationDisabled()"
+        (click)="openAddOthersModal(modalTpl)">
+        <span nz-icon nzType="user-add" nzTheme="outline"></span>
+        Prenota un’altra persona
+      </button>
+    </div>
 
-        <div class="table-responsive flex-grow-1 mb-3">
-          <table class="table custom-table mb-0">
-            <thead>
-              <tr>
-                <th>GIOCATORE</th>
-                <th>DATA E ORARIO</th>
-                <th class="text-center">AZIONI</th>
-              </tr>
-            </thead>
-            <tbody class="scrollable-tbody">
-              <!-- Titolari Section -->
-              <tr class="section-header-row">
-                <td colspan="3" class="section-divider-text">TITOLARI ({{ starters().length }}/14)</td>
-              </tr>
-              @for (res of starters(); track res.id) {
-              <tr>
-                <td class="fw-bold text-nowrap">
-                  <span class="position-badge starter-badge">{{ $index + 1 }}</span>
-                  <span class="player-name">{{ res.nomeCognome }}</span>
-                  @if (res.playerId) {
-                  <span nz-icon nzType="check-circle" nzTheme="fill" class="ms-1 text-primary small"
-                    style="font-size: 12px; vertical-align: middle;"
-                    nz-tooltip nzTooltipTitle="Utente Registrato"></span>
-                  }
-                </td>
-                <td class="text-nowrap">
-                  <span class="d-block text-muted" style="font-size: 0.75rem;">{{ res.dataOra | date:'dd/MM/yyyy' }}</span>
-                  <span class="d-block text-success fw-bold" style="font-size: 0.85rem;">{{ res.dataOra | date:'HH:mm:ss' }}</span>
-                </td>
-                <td class="text-center">
-                  @if (canDeleteReservation(res)) {
-                    <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)" title="Elimina prenotazione">
-                      <i class="fa fa-trash-o"></i>
-                    </button>
-                  }
-                </td>
-              </tr>
+    <p class="booking-note">
+      <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+      Le prenotazioni aprono la domenica alle 17:00.
+    </p>
+
+    @if (isDevelopment) {
+      <button nz-button nzType="default" class="development-action" (click)="popolaFittizie()">
+        <span nz-icon nzType="experiment" nzTheme="outline"></span>
+        Popola 10 prenotazioni fittizie
+      </button>
+    }
+  </section>
+
+  <ng-template #modalTpl>
+    <div class="modal-form-container">
+      <form nz-form [formGroup]="validateForm" nzLayout="vertical">
+        <nz-form-item class="mb-3">
+          <nz-form-label class="modal-label" nzFor="person-name">Nome e Cognome</nz-form-label>
+          <nz-form-control nzErrorTip="Inserisci il nome e cognome">
+            <input nz-input class="custom-input" formControlName="nomeCognome" placeholder="Cerca un partecipante"
+              id="person-name" [nzAutocomplete]="auto" />
+            <nz-autocomplete #auto>
+              @for (option of filteredOptions(); track option.id) {
+                <nz-auto-option [nzValue]="option.nomeCognome">{{ option.nomeCognome }}</nz-auto-option>
               }
+            </nz-autocomplete>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </ng-template>
 
-              <!-- Sostituti Section -->
-              @if (substitutes().length > 0) {
-              <tr class="section-header-row mt-3">
-                <td colspan="3" class="section-divider-text substitute-title">SOSTITUTI ({{ substitutes().length }})
-                </td>
-              </tr>
-              @for (res of substitutes(); track res.id) {
+  <section class="reservation-card" aria-labelledby="reservation-list-title">
+    <header class="reservation-card__header">
+      <div>
+        <p class="card-eyebrow">Prossima settimana</p>
+        <h2 id="reservation-list-title">Formazione prenotata</h2>
+      </div>
+      <div class="reservation-counter" aria-label="Posti titolari occupati">
+        <strong>{{ starters().length }}</strong><span>/14 titolari</span>
+      </div>
+    </header>
+
+    <div class="table-responsive reservation-table-wrapper">
+      <table class="table custom-table mb-0">
+        <thead>
+          <tr>
+            <th>Giocatore</th>
+            <th>Data e orario</th>
+            <th class="text-center">Azioni</th>
+          </tr>
+        </thead>
+        <tbody class="scrollable-tbody">
+          <tr class="section-header-row">
+            <td colspan="3" class="section-divider-text">Titolari <span>{{ starters().length }}/14</span></td>
+          </tr>
+
+          @if (starters().length === 0) {
+            <tr class="empty-row">
+              <td colspan="3">
+                <span nz-icon nzType="calendar" nzTheme="outline"></span>
+                Nessun titolare prenotato: prendi il primo posto.
+              </td>
+            </tr>
+          }
+
+          @for (res of starters(); track res.id) {
+            <tr>
+              <td class="player-cell">
+                <span class="position-badge starter-badge">{{ $index + 1 }}</span>
+                <span class="player-name">{{ res.nomeCognome }}</span>
+                @if (res.playerId) {
+                  <span nz-icon nzType="check-circle" nzTheme="fill" class="registered-icon"
+                    nz-tooltip nzTooltipTitle="Utente registrato"></span>
+                }
+              </td>
+              <td class="date-cell">
+                <span>{{ res.dataOra | date:'dd/MM/yyyy' }}</span>
+                <strong>{{ res.dataOra | date:'HH:mm' }}</strong>
+              </td>
+              <td class="text-center">
+                @if (canDeleteReservation(res)) {
+                  <button nz-button nzType="text" nzDanger class="delete-button" (click)="deleteReservation(res)"
+                    title="Elimina prenotazione" aria-label="Elimina prenotazione di {{ res.nomeCognome }}">
+                    <span nz-icon nzType="delete" nzTheme="outline"></span>
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+
+          @if (substitutes().length > 0) {
+            <tr class="section-header-row section-header-row--substitutes">
+              <td colspan="3" class="section-divider-text">Sostituti <span>{{ substitutes().length }}</span></td>
+            </tr>
+            @for (res of substitutes(); track res.id) {
               <tr class="substitute-row">
-                <td class="fw-bold text-nowrap">
+                <td class="player-cell">
                   <span class="position-badge substitute-badge">{{ $index + 15 }}</span>
                   <span class="player-name">{{ res.nomeCognome }}</span>
                   @if (res.playerId) {
-                  <span nz-icon nzType="check-circle" nzTheme="fill" class="ms-1 text-primary small"
-                    style="font-size: 12px; vertical-align: middle;"
-                    nz-tooltip nzTooltipTitle="Utente Registrato"></span>
+                    <span nz-icon nzType="check-circle" nzTheme="fill" class="registered-icon"
+                      nz-tooltip nzTooltipTitle="Utente registrato"></span>
                   }
                 </td>
-                <td class="text-nowrap">
-                  <span class="d-block text-muted" style="font-size: 0.75rem;">{{ res.dataOra | date:'dd/MM/yyyy' }}</span>
-                  <span class="d-block text-muted fw-bold" style="font-size: 0.85rem;">{{ res.dataOra | date:'HH:mm:ss' }}</span>
+                <td class="date-cell">
+                  <span>{{ res.dataOra | date:'dd/MM/yyyy' }}</span>
+                  <strong>{{ res.dataOra | date:'HH:mm' }}</strong>
                 </td>
                 <td class="text-center">
                   @if (canDeleteReservation(res)) {
-                    <button nz-button nzType="text" nzDanger (click)="deleteReservation(res)" title="Elimina prenotazione">
-                      <i class="fa fa-trash-o"></i>
+                    <button nz-button nzType="text" nzDanger class="delete-button" (click)="deleteReservation(res)"
+                      title="Elimina prenotazione" aria-label="Elimina prenotazione di {{ res.nomeCognome }}">
+                      <span nz-icon nzType="delete" nzTheme="outline"></span>
                     </button>
                   }
                 </td>
               </tr>
-              }
-              }
-            </tbody>
-          </table>
-        </div>
-
-      </div>
+            }
+          }
+        </tbody>
+      </table>
     </div>
-  </div>
+  </section>
 
   <app-confirm-modal
     [isVisible]="isDeleteModalVisible()"
@@ -134,4 +174,4 @@
     (confirm)="confermaEliminazionePrenotazione()"
     (cancel)="annullaEliminazionePrenotazione()">
   </app-confirm-modal>
-</div>
+</main>

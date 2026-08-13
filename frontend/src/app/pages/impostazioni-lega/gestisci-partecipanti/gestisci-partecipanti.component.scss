@@ -126,6 +126,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  width: 100%;
 }
 
 .user-avatar-icon {
@@ -137,13 +138,71 @@
 }
 
 .user-name-text {
+  flex: 1;
+  min-width: 0;
   font-weight: 500;
   color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .email-cell {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.85rem;
+}
+
+.role-control {
+  display: inline-block;
+}
+
+.role-indicator {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.625rem;
+  font-size: 1rem;
+}
+
+.admin-indicator {
+  color: #ffb700;
+  background: rgba(255, 183, 0, 0.14);
+  border: 0.0625rem solid rgba(255, 183, 0, 0.35);
+}
+
+.co-admin-indicator {
+  color: #2db7f5;
+  background: rgba(45, 183, 245, 0.14);
+  border: 0.0625rem solid rgba(45, 183, 245, 0.35);
+}
+
+@media (max-width: 767px) {
+  ::ng-deep .custom-nz-table .ant-table-thead > tr > th:first-child,
+  ::ng-deep .custom-nz-table .ant-table-thead > tr > th.ant-table-cell-fix-left,
+  ::ng-deep .custom-nz-table .ant-table-tbody > tr > td:first-child,
+  ::ng-deep .custom-nz-table .ant-table-tbody > tr > td.ant-table-cell-fix-left {
+    width: 13.125rem !important;
+    min-width: 13.125rem !important;
+  }
+
+  .user-cell {
+    position: relative;
+    gap: 0.625rem;
+  }
+
+  .role-indicator {
+    position: absolute;
+    top: -0.3rem;
+    left: 1.45rem;
+    z-index: 1;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 50%;
+    font-size: 0.7rem;
+  }
 }
 
 .role-select {

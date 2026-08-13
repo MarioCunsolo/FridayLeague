@@ -317,8 +317,12 @@ public class AuthController : ControllerBase
 
         var partecipanti = await _context.UserLeghe
             .Where(ul => ul.LegaId == legaId)
-            .Include(ul => ul.User)
-            .Include(ul => ul.Ruolo)
+            .OrderBy(ul => ul.Ruolo.Nome == "SUPER_ADMIN" ? 0
+                : ul.Ruolo.Nome == "ADMIN" ? 1
+                : ul.Ruolo.Nome == "CO_ADMIN" ? 2
+                : 3)
+            .ThenBy(ul => ul.User.Nome)
+            .ThenBy(ul => ul.User.Cognome)
             .Select(ul => new ParticipantDto
             {
                 UserId = ul.UserId,

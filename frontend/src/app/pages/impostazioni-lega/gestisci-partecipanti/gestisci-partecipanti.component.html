@@ -30,7 +30,7 @@
             <th nzLeft="0px" nzWidth="150px">Nome</th>
             <th nzWidth="120px">Cognome</th>
             <th nzWidth="180px">Email</th>
-            <th nzWidth="120px">Ruolo</th>
+            <th nzWidth="180px">Ruolo</th>
             <th nzWidth="160px" class="actions-header text-end">Azioni</th>
           </tr>
         </thead>
@@ -41,23 +41,34 @@
               <div class="user-cell">
                 <span nz-icon nzType="user" nzTheme="outline" class="user-avatar-icon"></span>
                 <span class="user-name-text">{{ item.nome }}</span>
+                @if (item.ruolo === 'ADMIN' || item.ruolo === 'CO_ADMIN') {
+                  <span
+                    class="role-indicator"
+                    [class.admin-indicator]="item.ruolo === 'ADMIN'"
+                    [class.co-admin-indicator]="item.ruolo === 'CO_ADMIN'"
+                    [title]="item.ruolo === 'ADMIN' ? 'Admin della lega' : 'Co-admin della lega'">
+                    <span nz-icon [nzType]="item.ruolo === 'ADMIN' ? 'crown' : 'safety-certificate'" nzTheme="fill"></span>
+                  </span>
+                }
               </div>
             </td>
             <td>{{ item.cognome }}</td>
             <td class="email-cell">{{ item.email }}</td>
             <td class="role-cell">
               @if (canChangeRole(item)) {
-                <nz-select 
-                  [ngModel]="item.ruolo" 
-                  (ngModelChange)="onRoleSelectChange(item, $event)"
-                  class="role-select" 
-                  [nzDropdownClassName]="'role-select-dropdown'"
-                  nzSize="small"
-                  [nzDropdownMatchSelectWidth]="false">
-                  <nz-option nzValue="GIOCATORE" nzLabel="GIOCATORE"></nz-option>
-                  <nz-option nzValue="CO_ADMIN" nzLabel="CO_ADMIN"></nz-option>
-                  <nz-option nzValue="ADMIN" nzLabel="ADMIN"></nz-option>
-                </nz-select>
+                <div class="role-control">
+                  <nz-select
+                    [ngModel]="item.ruolo"
+                    (ngModelChange)="onRoleSelectChange(item, $event)"
+                    class="role-select"
+                    [nzDropdownClassName]="'role-select-dropdown'"
+                    nzSize="small"
+                    [nzDropdownMatchSelectWidth]="false">
+                    <nz-option nzValue="GIOCATORE" nzLabel="GIOCATORE"></nz-option>
+                    <nz-option nzValue="CO_ADMIN" nzLabel="CO_ADMIN"></nz-option>
+                    <nz-option nzValue="ADMIN" nzLabel="ADMIN"></nz-option>
+                  </nz-select>
+                </div>
               } @else {
                 <nz-tag [nzColor]="getRoleColor(item.ruolo)" class="role-tag">
                   {{ item.ruolo }}

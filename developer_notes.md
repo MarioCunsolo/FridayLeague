@@ -64,6 +64,8 @@ Non sono in uso EF Core Migrations. All'avvio l'app esegue `EnsureCreated()` e b
 2. creazione/compatibilità in `Program.cs`;
 3. DTO, repository/proxy/service e client Angular interessati.
 
+Il nome di una lega è univoco: `Leghe.Nome` usa `VARCHAR(255)` e l'indice univoco `IX_Leghe_Nome`. Il bootstrap converte le basi dati precedenti, in cui il campo poteva essere `TEXT`, prima di creare l'indice. Il controllo applicativo rifiuta inoltre nomi già presenti ignorando maiuscole/minuscole e spazi iniziali/finali; il vincolo del database protegge dalle richieste concorrenti.
+
 `Database:RemoveLegacyTables` e `SeedDemoData` sono impostazioni di sviluppo. Devono rimanere `false` in produzione.
 
 ### Architettura backend
@@ -154,6 +156,8 @@ Sul frontend le regole non devono essere duplicate nei componenti: `Authorizatio
 
 Il backend resta sempre l'autorità finale: `AuthController` valida ruoli e appartenenza alla lega per cambio ruolo, rimozione partecipante e registro attività. Il registro (`/api/auth/lega/{legaId}/registri-attivita`) è visibile solo a `SUPER_ADMIN` e `ADMIN`.
 
+`GET /api/auth/lega/{legaId}/partecipanti` restituisce i partecipanti ordinati per gerarchia (`SUPER_ADMIN`, `ADMIN`, `CO_ADMIN`, `GIOCATORE`) e, a parità di ruolo, per nome e poi cognome in ordine alfabetico.
+
 ---
 
 ## 7. Leghe, partite, prenotazioni e statistiche
@@ -166,7 +170,9 @@ Una lega ha codice invito, descrizione e tipo di competizione. I tipi sono looku
 - `CAMPIONATO` (ID 2, richiede almeno due squadre);
 - `TORNEO` (ID 3, richiede almeno un girone).
 
-Creazione e adesione aggiornano l'utente autenticato con la lega attiva. Il codice invito è mostrato nelle impostazioni della lega e può essere copiato tramite Clipboard API. `ActivityLog` registra creazione della lega, accesso, cambi ruolo e rimozioni.
+Creazione e adesione aggiornano l'utente autenticato con la lega attiva. Il nome viene normalizzato con `Trim`, non può superare 255 caratteri e deve essere unico; l'errore di nome già occupato è restituito al click su “Crea la tua lega”. Il codice invito è casuale, alfanumerico maiuscolo di 6 caratteri e viene rigenerato finché non è unico. È mostrato nelle impostazioni della lega e può essere copiato tramite Clipboard API. `ActivityLog` registra creazione della lega, accesso, cambi ruolo e rimozioni.
+
+Nella UI di creazione sono attualmente disponibili solo le leghe `PARTITA_SINGOLA`: `CAMPIONATO` e `TORNEO` sono disabilitati e contrassegnati “Prossimamente”, anche se i tipi e le relative validazioni backend restano già predisposti. La schermata è responsiva e possiede un proprio contenitore di scroll, necessario perché il documento globale non scorre.
 
 ### Partite e statistiche
 
@@ -186,6 +192,7 @@ Una prenotazione riguarda sempre la prossima partita `Programmata` della lega at
 - `DELETE /api/reservations/{reservationId}` usa l'ID numerico della prenotazione, non l'UUID del giocatore.
 - Il server verifica che la prenotazione appartenga alla prossima partita della lega attiva e autorizza chi è prenotato, chi ha creato la prenotazione oppure un amministratore della lega.
 - `POST /api/reservations/seed-dummy` è disponibile esclusivamente in Development; in produzione restituisce 404 e la UI non espone l'azione.
+- Nell'autocomplete “Prenota altre persone” sono mostrati i membri registrati della lega che non hanno già una prenotazione nella prossima partita. L'esclusione usa prima l'UUID del giocatore e, per compatibilità con prenotazioni storiche senza UUID, anche il nome normalizzato.
 
 ---
 
@@ -194,6 +201,8 @@ Una prenotazione riguarda sempre la prossima partita `Programmata` della lega at
 `ConfirmModalComponent` è una modale riutilizzabile, con tema adattivo, azione standard o pericolosa e output `confirm`/`cancel`. Nella gestione partecipanti viene istanziata dinamicamente con `ViewContainerRef.createComponent()`, configurata, sottoscritta e distrutta dopo l'azione.
 
 Il layout include navigazione desktop/mobile, selettore della lega, logout e cambio tema. Componenti con richieste o sottoscrizioni di durata pagina devono usare `takeUntilDestroyed` (o un equivalente appropriato) per evitare leak.
+
+Gli stati di validazione dei form sono tematizzati globalmente in `frontend/src/styles.scss`: input, textarea, input numerici, select, date picker e campi Bootstrap mantengono lo sfondo del tema corrente anche in errore. Per i campi NG-ZORRO con prefisso/suffisso, il bordo di errore è disegnato solo dal wrapper esterno, senza un secondo riquadro sull'input interno.
 
 ---
 

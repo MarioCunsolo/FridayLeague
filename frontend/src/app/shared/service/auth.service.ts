@@ -2,7 +2,17 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, firstValueFrom, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, LoginRequest, RegisterRequest, UpdateProfileRequest, UserDto } from '../../models/api/auth.models';
+import {
+  AuthResponse,
+  LoginRequest,
+  RegistrationPendingResponse,
+  RegisterRequest,
+  ResendVerificationRequest,
+  UpdateProfileRequest,
+  UserDto,
+  VerifyEmailRequest,
+  VerifyEmailResponse
+} from '../../models/api/auth.models';
 import { Theme } from '../../models/api/core.models';
 import { AuthorizationService } from './authorization.service';
 import { TokenStorageService } from './token-storage.service';
@@ -39,9 +49,15 @@ export class AuthService {
   }
 
   register(request: RegisterRequest) {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, request).pipe(
-      tap(response => this.persistAuthentication(response, true))
-    );
+    return this.http.post<RegistrationPendingResponse>(`${this.baseUrl}/register`, request);
+  }
+
+  verifyEmail(request: VerifyEmailRequest) {
+    return this.http.post<VerifyEmailResponse>(`${this.baseUrl}/verify-email`, request);
+  }
+
+  resendVerification(request: ResendVerificationRequest) {
+    return this.http.post<RegistrationPendingResponse>(`${this.baseUrl}/resend-verification`, request);
   }
 
   logout() {

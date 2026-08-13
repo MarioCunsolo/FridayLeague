@@ -25,6 +25,13 @@
         </div>
         }
 
+        @if (pendingVerificationEmail()) {
+        <button nz-button nzType="default" type="button" class="w-100 mb-4"
+          [nzLoading]="resendingVerification()" (click)="resendVerification()">
+          Invia nuovamente l'email di verifica
+        </button>
+        }
+
         <nz-form-item>
           <nz-form-control nzErrorTip="Inserisci un'email valida!">
             <nz-input-group nzPrefixIcon="user">

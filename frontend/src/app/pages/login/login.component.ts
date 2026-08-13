@@ -34,6 +34,8 @@ export class LoginComponent {
 
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
+  pendingVerificationEmail = signal<string | null>(null);
+  resendingVerification = signal(false);
 
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -58,6 +60,7 @@ export class LoginComponent {
   submitForm(): void {
     if (this.loginForm.valid) {
       this.errorMessage.set(null);
+      this.pendingVerificationEmail.set(null);
       this.authService.login(this.loginForm.getRawValue()).subscribe({
         next: () => {
           // Sostituisce la route di login dopo che AuthService ha pubblicato l'utente.
@@ -65,6 +68,11 @@ export class LoginComponent {
         },
         error: (err) => {
           console.error('Login failed', err);
+          if (err.error?.code === 'EMAIL_NOT_VERIFIED') {
+            this.pendingVerificationEmail.set(this.loginForm.controls.email.value);
+            this.errorMessage.set(err.error.message);
+            return;
+          }
           if (err.error && typeof err.error === 'string') {
             this.errorMessage.set(err.error);
           } else if (err.error && err.error.message) {
@@ -82,5 +90,22 @@ export class LoginComponent {
         }
       });
     }
+  }
+
+  resendVerification(): void {
+    const email = this.pendingVerificationEmail();
+    if (!email || this.resendingVerification()) return;
+
+    this.resendingVerification.set(true);
+    this.authService.resendVerification({ email }).subscribe({
+      next: response => {
+        this.successMessage.set(response.message);
+        this.resendingVerification.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('Non è stato possibile richiedere una nuova email. Riprova tra poco.');
+        this.resendingVerification.set(false);
+      }
+    });
   }
 }

@@ -10,6 +10,7 @@ public class LineUpDbContext : DbContext
     }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<EmailVerificationToken> EmailVerificationTokens => Set<EmailVerificationToken>();
     public DbSet<Lega> Leghe => Set<Lega>();
     public DbSet<TipoLegaLookup> TipiLega => Set<TipoLegaLookup>();
     public DbSet<UserLega> UserLeghe => Set<UserLega>();
@@ -28,6 +29,19 @@ public class LineUpDbContext : DbContext
 
         // Unique index for User Email
         modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+        modelBuilder.Entity<EmailVerificationToken>(entity =>
+        {
+            entity.Property(token => token.TokenHash).HasMaxLength(64);
+            entity.Property(token => token.ProviderMessageId).HasMaxLength(255);
+            entity.HasIndex(token => token.TokenHash).IsUnique();
+            entity.HasIndex(token => new { token.UserId, token.CreatedAtUtc });
+            entity.HasIndex(token => token.ExpiresAtUtc);
+            entity.HasOne(token => token.User)
+                .WithMany()
+                .HasForeignKey(token => token.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
         // Composite key for UserLega
         modelBuilder.Entity<UserLega>()

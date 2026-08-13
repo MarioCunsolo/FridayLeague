@@ -1,0 +1,46 @@
+<main class="verification-container">
+  <section class="verification-card">
+    <header class="brand-section">
+      <div class="mail-icon">
+        <span nz-icon nzType="mail" nzTheme="outline"></span>
+      </div>
+      <h1 class="navbar-brand">LineUp</h1>
+      <h2>Controlla la tua email</h2>
+      <p class="subtitle">Abbiamo inviato un link di attivazione. Aprilo per verificare il tuo indirizzo email e completare la registrazione.</p>
+      <p class="hint">Se non trovi il messaggio, controlla anche la cartella spam.</p>
+    </header>
+
+    @if (message()) {
+      <div class="form-success-alert mb-4">
+        <span nz-icon nzType="check-circle" nzTheme="fill"></span>
+        <span>{{ message() }}</span>
+      </div>
+    }
+    @if (errorMessage()) {
+      <div class="form-error-alert mb-4">
+        <span nz-icon nzType="close-circle" nzTheme="fill"></span>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form nz-form [formGroup]="resendForm" (ngSubmit)="resend()" class="resend-form">
+      <p class="resend-title">Non hai ricevuto l'email?</p>
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Inserisci un indirizzo email valido">
+          <nz-input-group nzPrefixIcon="mail">
+            <input id="resend-email" nz-input type="email" formControlName="email" placeholder="Email" autocomplete="email" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <button nz-button nzType="primary" type="submit" class="resend-button" [nzLoading]="resending()" [disabled]="remainingSeconds() > 0">
+        @if (remainingSeconds() > 0) {
+          Riprova tra {{ remainingSeconds() }} secondi
+        } @else {
+          Invia nuovamente l'email
+        }
+      </button>
+    </form>
+
+    <a routerLink="/login" class="login-link">Torna al login</a>
+  </section>
+</main>

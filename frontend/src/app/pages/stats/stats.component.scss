@@ -49,7 +49,7 @@
 }
 
 :host ::ng-deep .custom-segmented .ant-segmented-item-selected .ant-segmented-item-label {
-    color: #000000 !important;
+    color: var(--green-button-text) !important;
 }
 
 :host ::ng-deep .custom-segmented .ant-segmented-thumb {

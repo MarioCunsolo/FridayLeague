@@ -1,5 +1,7 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using LineUp.Api.Data;
@@ -37,6 +39,50 @@ if (!builder.Environment.IsDevelopment() && allowedCorsOrigins.Length == 0)
 {
     throw new InvalidOperationException("In produzione deve essere configurata almeno un'origine CORS tramite Cors__AllowedOrigins__0.");
 }
+
+var frontendBaseUrl = builder.Configuration["App:FrontendBaseUrl"];
+if (!Uri.TryCreate(frontendBaseUrl, UriKind.Absolute, out var parsedFrontendBaseUrl) ||
+    (!builder.Environment.IsDevelopment() && parsedFrontendBaseUrl.Scheme != Uri.UriSchemeHttps))
+{
+    throw new InvalidOperationException("App:FrontendBaseUrl deve essere un URL assoluto e HTTPS in produzione.");
+}
+
+var emailOptions = builder.Configuration.GetSection("Email").Get<EmailOptions>() ?? new EmailOptions();
+if (!builder.Environment.IsDevelopment() && !string.Equals(emailOptions.Provider, "Resend", StringComparison.OrdinalIgnoreCase))
+{
+    throw new InvalidOperationException("In produzione Email:Provider deve essere Resend.");
+}
+
+if (string.Equals(emailOptions.Provider, "Resend", StringComparison.OrdinalIgnoreCase) &&
+    (string.IsNullOrWhiteSpace(emailOptions.ResendApiKey) || string.IsNullOrWhiteSpace(emailOptions.FromAddress)))
+{
+    throw new InvalidOperationException("Email:ResendApiKey e Email:FromAddress sono obbligatorie quando il provider è Resend.");
+}
+
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.Configure<EmailVerificationOptions>(builder.Configuration.GetSection("EmailVerification"));
+builder.Services.AddHttpClient<ResendEmailSender>(client => client.BaseAddress = new Uri("https://api.resend.com/"));
+builder.Services.AddScoped<DevelopmentEmailSender>();
+builder.Services.AddScoped<SmtpEmailSender>();
+builder.Services.AddScoped<IEmailSender>(serviceProvider =>
+    string.Equals(emailOptions.Provider, "Resend", StringComparison.OrdinalIgnoreCase)
+        ? serviceProvider.GetRequiredService<ResendEmailSender>()
+        : string.Equals(emailOptions.Provider, "MailHog", StringComparison.OrdinalIgnoreCase)
+            ? serviceProvider.GetRequiredService<SmtpEmailSender>()
+        : serviceProvider.GetRequiredService<DevelopmentEmailSender>());
+builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
+
+builder.Services.AddRateLimiter(rateLimitOptions =>
+{
+    rateLimitOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    rateLimitOptions.AddFixedWindowLimiter("email-verification", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 12;
+        limiterOptions.Window = TimeSpan.FromMinutes(15);
+        limiterOptions.QueueLimit = 0;
+        limiterOptions.AutoReplenishment = true;
+    });
+});
 
 // Register Services
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -147,8 +193,35 @@ using (var scope = app.Services.CreateScope())
                 Cognome VARCHAR(255) NOT NULL,
                 Email VARCHAR(255) NOT NULL UNIQUE,
                 PasswordHash VARCHAR(255) NOT NULL,
+                EmailVerifiedAtUtc DATETIME(6) NULL,
                 LegaId VARCHAR(36) NULL,
                 Tema VARCHAR(20) NOT NULL DEFAULT 'dark'
+            );
+        ");
+
+        var hasEmailVerifiedAtUtc = dbContext.Database.SqlQueryRaw<int>(
+            "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'EmailVerifiedAtUtc'"
+        ).AsEnumerable().FirstOrDefault() > 0;
+
+        if (!hasEmailVerifiedAtUtc)
+        {
+            dbContext.Database.ExecuteSqlRaw("ALTER TABLE Users ADD COLUMN EmailVerifiedAtUtc DATETIME(6) NULL;");
+            dbContext.Database.ExecuteSqlRaw("UPDATE Users SET EmailVerifiedAtUtc = UTC_TIMESTAMP(6) WHERE EmailVerifiedAtUtc IS NULL;");
+        }
+
+        dbContext.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS EmailVerificationTokens (
+                Id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                UserId VARCHAR(36) NOT NULL,
+                TokenHash CHAR(64) NOT NULL,
+                CreatedAtUtc DATETIME(6) NOT NULL,
+                ExpiresAtUtc DATETIME(6) NOT NULL,
+                UsedAtUtc DATETIME(6) NULL,
+                RevokedAtUtc DATETIME(6) NULL,
+                ProviderMessageId VARCHAR(255) NULL,
+                CONSTRAINT UQ_EmailVerificationTokens_TokenHash UNIQUE (TokenHash),
+                INDEX IX_EmailVerificationTokens_UserId_CreatedAtUtc (UserId, CreatedAtUtc),
+                INDEX IX_EmailVerificationTokens_ExpiresAtUtc (ExpiresAtUtc)
             );
         ");
 
@@ -401,6 +474,7 @@ using (var scope = app.Services.CreateScope())
                     Nome = u.Nome,
                     Cognome = u.Cognome,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("password"),
+                    EmailVerifiedAtUtc = DateTime.UtcNow,
                     LegaId = league.Id,
                     Tema = "dark"
                 };
@@ -412,6 +486,12 @@ using (var scope = app.Services.CreateScope())
                 if (user.LegaId == null)
                 {
                     user.LegaId = league.Id;
+                    dbContext.SaveChanges();
+                }
+
+                if (!user.EmailVerifiedAtUtc.HasValue)
+                {
+                    user.EmailVerifiedAtUtc = DateTime.UtcNow;
                     dbContext.SaveChanges();
                 }
             }
@@ -453,6 +533,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -2,6 +2,7 @@
   /* Common Tokens */
   --primary-green: #00cc66;
   --secondary-green: #00e673;
+  --green-button-text: #ffffff;
   --danger-red: #ff4444;
   --transition-speed: 0.3s;
 
@@ -31,6 +32,7 @@
   --text-tertiary: #868e96;
   --stat-card-bg: #ffffff;
   --table-striped-bg: rgba(0, 0, 0, 0.02);
+  --green-button-text: #000000;
 }
 
 /* Global Reset & Typography */
@@ -244,6 +246,12 @@ html, body {
 
 /* Helper Classes */
 .text-success { color: var(--primary-green) !important; }
+
+/* Il contrasto dei CTA verdi segue il tema: chiaro sul tema scuro, scuro su quello chiaro. */
+.ant-btn-primary:not(.ant-btn-dangerous),
+.btn-success {
+  color: var(--green-button-text) !important;
+}
 .text-danger { color: var(--danger-red) !important; }
 .text-muted { color: var(--text-secondary) !important; }
 .shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.05)!important; }
@@ -310,7 +318,7 @@ html, body {
 .ant-modal-confirm-btns .ant-btn-primary {
     background-color: var(--primary-green) !important;
     border-color: var(--primary-green) !important;
-    color: #000000 !important;
+    color: var(--green-button-text) !important;
 }
 
 .ant-modal-confirm-btns .ant-btn-dangerous.ant-btn-primary {
@@ -455,7 +463,7 @@ html, body {
 
 .ant-picker-dropdown .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
     background-color: var(--primary-green) !important;
-    color: #000000 !important;
+    color: var(--green-button-text) !important;
 }
 
 .ant-picker-dropdown .ant-picker-time-panel {
@@ -476,7 +484,7 @@ html, body {
 
 .ant-picker-dropdown .ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
     background-color: var(--primary-green) !important;
-    color: #000000 !important;
+    color: var(--green-button-text) !important;
     font-weight: 700 !important;
 }
 
@@ -491,7 +499,7 @@ html, body {
 .ant-picker-dropdown .ant-picker-ok .ant-btn {
     background-color: var(--primary-green) !important;
     border-color: var(--primary-green) !important;
-    color: #000000 !important;
+    color: var(--green-button-text) !important;
 }
 
 .ant-picker-dropdown .ant-picker-ok .ant-btn[disabled] {

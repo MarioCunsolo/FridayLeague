@@ -301,7 +301,7 @@
 }
 
 ::ng-deep .custom-nz-table .ant-pagination-item-active a {
-  color: #000000 !important;
+  color: var(--green-button-text) !important;
   font-weight: 700 !important;
 }
 
@@ -311,7 +311,7 @@
 }
 
 ::ng-deep .custom-nz-table .ant-pagination-item-active:hover a {
-  color: #000000 !important;
+  color: var(--green-button-text) !important;
 }
 
 /* Prev and Next Buttons */

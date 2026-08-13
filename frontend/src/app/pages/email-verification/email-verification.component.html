@@ -1,0 +1,29 @@
+<main class="verification-container">
+  <section class="verification-card">
+    <header class="brand-section">
+      @if (state() === 'loading') {
+        <div class="status-icon loading"><span nz-icon nzType="loading" nzSpin></span></div>
+      } @else if (state() === 'success') {
+        <div class="status-icon success"><span nz-icon nzType="check" nzTheme="outline"></span></div>
+      } @else {
+        <div class="status-icon error"><span nz-icon nzType="close" nzTheme="outline"></span></div>
+      }
+
+      <h1 class="navbar-brand">LineUp</h1>
+      @if (state() === 'loading') {
+        <h2>Verifica in corso</h2>
+      } @else if (state() === 'success') {
+        <h2>Email verificata</h2>
+      } @else {
+        <h2>Verifica non completata</h2>
+      }
+      <p class="subtitle">{{ message() }}</p>
+    </header>
+
+    @if (state() === 'success') {
+      <a nz-button nzType="primary" routerLink="/login" class="action-button primary-action">Vai al login</a>
+    } @else if (state() !== 'loading') {
+      <a nz-button nzType="default" routerLink="/verifica-email-inviata" class="action-button secondary-action">Richiedi una nuova email</a>
+    }
+  </section>
+</main>

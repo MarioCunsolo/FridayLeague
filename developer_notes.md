@@ -43,6 +43,17 @@ Il frontend di sviluppo determina l'API con l'host corrente e la porta `8080`; c
 
 `appsettings.Development.json` contiene una chiave JWT di solo sviluppo e abilita dati demo. In produzione la chiave non è nel repository: deve essere fornita con `JwtSettings__TokenKey`.
 
+### Verifica dell'email
+
+La registrazione crea un account non attivato e restituisce sempre una risposta generica, senza token JWT. Il backend salva solo l'hash SHA-256 del token di attivazione (valido 24 ore) nella tabella `EmailVerificationTokens`; il token originale viene trasmesso una sola volta via email nel fragment dell'URL (`/verifica-email#token=...`). La SPA estrae il fragment e invia il token con `POST /api/auth/verify-email`, quindi la visita di un link da parte di un mail scanner non può attivare l'account.
+
+- `POST /api/auth/register` e `POST /api/auth/resend-verification` rispondono con messaggi generici per non rivelare se un'email esiste.
+- Il login di un account non verificato restituisce `403` e il codice `EMAIL_NOT_VERIFIED`; l'interfaccia consente il reinvio.
+- Il reinvio ha un cooldown di 60 secondi e un massimo di 5 richieste all'ora per account; gli endpoint sono inoltre limitati per IP.
+- In sviluppo il provider `MailHog` consegna via SMTP locale (`localhost:1025`): l'interfaccia per leggere le email è `http://localhost:8025` dopo `cd beckendNET && docker compose up -d`. In produzione `Email__Provider=Resend`, `Email__ResendApiKey`, `Email__FromAddress` e `App__FrontendBaseUrl` sono obbligatori.
+- Il template di attivazione è condiviso da MailHog e Resend, è ottimizzato per client email con stili inline e include il logo `frontend/src/assets/logo-icon.png`, servito dal dominio pubblico del frontend. Il fallback testuale resta disponibile per i client senza HTML.
+- Gli account esistenti vengono considerati verificati una sola volta quando viene aggiunta la nuova colonna. La modifica dell'email da profilo è temporaneamente disabilitata, perché richiederebbe un nuovo ciclo di verifica.
+
 ---
 
 ## 3. Backend: bootstrap, sicurezza e persistenza
@@ -95,7 +106,7 @@ Il frontend non usa più `AppModule` né `app-routing.module.ts`.
 La struttura protetta è:
 
 ```text
-/login, /register                         pubbliche
+/login, /register, /verifica-email-inviata, /verifica-email  pubbliche
 /seleziona-lega                           authGuard + leagueGuard
 /home, /prenotazioni, /calendario, ...    authGuard + leagueGuard, sotto LayoutComponent
 /impostazioni                             anche adminOrCoAdminGuard
@@ -123,7 +134,7 @@ Non usare `number` per UUID. Le vecchie interfacce in `models/interface` restano
 
 ### Ciclo di vita del token
 
-1. Login e registrazione ricevono `AuthResponse` (`user` e `token`).
+1. Il login riceve `AuthResponse` (`user` e `token`); la registrazione riceve solo l'esito pending della verifica email.
 2. `AuthService` aggiorna subito il Signal `currentUser` e delega la persistenza a `TokenStorageService`.
 3. Con “Ricordami” il token è in `localStorage`; altrimenti è in `sessionStorage`.
 4. All'avvio `provideAppInitializer` attende `AuthService.initSession()`, che richiama `GET /api/auth/current-user` prima che le guardie valutino le route.
@@ -135,7 +146,8 @@ Il logout è effettivamente client-side: `AuthService` rimuove token e utente pr
 
 ### Flussi utente
 
-- Un nuovo utente registrato è già autenticato e viene inviato a `/seleziona-lega` per creare o raggiungere una lega.
+- Dopo la registrazione l'utente viene inviato a `/verifica-email-inviata`; resta anonimo finché non apre il link e completa la verifica in `/verifica-email`.
+- Le due schermate pubbliche di verifica seguono lo stesso layout delle pagine Login e Registrazione: card responsive, branding LineUp, tema chiaro/scuro e CTA principali verdi.
 - `leagueGuard` porta un utente autenticato senza lega attiva a `/seleziona-lega`.
 - Tema e lega attiva sono proprietà dell'utente restituite dall'API; il tema viene applicato dal `LayoutComponent` e sincronizzato con il backend.
 
@@ -201,6 +213,8 @@ Una prenotazione riguarda sempre la prossima partita `Programmata` della lega at
 `ConfirmModalComponent` è una modale riutilizzabile, con tema adattivo, azione standard o pericolosa e output `confirm`/`cancel`. Nella gestione partecipanti viene istanziata dinamicamente con `ViewContainerRef.createComponent()`, configurata, sottoscritta e distrutta dopo l'azione.
 
 Il layout include navigazione desktop/mobile, selettore della lega, logout e cambio tema. Componenti con richieste o sottoscrizioni di durata pagina devono usare `takeUntilDestroyed` (o un equivalente appropriato) per evitare leak.
+
+I controlli con sfondo verde usano `--green-button-text`: testo bianco nel tema scuro e nero nel tema chiaro. La regola è applicata anche alle CTA Ng-Zorro, modali, prenotazioni, azioni di partita, selettori e navigazione attiva. Le nuove CTA verdi devono usare questa variabile invece di fissare il colore del testo.
 
 Gli stati di validazione dei form sono tematizzati globalmente in `frontend/src/styles.scss`: input, textarea, input numerici, select, date picker e campi Bootstrap mantengono lo sfondo del tema corrente anche in errore. Per i campi NG-ZORRO con prefisso/suffisso, il bordo di errore è disegnato solo dal wrapper esterno, senza un secondo riquadro sull'input interno.
 

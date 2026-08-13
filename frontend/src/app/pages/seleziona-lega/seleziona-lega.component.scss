@@ -192,7 +192,7 @@
     font-size: 1.125rem;
     background-color: var(--primary-green);
     border-color: var(--primary-green);
-    color: #000000 !important;
+    color: var(--green-button-text) !important;
     transition: all 0.2s ease;
     margin-top: 1rem;
 }
@@ -298,7 +298,7 @@
 .league-type-card.active .type-icon-wrapper {
     background-color: var(--primary-green);
     .type-icon {
-        color: #000000;
+        color: var(--green-button-text);
     }
 }
 
@@ -383,7 +383,7 @@
     &.active {
         background-color: var(--primary-green);
         border-color: var(--primary-green);
-        color: #000000;
+        color: var(--green-button-text);
         font-weight: 700;
     }
 }

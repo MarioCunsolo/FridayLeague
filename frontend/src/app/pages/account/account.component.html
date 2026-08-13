@@ -62,7 +62,9 @@
                 type="email" 
                 formControlName="email" 
                 class="form-control custom-input" 
+                readonly
                 placeholder="Inserisci l'indirizzo email">
+              <small class="text-secondary d-block mt-2">L'indirizzo email non può essere modificato finché il flusso di nuova verifica non sarà disponibile.</small>
               @if (profileForm.get('email')?.touched && profileForm.get('email')?.invalid) {
                 <div class="text-danger small mt-1">Inserisci un indirizzo email valido.</div>
               }

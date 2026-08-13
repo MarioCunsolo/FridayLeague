@@ -36,6 +36,7 @@ export class RegisterComponent {
   }>;
 
   errorMessage = signal<string | null>(null);
+  submitting = signal(false);
 
   constructor() {
     this.registerForm = this.fb.nonNullable.group({
@@ -49,10 +50,10 @@ export class RegisterComponent {
   submitForm(): void {
     if (this.registerForm.valid) {
       this.errorMessage.set(null);
+      this.submitting.set(true);
       this.authService.register(this.registerForm.getRawValue()).subscribe({
         next: () => {
-          // Il backend restituisce già una sessione valida: evitare un secondo login incoerente.
-          this.router.navigate(['/seleziona-lega']);
+          void this.router.navigate(['/verifica-email-inviata']);
         },
         error: (err) => {
           console.error('Registration failed', err);
@@ -63,6 +64,7 @@ export class RegisterComponent {
           } else {
             this.errorMessage.set('Errore durante la registrazione. Riprova.');
           }
+          this.submitting.set(false);
         }
       });
     } else {

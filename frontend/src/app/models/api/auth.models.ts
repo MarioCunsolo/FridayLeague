@@ -28,6 +28,23 @@ export interface AuthResponse {
   token: string;
 }
 
+export interface RegistrationPendingResponse {
+  message: string;
+}
+
+export interface VerifyEmailRequest {
+  token: string;
+}
+
+export interface VerifyEmailResponse {
+  verified: boolean;
+  message: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

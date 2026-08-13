@@ -37,6 +37,14 @@ Il container Angular usa Nginx, gestisce i refresh sulle rotte Angular e legge `
    JwtSettings__Issuer=LineUpBackend
    JwtSettings__Audience=LineUpFrontend
    Cors__AllowedOrigins__0=https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}
+   App__FrontendBaseUrl=https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}
+   Email__Provider=Resend
+   Email__ResendApiKey=re_xxxxxxxxx
+   Email__FromAddress=account@tuodominio.it
+   Email__FromName=LineUp
+   EmailVerification__TokenLifetimeMinutes=1440
+   EmailVerification__ResendCooldownSeconds=60
+   EmailVerification__MaxSendsPerHour=5
    SeedDemoData=false
    Database__RemoveLegacyTables=false
    ```
@@ -62,10 +70,12 @@ Railway riavvierà Nginx e l'app Angular inizierà a usare l'API senza ricompila
 ## 5. Verifica
 
 1. Apri il dominio del frontend e registra un nuovo utente.
-2. Controlla i log del servizio `api` e la risposta `GET /health`.
-3. Riavvia l'API e verifica che MySQL conservi i dati.
-4. Non abilitare `SeedDemoData` né `Database__RemoveLegacyTables` in produzione.
+2. Controlla che l'email arrivi dall'indirizzo verificato in Resend e apri il link di attivazione.
+3. Verifica che il login sia consentito soltanto dopo l'attivazione dell'email.
+4. Controlla i log del servizio `api` e la risposta `GET /health`.
+5. Riavvia l'API e verifica che MySQL conservi i dati.
+6. Non abilitare `SeedDemoData` né `Database__RemoveLegacyTables` in produzione.
 
 ## Sviluppo locale
 
-In ambiente Development rimangono attivi i dati demo, la chiave JWT locale e il CORS permissivo per supportare il frontend locale e i test su rete Wi-Fi. Queste impostazioni non vengono applicate con `ASPNETCORE_ENVIRONMENT=Production`.
+In ambiente Development rimangono attivi i dati demo, la chiave JWT locale e il CORS permissivo per supportare il frontend locale e i test su rete Wi-Fi. Le email vengono intercettate da MailHog: avvia i servizi con `cd beckendNET && docker compose up -d`, poi apri `http://localhost:8025` per leggere l'email e usare il link di verifica. Queste impostazioni non vengono applicate con `ASPNETCORE_ENVIRONMENT=Production`.

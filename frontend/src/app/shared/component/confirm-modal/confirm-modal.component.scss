@@ -117,7 +117,7 @@
 .confirm-btn {
     background-color: var(--primary-green) !important;
     border-color: var(--primary-green) !important;
-    color: #000000 !important;
+    color: var(--green-button-text) !important;
     box-shadow: 0 0.25rem 0.625rem rgba(0, 204, 102, 0.2);
 
     &:hover {

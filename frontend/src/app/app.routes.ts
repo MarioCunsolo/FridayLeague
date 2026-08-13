@@ -9,6 +9,8 @@ import { leagueGuard } from './shared/guard/league.guard';
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'verifica-email-inviata', loadComponent: () => import('./pages/email-verification-sent/email-verification-sent.component').then(m => m.EmailVerificationSentComponent) },
+  { path: 'verifica-email', loadComponent: () => import('./pages/email-verification/email-verification.component').then(m => m.EmailVerificationComponent) },
   {
     path: 'seleziona-lega',
     canActivate: [authGuard, leagueGuard],

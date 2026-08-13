@@ -5,6 +5,7 @@ using LineUp.Api.Services;
 using LineUp.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace LineUp.Api.Controllers;
@@ -15,39 +16,86 @@ public class AuthController : ControllerBase
 {
     private readonly LineUpDbContext _context;
     private readonly ITokenService _tokenService;
+    private readonly IEmailVerificationService _emailVerificationService;
 
-    public AuthController(LineUpDbContext context, ITokenService tokenService)
+    public AuthController(
+        LineUpDbContext context,
+        ITokenService tokenService,
+        IEmailVerificationService emailVerificationService)
     {
         _context = context;
         _tokenService = tokenService;
+        _emailVerificationService = emailVerificationService;
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
+    [EnableRateLimiting("email-verification")]
+    public async Task<ActionResult<RegistrationPendingResponse>> Register(RegisterRequest request, CancellationToken cancellationToken)
     {
-        if (await UserExists(request.Email))
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+        var response = new RegistrationPendingResponse();
+        if (await UserExists(normalizedEmail))
         {
-            return BadRequest("L'email è già registrata.");
+            return Accepted(response);
         }
 
         var user = new User
         {
-            Nome = request.Nome,
-            Cognome = request.Cognome,
-            Email = request.Email.ToLower(),
+            Nome = request.Nome.Trim(),
+            Cognome = request.Cognome.Trim(),
+            Email = normalizedEmail,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
         };
 
         _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        var userDto = await MapToUserDtoWithLegheAsync(user);
-        var token = _tokenService.CreateToken(user);
-
-        return Ok(new AuthResponse
+        try
         {
-            User = userDto,
-            Token = token
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            return Accepted(response);
+        }
+
+        await _emailVerificationService.SendVerificationEmailAsync(user, enforceLimits: false, cancellationToken);
+        return Accepted(response);
+    }
+
+    [HttpPost("verify-email")]
+    [EnableRateLimiting("email-verification")]
+    public async Task<ActionResult<VerifyEmailResponse>> VerifyEmail(VerifyEmailRequest request, CancellationToken cancellationToken)
+    {
+        var verified = await _emailVerificationService.VerifyAsync(request.Token, cancellationToken);
+        if (!verified)
+        {
+            return BadRequest(new ApiErrorResponse
+            {
+                Code = "INVALID_OR_EXPIRED_TOKEN",
+                Message = "Il link di attivazione non è valido o è scaduto. Richiedi una nuova email di verifica."
+            });
+        }
+
+        return Ok(new VerifyEmailResponse
+        {
+            Verified = true,
+            Message = "Il tuo indirizzo email è stato verificato. Ora puoi accedere a LineUp."
+        });
+    }
+
+    [HttpPost("resend-verification")]
+    [EnableRateLimiting("email-verification")]
+    public async Task<ActionResult<RegistrationPendingResponse>> ResendVerification(ResendVerificationRequest request, CancellationToken cancellationToken)
+    {
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+        var user = await _context.Users.SingleOrDefaultAsync(item => item.Email == normalizedEmail, cancellationToken);
+        if (user != null && !user.EmailVerifiedAtUtc.HasValue)
+        {
+            await _emailVerificationService.SendVerificationEmailAsync(user, enforceLimits: true, cancellationToken);
+        }
+
+        return Accepted(new RegistrationPendingResponse
+        {
+            Message = "Se esiste un account non ancora attivato, riceverai una nuova email di verifica."
         });
     }
 
@@ -55,7 +103,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
     {
         var user = await _context.Users
-            .SingleOrDefaultAsync(x => x.Email == request.Email.ToLower());
+            .SingleOrDefaultAsync(x => x.Email == request.Email.Trim().ToLowerInvariant());
 
         if (user == null)
         {
@@ -67,6 +115,15 @@ public class AuthController : ControllerBase
         if (!result)
         {
             return Unauthorized("Credenziali non valide.");
+        }
+
+        if (!user.EmailVerifiedAtUtc.HasValue)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ApiErrorResponse
+            {
+                Code = "EMAIL_NOT_VERIFIED",
+                Message = "Devi verificare l'indirizzo email prima di accedere."
+            });
         }
 
         var userDto = await MapToUserDtoWithLegheAsync(user);
@@ -91,6 +148,11 @@ public class AuthController : ControllerBase
             return NotFound("Utente non trovato.");
         }
 
+        if (!user.EmailVerifiedAtUtc.HasValue)
+        {
+            return Unauthorized();
+        }
+
         return Ok(await MapToUserDtoWithLegheAsync(user));
     }
 
@@ -105,15 +167,10 @@ public class AuthController : ControllerBase
             return NotFound("Utente non trovato.");
         }
 
-        var normalizedEmail = request.Email.Trim().ToLower();
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
         if (user.Email.ToLower() != normalizedEmail)
         {
-            var emailExists = await _context.Users.AnyAsync(u => u.Email == normalizedEmail);
-            if (emailExists)
-            {
-                return BadRequest("L'indirizzo email inserito è già utilizzato da un altro utente.");
-            }
-            user.Email = normalizedEmail;
+            return BadRequest("La modifica dell'indirizzo email richiede una nuova verifica e non è ancora disponibile.");
         }
 
         user.Nome = request.Nome.Trim();
@@ -557,7 +614,7 @@ public class AuthController : ControllerBase
 
     private async Task<bool> UserExists(string email)
     {
-        return await _context.Users.AnyAsync(x => x.Email == email.ToLower());
+        return await _context.Users.AnyAsync(x => x.Email == email.Trim().ToLowerInvariant());
     }
 
     private async Task<UserDto> MapToUserDtoWithLegheAsync(User user)

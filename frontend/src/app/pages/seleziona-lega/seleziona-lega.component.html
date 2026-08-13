@@ -84,16 +84,21 @@
           <label class="form-input-label mb-2">Formato di Competizione</label>
           <div class="row g-3 league-types-grid">
             @for (type of leagueTypes; track type.id) {
-              <div class="col-12 col-md-4">
+              <div class="col-12 col-lg-4">
                 <div class="league-type-card" 
                      [class.active]="selectedTipoLegaId() === type.id" 
+                     [class.unavailable]="type.id !== 1"
                      (click)="selectTipoLega(type.id)">
                   
                   <div class="type-card-header">
                     <div class="type-icon-wrapper">
                       <span nz-icon [nzType]="type.icon" nzTheme="outline" class="type-icon"></span>
                     </div>
-                    <span class="type-badge">{{ type.badge }}</span>
+                    @if (type.id === 1) {
+                      <span class="type-badge">{{ type.badge }}</span>
+                    } @else {
+                      <span class="coming-soon-badge">Prossimamente</span>
+                    }
                   </div>
 
                   <h4 class="type-title">{{ type.name }}</h4>

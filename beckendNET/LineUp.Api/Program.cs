@@ -130,7 +130,7 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.ExecuteSqlRaw(@"
             CREATE TABLE IF NOT EXISTS Leghe (
                 Id VARCHAR(36) PRIMARY KEY,
-                Nome VARCHAR(255) NOT NULL,
+                Nome VARCHAR(255) NOT NULL UNIQUE,
                 Descrizione TEXT NULL,
                 CodiceInvito VARCHAR(50) NOT NULL UNIQUE,
                 TipoLegaId INT NOT NULL DEFAULT 1,
@@ -222,7 +222,7 @@ using (var scope = app.Services.CreateScope())
         try
         {
             var hasTipoLegaId = dbContext.Database.SqlQueryRaw<int>(
-                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'TipoLegaId'"
+                "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'TipoLegaId'"
             ).AsEnumerable().FirstOrDefault() > 0;
 
             if (!hasTipoLegaId)
@@ -231,7 +231,7 @@ using (var scope = app.Services.CreateScope())
             }
 
             var hasNumeroSquadre = dbContext.Database.SqlQueryRaw<int>(
-                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'NumeroSquadre'"
+                "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'NumeroSquadre'"
             ).AsEnumerable().FirstOrDefault() > 0;
 
             if (!hasNumeroSquadre)
@@ -240,12 +240,30 @@ using (var scope = app.Services.CreateScope())
             }
 
             var hasNumeroGironi = dbContext.Database.SqlQueryRaw<int>(
-                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'NumeroGironi'"
+                "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'NumeroGironi'"
             ).AsEnumerable().FirstOrDefault() > 0;
 
             if (!hasNumeroGironi)
             {
                 dbContext.Database.ExecuteSqlRaw("ALTER TABLE Leghe ADD COLUMN NumeroGironi INT NULL;");
+            }
+
+            var leagueNameColumnType = dbContext.Database.SqlQueryRaw<string>(
+                "SELECT DATA_TYPE AS Value FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'Nome'"
+            ).AsEnumerable().FirstOrDefault();
+
+            if (leagueNameColumnType is "text" or "mediumtext" or "longtext")
+            {
+                dbContext.Database.ExecuteSqlRaw("ALTER TABLE Leghe MODIFY COLUMN Nome VARCHAR(255) NOT NULL;");
+            }
+
+            var hasUniqueLeagueNameIndex = dbContext.Database.SqlQueryRaw<int>(
+                "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'Nome' AND NON_UNIQUE = 0"
+            ).AsEnumerable().FirstOrDefault() > 0;
+
+            if (!hasUniqueLeagueNameIndex)
+            {
+                dbContext.Database.ExecuteSqlRaw("CREATE UNIQUE INDEX IX_Leghe_Nome ON Leghe (Nome);");
             }
         }
         catch { }

@@ -65,9 +65,7 @@ export class ReservationComponent implements OnInit {
   constructor() {
     this.validateForm.controls.nomeCognome.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(value => this.filteredOptions.set(this.registeredUsers.filter(option =>
-        option.nomeCognome.toLowerCase().includes((value ?? '').toLowerCase())
-      )));
+      .subscribe(value => this.filteredOptions.set(this.getAvailableRegisteredUsers(value)));
   }
 
   ngOnInit(): void {
@@ -77,7 +75,7 @@ export class ReservationComponent implements OnInit {
     if (legaId) {
       this.legaService.getLegaPartecipanti(legaId).subscribe((partecipanti: ParticipantDto[]) => {
         this.registeredUsers = partecipanti.map(p => ({ id: p.userId, nomeCognome: `${p.nome} ${p.cognome}` }));
-        this.filteredOptions.set(this.registeredUsers);
+        this.filteredOptions.set(this.getAvailableRegisteredUsers());
       });
     }
   }
@@ -160,7 +158,7 @@ export class ReservationComponent implements OnInit {
 
   openAddOthersModal(tpl: TemplateRef<unknown>): void {
     this.validateForm.reset();
-    this.filteredOptions.set(this.registeredUsers);
+    this.filteredOptions.set(this.getAvailableRegisteredUsers());
 
     const modalRef = this.modal.create({
       nzTitle: 'Prenota altra persona',
@@ -188,6 +186,28 @@ export class ReservationComponent implements OnInit {
       });
     });
     modalRef.afterClose.subscribe(() => statusSubscription.unsubscribe());
+  }
+
+  private getAvailableRegisteredUsers(query: string | null = ''): { id: string, nomeCognome: string }[] {
+    const reservedUserIds = new Set(
+      this.reservations()
+        .map(reservation => reservation.playerId)
+        .filter((playerId): playerId is string => playerId !== null)
+    );
+    const reservedNames = new Set(
+      this.reservations().map(reservation => this.normalizeName(reservation.nomeCognome))
+    );
+    const normalizedQuery = this.normalizeName(query);
+
+    return this.registeredUsers.filter(option =>
+      !reservedUserIds.has(option.id) &&
+      !reservedNames.has(this.normalizeName(option.nomeCognome)) &&
+      this.normalizeName(option.nomeCognome).includes(normalizedQuery)
+    );
+  }
+
+  private normalizeName(name: string | null): string {
+    return (name ?? '').trim().toLocaleLowerCase();
   }
 
 }

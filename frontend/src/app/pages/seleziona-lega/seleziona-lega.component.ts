@@ -120,14 +120,12 @@ export class SelezionaLegaComponent {
    * Seleziona il tipo di lega da creare.
    */
   selectTipoLega(tipoId: number): void {
+    if (tipoId !== 1) {
+      return;
+    }
+
     this.selectedTipoLegaId.set(tipoId);
     this.createForm.controls.tipoLegaId.setValue(tipoId);
-    
-    if (tipoId === 2 && !this.createForm.controls.numeroSquadre.value) {
-      this.createForm.controls.numeroSquadre.setValue(4);
-    } else if (tipoId === 3 && !this.createForm.controls.numeroGironi.value) {
-      this.createForm.controls.numeroGironi.setValue(2);
-    }
   }
 
   /**

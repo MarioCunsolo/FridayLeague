@@ -537,6 +537,89 @@ html, body {
     gap: 0.5rem;
 }
 
+/*
+ * NG-ZORRO imposta uno sfondo bianco sugli input con validazione negativa.
+ * Manteniamo lo sfondo del tema e lasciamo al bordo, al testo d'errore e al
+ * focus rosso il compito di comunicare lo stato non valido.
+ */
+.ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless):not(.ant-input-affix-wrapper *).ant-input,
+.ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless):not(.ant-input-affix-wrapper *).ant-input:hover,
+.ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper,
+.ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper:hover,
+.ant-input-number-status-error:not(.ant-input-number-disabled):not(.ant-input-number-borderless):not(.ant-input-number-affix-wrapper *).ant-input-number,
+.ant-input-number-status-error:not(.ant-input-number-disabled):not(.ant-input-number-borderless):not(.ant-input-number-affix-wrapper *).ant-input-number:hover,
+.ant-input-number-affix-wrapper-status-error:not(.ant-input-number-affix-wrapper-disabled):not(.ant-input-number-affix-wrapper-borderless).ant-input-number-affix-wrapper,
+.ant-input-number-affix-wrapper-status-error:not(.ant-input-number-affix-wrapper-disabled):not(.ant-input-number-affix-wrapper-borderless).ant-input-number-affix-wrapper:hover,
+.ant-picker-status-error.ant-picker,
+.ant-picker-status-error.ant-picker:not(.ant-picker-disabled):hover,
+.ant-select-status-error.ant-select:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer) .ant-select-selector,
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+  background-color: var(--input-bg) !important;
+  border-color: var(--danger-red) !important;
+  color: var(--text-primary) !important;
+}
+
+.ant-input-affix-wrapper-status-error .ant-input,
+.ant-input-number-affix-wrapper-status-error .ant-input-number-input,
+.ant-input-number-status-error .ant-input-number-input,
+.ant-picker-status-error .ant-picker-input > input,
+.ant-select-status-error .ant-select-selection-item,
+.ant-select-status-error .ant-select-selection-placeholder,
+.form-control.is-invalid::placeholder,
+.was-validated .form-control:invalid::placeholder {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+/* Il bordo di errore appartiene al wrapper: l'input annidato non deve disegnarne un secondo. */
+.ant-input-affix-wrapper .ant-input,
+.ant-input-affix-wrapper .ant-input:hover,
+.ant-input-affix-wrapper .ant-input:focus,
+.ant-input-affix-wrapper .ant-input:focus-visible,
+.ant-input-affix-wrapper .ant-input.ant-input-status-error,
+.ant-input-affix-wrapper-status-error .ant-input,
+.ant-input-affix-wrapper-status-error .ant-input:hover,
+.ant-input-affix-wrapper-status-error .ant-input:focus,
+.ant-input-affix-wrapper-status-error .ant-input.ant-input-status-error,
+.ant-input-number-affix-wrapper .ant-input-number-input,
+.ant-input-number-affix-wrapper .ant-input-number-input:hover,
+.ant-input-number-affix-wrapper .ant-input-number-input:focus,
+.ant-input-number-affix-wrapper-status-error .ant-input-number-input {
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.ant-input-affix-wrapper-status-error .ant-input::placeholder,
+.ant-input-status-error::placeholder,
+.ant-input-number-affix-wrapper-status-error .ant-input-number-input::placeholder,
+.ant-input-number-status-error .ant-input-number-input::placeholder,
+.ant-picker-status-error .ant-picker-input > input::placeholder,
+.ant-select-status-error .ant-select-selection-placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+.ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless):not(.ant-input-affix-wrapper *).ant-input:focus,
+.ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless):not(.ant-input-affix-wrapper *).ant-input-focused,
+.ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper-focused,
+.ant-input-number-status-error:not(.ant-input-number-disabled):not(.ant-input-number-borderless):not(.ant-input-number-affix-wrapper *).ant-input-number:focus,
+.ant-input-number-status-error:not(.ant-input-number-disabled):not(.ant-input-number-borderless):not(.ant-input-number-affix-wrapper *).ant-input-number-focused,
+.ant-input-number-affix-wrapper-status-error:not(.ant-input-number-affix-wrapper-disabled):not(.ant-input-number-affix-wrapper-borderless).ant-input-number-affix-wrapper:focus,
+.ant-input-number-affix-wrapper-status-error:not(.ant-input-number-affix-wrapper-disabled):not(.ant-input-number-affix-wrapper-borderless).ant-input-number-affix-wrapper-focused,
+.ant-picker-status-error.ant-picker-focused,
+.ant-picker-status-error.ant-picker:focus,
+.ant-select-status-error.ant-select:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer).ant-select-open .ant-select-selector,
+.ant-select-status-error.ant-select:not(.ant-select-disabled):not(.ant-select-customize-input):not(.ant-pagination-size-changer).ant-select-focused .ant-select-selector,
+.form-control.is-invalid:focus,
+.was-validated .form-control:invalid:focus {
+  background-color: var(--input-bg) !important;
+  border-color: #ff7875 !important;
+  box-shadow: 0 0 0 0.125rem rgba(255, 77, 79, 0.2) !important;
+}
+
 /* Prevent automatic page zoom on input focus on mobile devices (iOS Safari / WebKit auto-zooms when input font-size < 16px) */
 @media screen and (max-width: 768px) {
   input,

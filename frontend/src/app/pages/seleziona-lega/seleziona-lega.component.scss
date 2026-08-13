@@ -1,18 +1,27 @@
+:host {
+    display: block;
+    height: 100%;
+    min-height: 0;
+}
+
 .select-league-container {
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
     width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     background-color: var(--app-bg);
     transition: background-color var(--transition-speed);
     padding: 1.5rem;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
 }
 
 .select-league-card {
     width: 100%;
-    max-width: 45rem;
+    max-width: 76rem;
     background-color: var(--card-bg);
     border: 0.0625rem solid var(--border-main);
     border-radius: 1.5rem;
@@ -21,6 +30,7 @@
     transition: all var(--transition-speed);
     animation: fadeIn 0.4s ease-out;
     position: relative;
+    margin-block: auto;
 }
 
 @keyframes fadeIn {
@@ -207,7 +217,7 @@
 
 /* Form Creazione Espanso per ospitare le Card dei Tipi di Lega */
 .create-form-expanded {
-    max-width: 44rem;
+    max-width: 70rem;
 }
 
 /* League Type Cards */
@@ -238,6 +248,29 @@
         background-color: rgba(0, 204, 102, 0.05);
         box-shadow: 0 0 1.25rem rgba(0, 204, 102, 0.15);
     }
+
+    &.unavailable {
+        cursor: not-allowed;
+        opacity: 0.58;
+
+        &:hover {
+            border-color: var(--border-sub);
+            box-shadow: none;
+            transform: none;
+        }
+    }
+}
+
+.coming-soon-badge {
+    border-radius: 999px;
+    padding: 0.3rem 0.6rem;
+    background-color: rgba(255, 196, 0, 0.14);
+    border: 0.0625rem solid rgba(255, 196, 0, 0.4);
+    color: #ffc400;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.03125rem;
+    text-transform: uppercase;
 }
 
 .type-card-header {

@@ -149,6 +149,19 @@ public class AuthController : ControllerBase
         var user = await _context.Users.FindAsync(userId);
         if (user == null) return NotFound("Utente non trovato.");
 
+        var leagueName = request.NomeLega.Trim();
+        if (string.IsNullOrWhiteSpace(leagueName))
+        {
+            return BadRequest("Il nome della lega è obbligatorio.");
+        }
+
+        var leagueNameExists = await _context.Leghe
+            .AnyAsync(lega => lega.Nome.ToLower() == leagueName.ToLower());
+        if (leagueNameExists)
+        {
+            return BadRequest("Esiste già una lega con questo nome.");
+        }
+
         // Validazione Tipo Lega
         var tipoLegaExists = await _context.TipiLega.AnyAsync(t => t.Id == request.TipoLegaId);
         if (!tipoLegaExists)
@@ -170,7 +183,7 @@ public class AuthController : ControllerBase
 
         var newLega = new Lega
         {
-            Nome = request.NomeLega,
+            Nome = leagueName,
             Descrizione = request.Descrizione,
             CodiceInvito = inviteCode,
             TipoLegaId = request.TipoLegaId,
@@ -179,7 +192,14 @@ public class AuthController : ControllerBase
         };
 
         _context.Leghe.Add(newLega);
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return BadRequest("Esiste già una lega con questo nome.");
+        }
 
         var userLega = new UserLega
         {

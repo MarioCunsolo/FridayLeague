@@ -50,6 +50,15 @@ public class LineUpDbContext : DbContext
             .HasIndex(l => l.CodiceInvito)
             .IsUnique();
 
+        // Ogni lega deve essere identificabile da un nome univoco.
+        modelBuilder.Entity<Lega>()
+            .Property(l => l.Nome)
+            .HasMaxLength(255);
+
+        modelBuilder.Entity<Lega>()
+            .HasIndex(l => l.Nome)
+            .IsUnique();
+
         // Relazione Lega -> TipoLegaLookup
         modelBuilder.Entity<Lega>()
             .HasOne(l => l.TipoLega)

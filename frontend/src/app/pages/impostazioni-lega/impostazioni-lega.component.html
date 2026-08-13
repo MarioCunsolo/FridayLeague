@@ -1,77 +1,73 @@
-<div class="impostazioni-container">
-  <div class="header-section mb-4">
-    <h2 class="title text-primary">Impostazioni Lega</h2>
-    <p class="subtitle text-secondary">
-      Gestisci le impostazioni, i partecipanti e le configurazioni per la lega attiva.
+<main class="settings-page">
+  <header class="page-header">
+    <p class="page-eyebrow">
+      <span nz-icon nzType="setting" nzTheme="outline"></span>
+      Area amministrativa
     </p>
-  </div>
+    <h1>Impostazioni lega</h1>
+    <p>Gestisci partecipanti, ruoli e attività della lega attiva.</p>
+  </header>
 
-  <!-- Info Lega Card con Codice Invito -->
   @if (activeLega(); as activeLega) {
-    <div class="league-info-banner mb-4 shadow-sm">
-      <div class="banner-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div class="league-meta">
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <span nz-icon nzType="trophy" nzTheme="outline" class="trophy-icon text-primary"></span>
-            <h3 class="league-name m-0">{{ activeLega.nome }}</h3>
-            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 font-semibold" style="font-size: 0.75rem;">
+    <section class="league-overview" aria-label="Informazioni della lega">
+      <div class="league-overview__main">
+        <div class="league-icon" aria-hidden="true">
+          <span nz-icon nzType="trophy" nzTheme="outline"></span>
+        </div>
+        <div class="league-copy">
+          <div class="league-title-row">
+            <h2>{{ activeLega.nome }}</h2>
+            <span class="league-type">
               {{ activeLega.tipoLegaNome || 'Partita Singola' }}
               <ng-container *ngIf="activeLega.tipoLegaId === 2 && activeLega.numeroSquadre">
-                ({{ activeLega.numeroSquadre }} Squadre)
+                · {{ activeLega.numeroSquadre }} squadre
               </ng-container>
               <ng-container *ngIf="activeLega.tipoLegaId === 3 && activeLega.numeroGironi">
-                ({{ activeLega.numeroGironi }} {{ activeLega.numeroGironi === 1 ? 'Girone' : 'Gironi' }})
+                · {{ activeLega.numeroGironi }} {{ activeLega.numeroGironi === 1 ? 'girone' : 'gironi' }}
               </ng-container>
             </span>
           </div>
-          @if (activeLega.descrizione) {
-            <p class="league-desc text-secondary mt-1 mb-0">{{ activeLega.descrizione }}</p>
-          } @else {
-            <p class="league-desc text-secondary mt-1 mb-0 italic">Nessuna descrizione impostata.</p>
-          }
-        </div>
-        
-        <div class="invite-code-box d-flex align-items-center justify-content-md-end gap-2">
-          <span class="label text-secondary m-0">CODICE INVITO:</span>
-          <span class="code-value font-monospace">{{ activeLega.codiceInvito }}</span>
+          <p>{{ activeLega.descrizione || 'Nessuna descrizione impostata per questa lega.' }}</p>
         </div>
       </div>
-    </div>
+
+      <div class="invite-code" aria-label="Codice invito">
+        <span class="invite-code__label">Codice invito</span>
+        <span class="invite-code__value">{{ activeLega.codiceInvito }}</span>
+      </div>
+    </section>
   }
 
-  <div class="row g-4">
-    <!-- Card Gestione Partecipanti -->
-    <div class="col-md-6 col-lg-4">
-      <div class="settings-card shadow-sm" [routerLink]="['partecipanti']">
-        <div class="icon-container">
-          <span nz-icon nzType="team" nzTheme="outline" class="settings-icon"></span>
-        </div>
-        <div class="card-details">
-          <h4 class="card-title">Gestisci Partecipanti</h4>
-          <p class="card-description">Visualizza l'elenco degli iscritti, gestisci i loro ruoli e controlla chi partecipa alla lega.</p>
-        </div>
-        <div class="arrow-container">
-          <span nz-icon nzType="arrow-right" nzTheme="outline" class="arrow-icon"></span>
-        </div>
-      </div>
+  <section class="settings-section" aria-labelledby="settings-actions-title">
+    <div class="section-heading">
+      <h2 id="settings-actions-title">Gestione della lega</h2>
+      <p>Seleziona l’area che vuoi amministrare.</p>
     </div>
 
-    <!-- Card Registro Attività -->
-    @if (isAdminOrSuperAdmin()) {
-      <div class="col-md-6 col-lg-4">
-        <div class="settings-card shadow-sm" [routerLink]="['registro-attivita']">
-          <div class="icon-container">
-            <span nz-icon nzType="file-protect" nzTheme="outline" class="settings-icon"></span>
-          </div>
-          <div class="card-details">
-            <h4 class="card-title">Registro Attività</h4>
-            <p class="card-description">Traccia lo storico delle operazioni amministrative (creazione, cambi di ruolo, eliminazioni) della lega.</p>
-          </div>
-          <div class="arrow-container">
-            <span nz-icon nzType="arrow-right" nzTheme="outline" class="arrow-icon"></span>
-          </div>
+    <div class="settings-grid">
+      <a class="settings-card" routerLink="partecipanti">
+        <div class="settings-card__icon">
+          <span nz-icon nzType="team" nzTheme="outline"></span>
         </div>
-      </div>
-    }
-  </div>
-</div>
+        <div class="settings-card__content">
+          <h3>Gestisci partecipanti</h3>
+          <p>Consulta gli iscritti, aggiorna i ruoli e controlla chi fa parte della lega.</p>
+        </div>
+        <span nz-icon nzType="arrow-right" nzTheme="outline" class="settings-card__arrow" aria-hidden="true"></span>
+      </a>
+
+      @if (isAdminOrSuperAdmin()) {
+        <a class="settings-card" routerLink="registro-attivita">
+          <div class="settings-card__icon">
+            <span nz-icon nzType="file-protect" nzTheme="outline"></span>
+          </div>
+          <div class="settings-card__content">
+            <h3>Registro attività</h3>
+            <p>Rivedi lo storico delle operazioni amministrative e delle modifiche ai ruoli.</p>
+          </div>
+          <span nz-icon nzType="arrow-right" nzTheme="outline" class="settings-card__arrow" aria-hidden="true"></span>
+        </a>
+      }
+    </div>
+  </section>
+</main>

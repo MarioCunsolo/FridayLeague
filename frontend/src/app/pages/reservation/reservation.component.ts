@@ -1,23 +1,27 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, TemplateRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Reservation } from '../../models/interface/reservation.interface';
 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ReservationService } from '../../shared/service/reservation.service';
 import { LegaService } from '../../shared/service/lega.service';
 import { AuthService } from '../../shared/service/auth.service';
-import { ConfirmModalComponent } from '../../shared/component/confirm-modal/confirm-modal.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ParticipantDto } from '../../models/api/league.models';
 import { AuthorizationService } from '../../shared/service/authorization.service';
 import { environment } from '../../../environments/environment';
+import { ResponsiveOverlayService } from '../../shared/overlay/responsive-overlay.service';
+import {
+  ReservationFormComponent,
+  ReservationFormDialogData,
+  ReservationFormResult
+} from './components/reservation-form/reservation-form.component';
+import {
+  ConfirmActionComponent,
+  ConfirmActionData
+} from '../../shared/overlay/content/confirm-action/confirm-action.component';
 
 @Component({
   selector: 'app-reservation',
@@ -28,45 +32,27 @@ import { environment } from '../../../environments/environment';
   imports: [
     CommonModule,
     DatePipe,
-    ReactiveFormsModule,
     NzButtonModule,
-    NzIconModule,
-    NzModalModule,
-    NzFormModule,
-    NzInputModule,
-    NzAutocompleteModule,
-    ConfirmModalComponent
+    NzIconModule
   ]
 })
 export class ReservationComponent implements OnInit {
-  private modal = inject(NzModalService);
-  private fb = inject(FormBuilder);
   private message = inject(NzMessageService);
   private reservationService = inject(ReservationService);
   private legaService = inject(LegaService);
   private authService = inject(AuthService);
   private authorization = inject(AuthorizationService);
   private destroyRef = inject(DestroyRef);
-
-  validateForm = this.fb.group({
-    nomeCognome: ['', [Validators.required]]
-  });
+  private overlays = inject(ResponsiveOverlayService);
 
   // Elenco dei membri della lega attiva, usato per l'autocomplete "Prenota altra persona"
   registeredUsers: { id: string, nomeCognome: string }[] = [];
-  filteredOptions = signal<{ id: string, nomeCognome: string }[]>([]);
 
   reservations = this.reservationService.reservations;
   readonly isDevelopment = !environment.production;
 
   starters = computed(() => this.reservations().slice(0, 14));
   substitutes = computed(() => this.reservations().slice(14));
-
-  constructor() {
-    this.validateForm.controls.nomeCognome.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(value => this.filteredOptions.set(this.getAvailableRegisteredUsers(value)));
-  }
 
   ngOnInit(): void {
     this.reservationService.loadReservations().subscribe();
@@ -75,7 +61,6 @@ export class ReservationComponent implements OnInit {
     if (legaId) {
       this.legaService.getLegaPartecipanti(legaId).subscribe((partecipanti: ParticipantDto[]) => {
         this.registeredUsers = partecipanti.map(p => ({ id: p.userId, nomeCognome: `${p.nome} ${p.cognome}` }));
-        this.filteredOptions.set(this.getAvailableRegisteredUsers());
       });
     }
   }
@@ -101,42 +86,31 @@ export class ReservationComponent implements OnInit {
     return this.authorization.canDeleteReservation(this.authService.currentUser(), player);
   }
 
-  isDeleteModalVisible = signal<boolean>(false);
-  selectedReservationToDelete = signal<Reservation | null>(null);
-
   deleteReservation(player: Reservation): void {
     if (!this.canDeleteReservation(player)) {
       this.message.error('Non hai i permessi per eliminare questa prenotazione.');
       return;
     }
 
-    this.selectedReservationToDelete.set(player);
-    this.isDeleteModalVisible.set(true);
-  }
-
-  confermaEliminazionePrenotazione(): void {
-    const player = this.selectedReservationToDelete();
-    if (!player) {
-      this.isDeleteModalVisible.set(false);
-      return;
-    }
-
-    this.reservationService.deleteReservation(player.id).subscribe({
-      next: () => {
-        this.message.success('Prenotazione eliminata con successo.');
-        this.isDeleteModalVisible.set(false);
-        this.selectedReservationToDelete.set(null);
+    this.overlays.open<ConfirmActionData, true>(ConfirmActionComponent, {
+      title: 'Elimina prenotazione',
+      data: {
+        message: "Sei sicuro di voler eliminare questa prenotazione? L'operazione è irreversibile e perderai la tua posizione attuale nella lista.",
+        confirmText: 'Sì, elimina',
+        danger: true
       },
-      error: (err) => {
-        this.message.error(err.error || "Errore durante l'eliminazione della prenotazione.");
-        this.isDeleteModalVisible.set(false);
-      }
-    });
-  }
+      modal: { width: 416 },
+      drawer: { height: 'auto' }
+    }).afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(confirmed => {
+        if (!confirmed) return;
 
-  annullaEliminazionePrenotazione(): void {
-    this.isDeleteModalVisible.set(false);
-    this.selectedReservationToDelete.set(null);
+        this.reservationService.deleteReservation(player.id).subscribe({
+          next: () => this.message.success('Prenotazione eliminata con successo.'),
+          error: err => this.message.error(err.error || "Errore durante l'eliminazione della prenotazione.")
+        });
+      });
   }
 
   isReservationDisabled = computed(() => {
@@ -156,39 +130,26 @@ export class ReservationComponent implements OnInit {
   });
 
 
-  openAddOthersModal(tpl: TemplateRef<unknown>): void {
-    this.validateForm.reset();
-    this.filteredOptions.set(this.getAvailableRegisteredUsers());
+  openAddOthersModal(): void {
+    this.overlays.open<ReservationFormDialogData, ReservationFormResult>(ReservationFormComponent, {
+      title: 'Prenota altra persona',
+      data: { availablePeople: this.getAvailableRegisteredUsers() },
+      autofocus: null,
+      modal: { width: 500 },
+      drawer: { height: 'auto' }
+    }).afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(result => {
+        if (!result) return;
 
-    const modalRef = this.modal.create({
-      nzTitle: 'Prenota altra persona',
-      nzContent: tpl,
-      nzWidth: 500,
-      nzOkDisabled: true,
-      nzOnOk: () => {
-        if (this.validateForm.valid) {
-          const typedName = this.validateForm.value.nomeCognome as string;
-
-          this.reservationService.addReservation({ nomeCognome: typedName }).subscribe({
-            next: () => this.message.success('Prenotazione effettuata con successo!'),
-            error: (err) => this.message.error(err.error || 'Errore durante la prenotazione.')
-          });
-          return true;
-        } else {
-          return false;
-        }
-      }
-    });
-
-    const statusSubscription = this.validateForm.statusChanges.subscribe(() => {
-      modalRef.updateConfig({
-        nzOkDisabled: !this.validateForm.valid
+        this.reservationService.addReservation(result).subscribe({
+          next: () => this.message.success('Prenotazione effettuata con successo!'),
+          error: err => this.message.error(err.error || 'Errore durante la prenotazione.')
+        });
       });
-    });
-    modalRef.afterClose.subscribe(() => statusSubscription.unsubscribe());
   }
 
-  private getAvailableRegisteredUsers(query: string | null = ''): { id: string, nomeCognome: string }[] {
+  private getAvailableRegisteredUsers(): { id: string, nomeCognome: string }[] {
     const reservedUserIds = new Set(
       this.reservations()
         .map(reservation => reservation.playerId)
@@ -197,12 +158,9 @@ export class ReservationComponent implements OnInit {
     const reservedNames = new Set(
       this.reservations().map(reservation => this.normalizeName(reservation.nomeCognome))
     );
-    const normalizedQuery = this.normalizeName(query);
-
     return this.registeredUsers.filter(option =>
       !reservedUserIds.has(option.id) &&
-      !reservedNames.has(this.normalizeName(option.nomeCognome)) &&
-      this.normalizeName(option.nomeCognome).includes(normalizedQuery)
+      !reservedNames.has(this.normalizeName(option.nomeCognome))
     );
   }
 

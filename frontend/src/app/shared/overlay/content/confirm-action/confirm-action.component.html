@@ -1,0 +1,22 @@
+<section class="confirm-content overlay-content">
+  <div class="confirm-content__body overlay-content__body">
+    <div class="confirm-icon" [class.confirm-icon--danger]="data.danger">
+      <nz-icon [nzType]="data.danger ? 'exclamation-circle' : 'question-circle'" nzTheme="outline" />
+    </div>
+    <p>{{ data.message }}</p>
+  </div>
+
+  <footer class="overlay-content__actions">
+    <button nz-button type="button" (click)="cancel()">
+      {{ data.cancelText ?? 'Annulla' }}
+    </button>
+    <button
+      nz-button
+      type="button"
+      nzType="primary"
+      [nzDanger]="data.danger ?? false"
+      (click)="confirm()">
+      {{ data.confirmText ?? 'Conferma' }}
+    </button>
+  </footer>
+</section>

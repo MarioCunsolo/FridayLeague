@@ -1,0 +1,39 @@
+<section class="overlay-content">
+  <main class="overlay-content__body">
+    <form nz-form [formGroup]="matchForm" nzLayout="vertical" (ngSubmit)="save()">
+      <nz-form-item>
+        <nz-form-label nzRequired>Squadra casa</nz-form-label>
+        <nz-form-control nzErrorTip="Inserisci il nome della squadra di casa">
+          <input nz-input formControlName="homeTeam" placeholder="Es. Squali Rossi" class="custom-input" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Squadra trasferta</nz-form-label>
+        <nz-form-control [nzErrorTip]="matchForm.controls.awayTeam.hasError('squadreUguali') ? 'Le due squadre devono essere diverse' : 'Inserisci il nome della squadra in trasferta'">
+          <input nz-input formControlName="awayTeam" placeholder="Es. Leoni FC" class="custom-input" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item class="mb-0">
+        <nz-form-label nzRequired>Data e ora</nz-form-label>
+        <nz-form-control nzErrorTip="Seleziona data e ora della partita">
+          <nz-date-picker
+            formControlName="date"
+            [nzShowTime]="{ nzFormat: 'HH:mm' }"
+            nzFormat="dd/MM/yyyy HH:mm"
+            [nzInputReadOnly]="true"
+            nzPlaceHolder="Seleziona data e ora"
+            class="custom-date-picker" />
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </main>
+
+  <footer class="overlay-content__actions">
+    <button nz-button type="button" (click)="cancel()">Annulla</button>
+    <button nz-button type="button" nzType="primary" [disabled]="matchForm.invalid" (click)="save()">
+      {{ isEditMode ? 'Salva modifiche' : 'Crea partita' }}
+    </button>
+  </footer>
+</section>

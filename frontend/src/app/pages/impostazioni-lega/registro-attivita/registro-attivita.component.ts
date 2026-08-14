@@ -9,6 +9,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../../../shared/service/auth.service';
 import { LegaService } from '../../../shared/service/lega.service';
+import { ActivityLogDto } from '../../../models/api/league.models';
 
 @Component({
   selector: 'app-registro-attivita',
@@ -31,7 +32,7 @@ export class RegistroAttivitaComponent implements OnInit {
   private legaService = inject(LegaService);
   private message = inject(NzMessageService);
 
-  public logs = signal<any[]>([]);
+  public logs = signal<ActivityLogDto[]>([]);
   public loading = signal<boolean>(true);
 
   ngOnInit(): void {

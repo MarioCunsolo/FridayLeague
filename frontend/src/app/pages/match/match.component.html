@@ -14,8 +14,10 @@
           <div class="row g-4">
             @for (match of group.matches; track match.id) {
             <div class="col-12 col-md-6">
-              <div class="match-card shadow-sm" [class.next-match]="match.id === nextMatchId()"
-                (click)="openMatchDetails(match)" style="cursor: pointer;">
+              <div class="match-card shadow-sm" [class.next-match]="match.id === nextMatchId()" role="button" tabindex="0"
+                (click)="openMatchDetails(match)" (keydown.enter)="openMatchDetails(match)"
+                (keydown.space)="$event.preventDefault(); openMatchDetails(match)"
+                [attr.aria-label]="'Apri i dettagli della partita ' + match.homeTeam + ' contro ' + match.awayTeam" style="cursor: pointer;">
                 @if (match.id === nextMatchId()) {
                 <div class="next-match-badge shadow-sm">PROSSIMA</div>
                 }
@@ -66,12 +68,8 @@
   } @else {
   <div class="row justify-content-center">
     <div class="col-12 col-md-10 col-lg-9">
-      <app-match-detail [match]="selectedMatch()" [isModal]="false" (close)="closeMatchDetails()"></app-match-detail>
+      <app-match-detail [match]="selectedMatch()" [isModal]="false" (detailsClosed)="closeMatchDetails()"></app-match-detail>
     </div>
   </div>
-  }
-
-  @if (isAddMatchModalVisible()) {
-  <app-add-match-modal (submit)="handleMatchSubmit($event)" (cancel)="handleMatchCancel()"></app-add-match-modal>
   }
 </div>

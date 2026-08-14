@@ -33,7 +33,7 @@
         Prenota il mio posto
       </button>
       <button nz-button nzType="default" class="booking-action booking-action--secondary" [disabled]="isReservationDisabled()"
-        (click)="openAddOthersModal(modalTpl)">
+        (click)="openAddOthersModal()">
         <span nz-icon nzType="user-add" nzTheme="outline"></span>
         Prenota un’altra persona
       </button>
@@ -51,25 +51,6 @@
       </button>
     }
   </section>
-
-  <ng-template #modalTpl>
-    <div class="modal-form-container">
-      <form nz-form [formGroup]="validateForm" nzLayout="vertical">
-        <nz-form-item class="mb-3">
-          <nz-form-label class="modal-label" nzFor="person-name">Nome e Cognome</nz-form-label>
-          <nz-form-control nzErrorTip="Inserisci il nome e cognome">
-            <input nz-input class="custom-input" formControlName="nomeCognome" placeholder="Cerca un partecipante"
-              id="person-name" [nzAutocomplete]="auto" />
-            <nz-autocomplete #auto>
-              @for (option of filteredOptions(); track option.id) {
-                <nz-auto-option [nzValue]="option.nomeCognome">{{ option.nomeCognome }}</nz-auto-option>
-              }
-            </nz-autocomplete>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-    </div>
-  </ng-template>
 
   <section class="reservation-card" aria-labelledby="reservation-list-title">
     <header class="reservation-card__header">
@@ -163,15 +144,4 @@
       </table>
     </div>
   </section>
-
-  <app-confirm-modal
-    [isVisible]="isDeleteModalVisible()"
-    title="Elimina Prenotazione"
-    message="Sei sicuro di voler eliminare questa prenotazione? L'operazione è irreversibile e perderai la tua posizione attuale nella lista."
-    confirmText="Sì, Elimina"
-    cancelText="Annulla"
-    [isDanger]="true"
-    (confirm)="confermaEliminazionePrenotazione()"
-    (cancel)="annullaEliminazionePrenotazione()">
-  </app-confirm-modal>
 </main>

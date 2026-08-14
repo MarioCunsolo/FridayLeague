@@ -33,7 +33,8 @@
       <div class="row g-4 justify-content-center options-grid">
         <!-- Card Crea -->
         <div class="col-12 col-md-6">
-          <div class="option-card shadow-sm" (click)="selectAction('create')">
+          <div class="option-card shadow-sm" role="button" tabindex="0" (click)="selectAction('create')"
+            (keydown.enter)="selectAction('create')" (keydown.space)="$event.preventDefault(); selectAction('create')">
             <div class="option-icon-wrapper">
               <i class="fa fa-trophy option-icon"></i>
             </div>
@@ -44,7 +45,8 @@
         
         <!-- Card Partecipa -->
         <div class="col-12 col-md-6">
-          <div class="option-card shadow-sm" (click)="selectAction('join')">
+          <div class="option-card shadow-sm" role="button" tabindex="0" (click)="selectAction('join')"
+            (keydown.enter)="selectAction('join')" (keydown.space)="$event.preventDefault(); selectAction('join')">
             <div class="option-icon-wrapper">
               <i class="fa fa-handshake-o option-icon"></i>
             </div>
@@ -62,9 +64,9 @@
         <!-- Nome Lega -->
         <nz-form-item>
           <nz-form-control nzErrorTip="Il nome della lega deve contenere almeno 3 caratteri">
-            <label class="form-input-label">Nome della Lega</label>
+            <label class="form-input-label" for="league-name">Nome della Lega</label>
             <nz-input-group nzPrefixIcon="trophy">
-              <input nz-input formControlName="nome" placeholder="Es. LineUp Milano / Friday Champions" />
+              <input id="league-name" nz-input formControlName="nome" placeholder="Es. LineUp Milano / Friday Champions" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
@@ -72,23 +74,25 @@
         <!-- Descrizione Lega -->
         <nz-form-item>
           <nz-form-control>
-            <label class="form-input-label">Descrizione (Opzionale)</label>
+            <label class="form-input-label" for="league-description">Descrizione (Opzionale)</label>
             <nz-input-group nzPrefixIcon="profile">
-              <textarea nz-input formControlName="descrizione" rows="2" placeholder="Aggiungi dettagli, orari e campo principale della lega..."></textarea>
+              <textarea id="league-description" nz-input formControlName="descrizione" rows="2" placeholder="Aggiungi dettagli, orari e campo principale della lega..."></textarea>
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
 
         <!-- Selezione Tipo Lega (Cards interattive con descrizione) -->
         <div class="league-type-section mb-4">
-          <label class="form-input-label mb-2">Formato di Competizione</label>
+          <span class="form-input-label mb-2">Formato di Competizione</span>
           <div class="row g-3 league-types-grid">
             @for (type of leagueTypes; track type.id) {
               <div class="col-12 col-lg-4">
                 <div class="league-type-card" 
                      [class.active]="selectedTipoLegaId() === type.id" 
                      [class.unavailable]="type.id !== 1"
-                     (click)="selectTipoLega(type.id)">
+                     role="button" tabindex="0" (click)="selectTipoLega(type.id)"
+                     (keydown.enter)="selectTipoLega(type.id)"
+                     (keydown.space)="$event.preventDefault(); selectTipoLega(type.id)">
                   
                   <div class="type-card-header">
                     <div class="type-icon-wrapper">
@@ -105,9 +109,11 @@
                   <p class="type-short-desc">{{ type.shortDesc }}</p>
                   <p class="type-long-desc">{{ type.longDesc }}</p>
 
-                  <div class="selected-check" *ngIf="selectedTipoLegaId() === type.id">
-                    <span nz-icon nzType="check-circle" nzTheme="fill"></span>
-                  </div>
+                  @if (selectedTipoLegaId() === type.id) {
+                    <div class="selected-check">
+                      <span nz-icon nzType="check-circle" nzTheme="fill"></span>
+                    </div>
+                  }
                 </div>
               </div>
             }
@@ -117,7 +123,7 @@
         <!-- Parametri specifici in base al tipo di lega -->
         @if (selectedTipoLegaId() === 2) {
           <div class="conditional-config-box mb-4">
-            <label class="form-input-label">Numero di Squadre del Campionato</label>
+            <label class="form-input-label" for="league-teams-count">Numero di Squadre del Campionato</label>
             <p class="config-help-text">Seleziona quante squadre si contenderanno la vittoria a punti:</p>
             <div class="quick-selectors d-flex flex-wrap gap-2 mb-3">
               @for (opt of squadreOptions; track opt) {
@@ -131,7 +137,7 @@
             <nz-form-item class="m-0">
               <nz-form-control nzErrorTip="Inserisci un numero valido di squadre (minimo 2)">
                 <nz-input-group nzPrefixIcon="team">
-                  <input nz-input type="number" formControlName="numeroSquadre" min="2" max="64" placeholder="Es. 8" />
+                  <input id="league-teams-count" nz-input type="number" formControlName="numeroSquadre" min="2" max="64" placeholder="Es. 8" />
                 </nz-input-group>
               </nz-form-control>
             </nz-form-item>
@@ -140,7 +146,7 @@
 
         @if (selectedTipoLegaId() === 3) {
           <div class="conditional-config-box mb-4">
-            <label class="form-input-label">Numero di Gironi del Torneo</label>
+            <label class="form-input-label" for="league-groups-count">Numero di Gironi del Torneo</label>
             <p class="config-help-text">Seleziona in quanti gironi saranno divise le squadre nella prima fase:</p>
             <div class="quick-selectors d-flex flex-wrap gap-2 mb-3">
               @for (opt of gironiOptions; track opt) {
@@ -154,7 +160,7 @@
             <nz-form-item class="m-0">
               <nz-form-control nzErrorTip="Inserisci un numero valido di gironi (minimo 1)">
                 <nz-input-group nzPrefixIcon="appstore">
-                  <input nz-input type="number" formControlName="numeroGironi" min="1" max="16" placeholder="Es. 4" />
+                  <input id="league-groups-count" nz-input type="number" formControlName="numeroGironi" min="1" max="16" placeholder="Es. 4" />
                 </nz-input-group>
               </nz-form-control>
             </nz-form-item>
@@ -179,9 +185,9 @@
       <form nz-form [formGroup]="joinForm" (ngSubmit)="submitJoin()" class="action-form">
         <nz-form-item>
           <nz-form-control nzErrorTip="Il codice deve essere alfanumerico e lungo 6 o 8 caratteri (es. FRID2026)">
-            <label class="form-input-label">Codice d'Accesso della Lega</label>
+            <label class="form-input-label" for="league-access-code">Codice d'Accesso della Lega</label>
             <nz-input-group nzPrefixIcon="key">
-              <input nz-input formControlName="codice" placeholder="Es. FL99AZ04" style="text-transform: uppercase;" />
+              <input id="league-access-code" nz-input formControlName="codice" placeholder="Es. FL99AZ04" style="text-transform: uppercase;" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>

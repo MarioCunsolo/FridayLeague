@@ -1,0 +1,51 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .ant-form-item-label > label {
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
+:host ::ng-deep .ant-select {
+  display: block;
+  height: 3.25rem;
+}
+
+:host ::ng-deep .ant-select-selector {
+  display: flex;
+  height: 3.25rem;
+  align-items: center;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border-color: var(--border-main);
+  border-radius: 0.75rem;
+}
+
+:host ::ng-deep .ant-select-focused .ant-select-selector,
+:host ::ng-deep .ant-select:hover .ant-select-selector {
+  background: var(--card-bg);
+  border-color: var(--primary-green);
+}
+
+.team-selector {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.team-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.team-label--home {
+  color: #ff4444;
+}
+
+.team-label--away {
+  color: #ffcc00;
+}

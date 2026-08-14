@@ -25,7 +25,7 @@ FridayLeague/
 - **SDK richiesto:** `global.json` richiede `10.0.100`, con `rollForward: latestFeature`. È quindi necessario avere installato un SDK .NET 10 (`dotnet --list-sdks`).
 - **Database:** MySQL 8.0, avviabile con `beckendNET/docker-compose.yml`; in locale espone la porta `3306`.
 - **ORM:** Pomelo `9.0.0`, che porta EF Core 9. Il progetto gira su .NET 10, ma non va aggiornato a EF Core/Pomelo 10 senza una migrazione dedicata e verificata.
-- **Frontend:** Angular `21.2`, componenti standalone, Signals e control flow nativo (`@if`, `@for`), con Ng-Zorro, Bootstrap e Font Awesome locali.
+- **Frontend:** Angular `21.2`, componenti standalone, Signals e control flow nativo (`@if`, `@for`), con Angular CDK, Ng-Zorro, Bootstrap e Font Awesome locali.
 - **Stile:** SCSS e variabili CSS per tema chiaro/scuro.
 
 Gli ID di `User`, `Lega` e tutte le FK utente/lega sono UUID: `Guid` in C#, `VARCHAR(36)` in MySQL e `string` in TypeScript. Le partite e le prenotazioni mantengono invece ID numerici.
@@ -210,7 +210,25 @@ Una prenotazione riguarda sempre la prossima partita `Programmata` della lega at
 
 ## 8. Componenti UI condivisi
 
-`ConfirmModalComponent` è una modale riutilizzabile, con tema adattivo, azione standard o pericolosa e output `confirm`/`cancel`. Nella gestione partecipanti viene istanziata dinamicamente con `ViewContainerRef.createComponent()`, configurata, sottoscritta e distrutta dopo l'azione.
+### Overlay responsivi
+
+L'apertura di modali e drawer è centralizzata in `frontend/src/app/shared/overlay`:
+
+- `AppModalService.createModal()` usa `NzModalService` per le modali desktop;
+- `AppDrawerService.createDrawer()` usa `NzDrawerService` con placement `bottom` per i drawer;
+- `ResponsiveOverlayService.open()` è l'API usata normalmente dalle feature e sceglie il contenitore al momento dell'apertura tramite `BreakpointObserver`: fino a `768px` apre un drawer, oltre tale soglia una modale;
+- `AppOverlayOptions<TData>` raggruppa titolo, dati tipizzati e configurazione di presentazione; `AppOverlayRef<TResult>` espone `afterClosed$` e distingue un risultato da una chiusura senza conferma;
+- `injectAppOverlayData<TData>()` e `injectAppOverlayRef<TResult>()` permettono ai componenti contenuto di ricevere dati e chiudersi senza dipendere dai token specifici di modale o drawer.
+
+`NzModalService` e `NzDrawerService` non sono provider root autonomi: nel bootstrap standalone `app.config.ts` deve registrare `importProvidersFrom(NzModalModule, NzDrawerModule)`. Senza questa registrazione, l'iniezione di `ResponsiveOverlayService` impedisce la creazione delle pagine che lo usano con errore Angular `NG0201`.
+
+I componenti funzionali (`MatchFormComponent`, `GoalFormComponent`, `LineupFormComponent`, `PasswordFormComponent`, `ReservationFormComponent` e `ConfirmActionComponent`) contengono soltanto form, validazione e azioni. Non devono introdurre backdrop, posizionamento `fixed`, animazioni del contenitore, proprietà `isVisible` o nomi legati a `Modal`: lo stesso componente deve funzionare in entrambi i contenitori. Le feature non devono usare direttamente `NzModalService`, `NzDrawerService`, `ViewContainerRef.createComponent()` o segnali `is...ModalVisible`; devono passare la classe del componente e un oggetto dati alla facade responsiva.
+
+Gli overlay utilizzano le animazioni native Ng-Zorro. Gli stili condivisi `.app-modal-overlay`, `.app-drawer-overlay` e `.overlay-content*` sono in `frontend/src/styles.scss`; non aggiungere animazioni CSS concorrenti. L'autofocus delle modali è disabilitato per impostazione predefinita. `ReservationFormComponent` assegna inoltre il focus iniziale al contenitore tramite Angular CDK, così l'apertura del drawer non attiva la tastiera mobile.
+
+Gli overlay applicativi usano uno `z-index` superiore al layout. Ng-Zorro assegna tale valore al wrapper e alla maschera, mentre Angular CDK lascia normalmente il relativo pane a `1000`: la regola globale `.cdk-global-overlay-wrapper > .cdk-overlay-pane { z-index: inherit; }` è quindi necessaria affinché il contenuto rimanga sopra la propria maschera e continui a ricevere i click.
+
+Le conferme standard e pericolose usano `ConfirmActionComponent` e restituiscono `true` solo alla conferma; `undefined` indica annullamento, chiusura dalla maschera o tasto Escape. Le sottoscrizioni a `afterClosed$` nei componenti di pagina devono usare `takeUntilDestroyed`.
 
 Il layout include navigazione desktop/mobile, selettore della lega, logout e cambio tema. Componenti con richieste o sottoscrizioni di durata pagina devono usare `takeUntilDestroyed` (o un equivalente appropriato) per evitare leak.
 

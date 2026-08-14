@@ -338,6 +338,144 @@ html, body {
     transform: translateY(-0.125rem);
 }
 
+/* Overlay applicativi: modale desktop e drawer mobile condividono gli stessi contenuti. */
+.cdk-global-overlay-wrapper > .cdk-overlay-pane {
+  /*
+   * Ng-Zorro applica nzZIndex al wrapper e alla mask, mentre CDK mantiene il
+   * pane a 1000. Con overlay applicativi sopra quota 1000 la mask finirebbe
+   * quindi davanti al contenuto, intercettando tutti i click.
+   */
+  z-index: inherit;
+}
+
+.app-modal-overlay {
+  .ant-modal-content {
+    overflow: hidden;
+    background: var(--card-bg) !important;
+    border: 0.0625rem solid var(--border-main) !important;
+    border-radius: 1.5rem !important;
+  }
+
+  .ant-modal-header {
+    padding: 1rem 1.25rem;
+    background: var(--app-bg) !important;
+    border-bottom: 0.0625rem solid var(--border-sub) !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+  }
+
+  .ant-modal-body {
+    max-height: calc(88dvh - 4rem);
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+.app-drawer-overlay {
+  .ant-drawer-content-wrapper {
+    max-height: 90dvh;
+  }
+
+  .ant-drawer-content {
+    overflow: hidden;
+    background: var(--card-bg);
+    border: 0.0625rem solid var(--border-main);
+    border-bottom: 0;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+
+  .ant-drawer-wrapper-body {
+    overflow: hidden;
+  }
+
+  .ant-drawer-header {
+    position: relative;
+    padding: 1.35rem 1rem 0.85rem;
+    background: var(--app-bg);
+    border-bottom: 0.0625rem solid var(--border-sub);
+  }
+
+  .ant-drawer-header::before {
+    position: absolute;
+    top: 0.45rem;
+    left: 50%;
+    width: 2.5rem;
+    height: 0.25rem;
+    content: '';
+    background: var(--border-main);
+    border-radius: 999px;
+    transform: translateX(-50%);
+  }
+
+  .ant-drawer-title,
+  .ant-drawer-close {
+    color: var(--text-primary);
+  }
+
+  .ant-drawer-body {
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .overlay-content {
+    max-height: calc(90dvh - 3.75rem);
+  }
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--card-bg);
+  outline: none;
+}
+
+.overlay-content__body {
+  min-height: 0;
+  padding: 1.25rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overlay-content__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  background: var(--app-bg);
+  border-top: 0.0625rem solid var(--border-sub);
+}
+
+.overlay-content__actions > button {
+  flex: 1;
+  min-height: 3rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+}
+
+.overlay-content__actions > .ant-btn-default {
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border-color: var(--border-main);
+}
+
+.overlay-content__actions > .ant-btn-primary:not(.ant-btn-dangerous) {
+  color: var(--green-button-text);
+  background: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+@media (max-width: 480px) {
+  .overlay-content__body {
+    padding: 1rem;
+  }
+
+  .overlay-content__actions {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+}
+
 /* Ant Design Select Dropdown Overrides for Theme Consistency */
 .ant-select-dropdown {
     background-color: var(--card-bg) !important;

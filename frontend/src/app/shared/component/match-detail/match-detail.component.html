@@ -1,5 +1,5 @@
 @if (isModal()) {
-<div class="match-details-backdrop" (click)="closeDetails()"></div>
+<button type="button" class="match-details-backdrop" (click)="closeDetails()" aria-label="Chiudi dettagli partita"></button>
 }
 
 <div [class.match-details-container]="isModal()" [class.match-details-page]="!isModal()" [class.shadow-lg]="isModal()">
@@ -265,25 +265,5 @@
       </div>
     </div>
   </main>
-  }
-
-  @if (isAddGoalModalVisible()) {
-    <app-add-goal-modal 
-      [match]="match()" 
-      (submit)="handleGoalSubmit($event)" 
-      (cancel)="handleGoalCancel()">
-    </app-add-goal-modal>
-  }
-
-  @if (isSetupModalVisible()) {
-    <app-setup-match-modal
-      [match]="match()"
-      (submit)="handleSetupSubmit($event)"
-      (cancel)="handleSetupCancel()">
-    </app-setup-match-modal>
-  }
-
-  @if (isEditMatchModalVisible()) {
-    <app-add-match-modal [matchToEdit]="match()" (submit)="handleEditMatchSubmit($event)" (cancel)="handleEditMatchCancel()"></app-add-match-modal>
   }
 </div>

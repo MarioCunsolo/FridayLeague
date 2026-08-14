@@ -1,0 +1,53 @@
+<section class="overlay-content">
+  <main class="overlay-content__body">
+    <form nz-form [formGroup]="goalForm" nzLayout="vertical" (ngSubmit)="save()">
+      <nz-form-item>
+        <nz-form-label nzRequired>Chi ha segnato?</nz-form-label>
+        <nz-form-control>
+          <nz-radio-group formControlName="isHome" (ngModelChange)="onTeamChange()" class="team-selector">
+            <!-- nz-radio renders the native radio input within its host label. -->
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label nz-radio [nzValue]="true">
+              <span class="team-label team-label--home">{{ data.match.homeTeam }}</span>
+            </label>
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label nz-radio [nzValue]="false">
+              <span class="team-label team-label--away">{{ data.match.awayTeam }}</span>
+            </label>
+          </nz-radio-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Marcatore</nz-form-label>
+        <nz-form-control nzErrorTip="Seleziona il marcatore">
+          <nz-select formControlName="scorerName" nzPlaceHolder="Seleziona giocatore" nzShowSearch>
+            @for (player of currentPlayers(); track player.name) {
+              <nz-option [nzLabel]="player.name" [nzValue]="player.name" />
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item class="mb-0">
+        <nz-form-label>Assist (opzionale)</nz-form-label>
+        <nz-form-control>
+          <nz-select formControlName="assistName" nzPlaceHolder="Seleziona chi ha fatto l'assist" nzAllowClear nzShowSearch>
+            @for (player of currentPlayers(); track player.name) {
+              @if (player.name !== goalForm.controls.scorerName.value) {
+                <nz-option [nzLabel]="player.name" [nzValue]="player.name" />
+              }
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </main>
+
+  <footer class="overlay-content__actions">
+    <button nz-button type="button" (click)="cancel()">Annulla</button>
+    <button nz-button type="button" nzType="primary" [disabled]="goalForm.invalid" (click)="save()">
+      Salva goal
+    </button>
+  </footer>
+</section>

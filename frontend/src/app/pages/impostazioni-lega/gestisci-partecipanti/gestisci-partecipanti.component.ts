@@ -1,6 +1,6 @@
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { Component, OnInit, inject, signal, ViewContainerRef } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -11,10 +11,15 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../../../shared/service/auth.service';
 import { LegaService } from '../../../shared/service/lega.service';
-import { ConfirmModalComponent } from '../../../shared/component/confirm-modal/confirm-modal.component';
 import { ParticipantDto } from '../../../models/api/league.models';
 import { LeagueRole, Uuid } from '../../../models/api/core.models';
 import { AuthorizationService } from '../../../shared/service/authorization.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ResponsiveOverlayService } from '../../../shared/overlay/responsive-overlay.service';
+import {
+  ConfirmActionComponent,
+  ConfirmActionData
+} from '../../../shared/overlay/content/confirm-action/confirm-action.component';
 
 @Component({
   selector: 'app-gestisci-partecipanti',
@@ -37,8 +42,9 @@ export class GestisciPartecipantiComponent implements OnInit {
   private authService = inject(AuthService);
   private legaService = inject(LegaService);
   private message = inject(NzMessageService);
-  private viewContainerRef = inject(ViewContainerRef);
   private authorization = inject(AuthorizationService);
+  private overlays = inject(ResponsiveOverlayService);
+  private destroyRef = inject(DestroyRef);
 
   public partecipanti = signal<ParticipantDto[]>([]);
   public loading = signal<boolean>(true);
@@ -85,9 +91,6 @@ export class GestisciPartecipantiComponent implements OnInit {
     this.chiediConfermaCambioRuolo(item, newRole);
   }
 
-  /**
-   * Crea ed apre la modale di conferma programmaticamente.
-   */
   private openConfirmModal(options: {
     title: string;
     message: string;
@@ -95,29 +98,21 @@ export class GestisciPartecipantiComponent implements OnInit {
     isDanger: boolean;
     onConfirm: () => void;
   }): void {
-    const componentRef = this.viewContainerRef.createComponent(ConfirmModalComponent);
-    
-    componentRef.instance.isVisible = true;
-    componentRef.instance.title = options.title;
-    componentRef.instance.message = options.message;
-    componentRef.instance.confirmText = options.confirmText;
-    componentRef.instance.isDanger = options.isDanger;
-
-    // Sottoscrizione all'evento di conferma
-    const confirmSub = componentRef.instance.confirm.subscribe(() => {
-      options.onConfirm();
-      confirmSub.unsubscribe();
-      cancelSub.unsubscribe();
-      componentRef.destroy();
-    });
-
-    // Sottoscrizione all'evento di annullamento
-    const cancelSub = componentRef.instance.cancel.subscribe(() => {
-      confirmSub.unsubscribe();
-      cancelSub.unsubscribe();
-      componentRef.destroy();
-      this.caricaPartecipanti();
-    });
+    this.overlays.open<ConfirmActionData, true>(ConfirmActionComponent, {
+      title: options.title,
+      data: {
+        message: options.message,
+        confirmText: options.confirmText,
+        danger: options.isDanger
+      },
+      modal: { width: 416 },
+      drawer: { height: 'auto' }
+    }).afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(confirmed => {
+        if (confirmed) options.onConfirm();
+        else this.caricaPartecipanti();
+      });
   }
 
   chiediConfermaCambioRuolo(item: ParticipantDto, nuovoRuolo: LeagueRole): void {

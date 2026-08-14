@@ -412,59 +412,6 @@
   font-size: 1.35rem;
 }
 
-.modal-form-container {
-  padding: 0.5rem 0;
-}
-
-::ng-deep .modal-label label {
-  color: var(--text-primary) !important;
-  font-size: 0.75rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.05rem !important;
-  text-transform: uppercase !important;
-}
-
-.custom-input {
-  height: 3.25rem !important;
-  color: var(--text-primary) !important;
-  background-color: var(--input-bg) !important;
-  border: 0.0625rem solid var(--border-main) !important;
-  border-radius: 0.75rem !important;
-  font-weight: 500;
-}
-
-.custom-input:hover,
-.custom-input:focus {
-  background-color: var(--input-bg) !important;
-  border-color: var(--primary-green) !important;
-}
-
-::ng-deep .ant-modal-footer {
-  padding: 1rem 1.5rem !important;
-  background-color: var(--card-bg) !important;
-  border-top: 0.0625rem solid var(--border-sub) !important;
-  border-radius: 0 0 1.25rem 1.25rem !important;
-}
-
-::ng-deep .ant-modal-footer .ant-btn {
-  height: 2.75rem !important;
-  padding: 0 1.5rem !important;
-  border-radius: 0.75rem !important;
-  font-weight: 700 !important;
-}
-
-::ng-deep .ant-modal-footer .ant-btn-primary {
-  color: var(--green-button-text) !important;
-  background-color: var(--primary-green) !important;
-  border-color: var(--primary-green) !important;
-}
-
-::ng-deep .ant-modal-footer .ant-btn-default {
-  color: var(--text-primary) !important;
-  background-color: var(--input-bg) !important;
-  border-color: var(--border-main) !important;
-}
-
 @media (max-width: 640px) {
   .reservation-page {
     padding: 1.5rem 1rem calc(6rem + env(safe-area-inset-bottom, 0px));

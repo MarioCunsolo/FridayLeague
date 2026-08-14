@@ -31,8 +31,9 @@
           <div class="row g-4">
             <!-- Nome -->
             <div class="col-md-6">
-              <label class="form-label text-secondary small fw-bold text-uppercase">Nome</label>
+              <label class="form-label text-secondary small fw-bold text-uppercase" for="account-name">Nome</label>
               <input 
+                id="account-name"
                 type="text" 
                 formControlName="nome" 
                 class="form-control custom-input" 
@@ -44,8 +45,9 @@
             
             <!-- Cognome -->
             <div class="col-md-6">
-              <label class="form-label text-secondary small fw-bold text-uppercase">Cognome</label>
+              <label class="form-label text-secondary small fw-bold text-uppercase" for="account-surname">Cognome</label>
               <input 
+                id="account-surname"
                 type="text" 
                 formControlName="cognome" 
                 class="form-control custom-input" 
@@ -57,8 +59,9 @@
             
             <!-- Email -->
             <div class="col-12">
-              <label class="form-label text-secondary small fw-bold text-uppercase">Email</label>
+              <label class="form-label text-secondary small fw-bold text-uppercase" for="account-email">Email</label>
               <input 
+                id="account-email"
                 type="email" 
                 formControlName="email" 
                 class="form-control custom-input" 
@@ -72,7 +75,7 @@
             
             <!-- Sicurezza Account (Modale Password) -->
             <div class="col-12">
-              <label class="form-label text-secondary small fw-bold text-uppercase d-block">Sicurezza Account</label>
+              <span class="form-label text-secondary small fw-bold text-uppercase d-block">Sicurezza Account</span>
               <button 
                 nz-button 
                 nzType="default" 

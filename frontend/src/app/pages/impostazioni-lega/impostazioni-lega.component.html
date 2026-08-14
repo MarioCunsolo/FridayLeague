@@ -19,12 +19,12 @@
             <h2>{{ activeLega.nome }}</h2>
             <span class="league-type">
               {{ activeLega.tipoLegaNome || 'Partita Singola' }}
-              <ng-container *ngIf="activeLega.tipoLegaId === 2 && activeLega.numeroSquadre">
+              @if (activeLega.tipoLegaId === 2 && activeLega.numeroSquadre) {
                 · {{ activeLega.numeroSquadre }} squadre
-              </ng-container>
-              <ng-container *ngIf="activeLega.tipoLegaId === 3 && activeLega.numeroGironi">
+              }
+              @if (activeLega.tipoLegaId === 3 && activeLega.numeroGironi) {
                 · {{ activeLega.numeroGironi }} {{ activeLega.numeroGironi === 1 ? 'girone' : 'gironi' }}
-              </ng-container>
+              }
             </span>
           </div>
           <p>{{ activeLega.descrizione || 'Nessuna descrizione impostata per questa lega.' }}</p>

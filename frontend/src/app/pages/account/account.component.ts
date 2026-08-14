@@ -1,11 +1,16 @@
-import { Component, signal, computed, inject, effect, ViewContainerRef } from '@angular/core';
+import { Component, DestroyRef, signal, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from 'src/app/shared/service/auth.service';
-import { PasswordModalComponent } from 'src/app/shared/component/password-modal/password-modal.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ResponsiveOverlayService } from 'src/app/shared/overlay/responsive-overlay.service';
+import {
+  PasswordFormComponent,
+  PasswordFormDialogData
+} from './components/password-form/password-form.component';
 
 @Component({
   selector: 'app-account',
@@ -24,7 +29,8 @@ export class AccountComponent {
   public authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private message = inject(NzMessageService);
-  private viewContainerRef = inject(ViewContainerRef);
+  private overlays = inject(ResponsiveOverlayService);
+  private destroyRef = inject(DestroyRef);
 
   salvando = signal(false);
   profileForm: FormGroup;
@@ -88,36 +94,16 @@ export class AccountComponent {
   }
 
   apriModificaPassword(): void {
-    const componentRef = this.viewContainerRef.createComponent(PasswordModalComponent);
-    
-    componentRef.instance.isVisible = true;
-
-    // Sottoscrizione all'evento di conferma
-    const confirmSub = componentRef.instance.confirm.subscribe((nuovaPassword: string) => {
-      this.salvando.set(true);
-
-      this.authService.cambiaPassword(nuovaPassword).subscribe({
-        next: () => {
-          this.message.success('Password modificata con successo!');
-          this.salvando.set(false);
-          confirmSub.unsubscribe();
-          cancelSub.unsubscribe();
-          componentRef.destroy();
-        },
-        error: (err) => {
-          console.error(err);
-          // Mostra l'errore del server direttamente nella modale per dare feedback
-          componentRef.instance.errorMessage = err.error || "Errore durante il salvataggio.";
-          this.salvando.set(false);
-        }
+    this.overlays.open<PasswordFormDialogData, true>(PasswordFormComponent, {
+      title: 'Modifica password',
+      data: {},
+      maskClosable: false,
+      modal: { width: 480 },
+      drawer: { height: 'auto' }
+    }).afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(changed => {
+        if (changed) this.message.success('Password modificata con successo!');
       });
-    });
-
-    // Sottoscrizione all'evento di annullamento
-    const cancelSub = componentRef.instance.cancel.subscribe(() => {
-      confirmSub.unsubscribe();
-      cancelSub.unsubscribe();
-      componentRef.destroy();
-    });
   }
 }

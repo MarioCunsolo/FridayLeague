@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
@@ -9,28 +9,31 @@ import { Match, MatchStatus } from 'src/app/models/interface/match.interface';
 import { MatchService } from 'src/app/shared/service/match.service';
 import { AuthService } from 'src/app/shared/service/auth.service';
 import { MatchDetailComponent } from 'src/app/shared/component/match-detail/match-detail.component';
-import { AddMatchModalComponent } from './add-match-modal/add-match-modal.component';
 import { MatchFormData } from '../../models/api/match.models';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ResponsiveOverlayService } from '../../shared/overlay/responsive-overlay.service';
+import { MatchFormComponent, MatchFormDialogData } from './components/match-form/match-form.component';
 
 @Component({
   selector: 'app-match',
   templateUrl: './match.component.html',
   styleUrls: ['./match.component.scss'],
   standalone: true,
-  imports: [MatchDetailComponent, AddMatchModalComponent, DatePipe, NzButtonModule, NzIconModule],
+  imports: [MatchDetailComponent, DatePipe, NzButtonModule, NzIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MatchComponent {
   private readonly matchService = inject(MatchService);
   private readonly route = inject(ActivatedRoute);
   private readonly message = inject(NzMessageService);
+  private readonly overlays = inject(ResponsiveOverlayService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly authService = inject(AuthService);
   private readonly queryParams = toSignal(this.route.queryParams, { initialValue: {} as Record<string, string> });
 
   readonly MatchStatus = MatchStatus;
   readonly showMatchDetails = signal(false);
   readonly selectedMatchId = signal<number | null>(null);
-  readonly isAddMatchModalVisible = signal(false);
   readonly matches = this.matchService.getMatches();
   private readonly requestedMatchId = computed(() => {
     const id = Number(this.queryParams()['matchId']);
@@ -71,20 +74,21 @@ export class MatchComponent {
     this.selectedMatchId.set(null);
   }
 
-  openAddMatchModal(): void { this.isAddMatchModalVisible.set(true); }
+  openAddMatchModal(): void {
+    this.overlays.open<MatchFormDialogData, MatchFormData>(MatchFormComponent, {
+      title: 'Nuova partita',
+      data: { matchToEdit: null },
+      modal: { width: 512 },
+      drawer: { height: 'auto' }
+    }).afterClosed$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(result => {
+        if (!result) return;
 
-  handleMatchSubmit(newMatch: MatchFormData): void {
-    this.matchService.createMatch(newMatch).subscribe({
-      next: () => {
-        this.message.success('Partita creata con successo!');
-        this.isAddMatchModalVisible.set(false);
-      },
-      error: () => {
-        this.message.error('Errore durante la creazione della partita.');
-        this.isAddMatchModalVisible.set(false);
-      }
-    });
+        this.matchService.createMatch(result).subscribe({
+          next: () => this.message.success('Partita creata con successo!'),
+          error: () => this.message.error('Errore durante la creazione della partita.')
+        });
+      });
   }
-
-  handleMatchCancel(): void { this.isAddMatchModalVisible.set(false); }
 }

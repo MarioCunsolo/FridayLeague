@@ -1,40 +1,53 @@
-import { Component, input, output, computed, signal, inject, ViewContainerRef } from '@angular/core';
+import { Component, DestroyRef, input, output, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GoalEvent, Match, MatchStatus } from '../../../models/interface/match.interface';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { AddGoalModalComponent } from './add-goal-modal/add-goal-modal.component';
-import { SetupMatchModalComponent } from './setup-match-modal/setup-match-modal.component';
-import { AddMatchModalComponent } from '../../../pages/match/add-match-modal/add-match-modal.component';
 import { MatchFormData } from '../../../models/api/match.models';
 import { MatchService } from '../../service/match.service';
 import { AuthService } from '../../service/auth.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ResponsiveOverlayService } from '../../overlay/responsive-overlay.service';
+import {
+    ConfirmActionComponent,
+    ConfirmActionData
+} from '../../overlay/content/confirm-action/confirm-action.component';
+import {
+    MatchFormComponent,
+    MatchFormDialogData
+} from '../../../pages/match/components/match-form/match-form.component';
+import {
+    GoalFormComponent,
+    GoalFormDialogData
+} from '../../../pages/match/components/goal-form/goal-form.component';
+import {
+    LineupFormComponent,
+    LineupFormDialogData,
+    LineupFormResult
+} from '../../../pages/match/components/lineup-form/lineup-form.component';
 
 @Component({
     selector: 'app-match-detail',
     templateUrl: './match-detail.component.html',
     styleUrls: ['./match-detail.component.scss'],
     standalone: true,
-    imports: [CommonModule, NzButtonModule, NzIconModule, AddGoalModalComponent, SetupMatchModalComponent, AddMatchModalComponent]
+    imports: [CommonModule, NzButtonModule, NzIconModule]
 })
 export class MatchDetailComponent {
     private matchService = inject(MatchService);
     protected authService = inject(AuthService);
     private message = inject(NzMessageService);
-    private viewContainerRef = inject(ViewContainerRef);
+    private overlays = inject(ResponsiveOverlayService);
+    private destroyRef = inject(DestroyRef);
 
     // Expose enum to template
     MatchStatus = MatchStatus;
 
     match = input<Match | null>(null);
     isModal = input<boolean>(true);
-    close = output<void>();
+    detailsClosed = output<void>();
 
-    isAddGoalModalVisible = signal(false);
-    isSetupModalVisible = signal(false);
-    isEditMatchModalVisible = signal(false);
     isDeleting = signal(false);
     isAnnullando = signal(false);
     isIniziando = signal(false);
@@ -107,31 +120,28 @@ export class MatchDetailComponent {
     });
 
     closeDetails() {
-        this.close.emit();
+        this.detailsClosed.emit();
     }
 
     openEditMatchModal(): void {
-        this.isEditMatchModalVisible.set(true);
-    }
-
-    handleEditMatchSubmit(updatedMatch: MatchFormData): void {
         const currentMatch = this.match();
         if (!currentMatch) return;
 
-        this.matchService.updateMatch(currentMatch.id, updatedMatch).subscribe({
-            next: () => {
-                this.message.success('Partita modificata con successo!');
-                this.isEditMatchModalVisible.set(false);
-            },
-            error: error => {
-                this.message.error(error?.error || 'Errore durante la modifica della partita.');
-                this.isEditMatchModalVisible.set(false);
-            }
-        });
-    }
+        this.overlays.open<MatchFormDialogData, MatchFormData>(MatchFormComponent, {
+            title: 'Modifica partita',
+            data: { matchToEdit: currentMatch },
+            modal: { width: 512 },
+            drawer: { height: 'auto' }
+        }).afterClosed$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(result => {
+                if (!result) return;
 
-    handleEditMatchCancel(): void {
-        this.isEditMatchModalVisible.set(false);
+                this.matchService.updateMatch(currentMatch.id, result).subscribe({
+                    next: () => this.message.success('Partita modificata con successo!'),
+                    error: error => this.message.error(error?.error || 'Errore durante la modifica della partita.')
+                });
+            });
     }
 
     chiediConfermaEliminazione() {
@@ -140,24 +150,12 @@ export class MatchDetailComponent {
             return;
         }
 
-        const componentRef = this.viewContainerRef.createComponent(ConfirmModalComponent);
-        componentRef.instance.isVisible = true;
-        componentRef.instance.title = 'Elimina Partita';
-        componentRef.instance.message = `Sei sicuro di voler eliminare definitivamente la partita ${currentMatch.homeTeam} - ${currentMatch.awayTeam}?`;
-        componentRef.instance.confirmText = 'Elimina';
-        componentRef.instance.isDanger = true;
-
-        const confirmSub = componentRef.instance.confirm.subscribe(() => {
-            this.eliminaPartita(currentMatch.id);
-            confirmSub.unsubscribe();
-            cancelSub.unsubscribe();
-            componentRef.destroy();
-        });
-
-        const cancelSub = componentRef.instance.cancel.subscribe(() => {
-            confirmSub.unsubscribe();
-            cancelSub.unsubscribe();
-            componentRef.destroy();
+        this.openConfirmation({
+            title: 'Elimina partita',
+            message: `Sei sicuro di voler eliminare definitivamente la partita ${currentMatch.homeTeam} - ${currentMatch.awayTeam}?`,
+            confirmText: 'Elimina',
+            danger: true,
+            onConfirm: () => this.eliminaPartita(currentMatch.id)
         });
     }
 
@@ -182,24 +180,12 @@ export class MatchDetailComponent {
             return;
         }
 
-        const componentRef = this.viewContainerRef.createComponent(ConfirmModalComponent);
-        componentRef.instance.isVisible = true;
-        componentRef.instance.title = 'Annulla Partita';
-        componentRef.instance.message = `Sei sicuro di voler annullare la partita ${currentMatch.homeTeam} - ${currentMatch.awayTeam}? La partita verrà segnata come non disputata.`;
-        componentRef.instance.confirmText = 'Annulla Partita';
-        componentRef.instance.isDanger = true;
-
-        const confirmSub = componentRef.instance.confirm.subscribe(() => {
-            this.annullaPartita(currentMatch.id);
-            confirmSub.unsubscribe();
-            cancelSub.unsubscribe();
-            componentRef.destroy();
-        });
-
-        const cancelSub = componentRef.instance.cancel.subscribe(() => {
-            confirmSub.unsubscribe();
-            cancelSub.unsubscribe();
-            componentRef.destroy();
+        this.openConfirmation({
+            title: 'Annulla partita',
+            message: `Sei sicuro di voler annullare la partita ${currentMatch.homeTeam} - ${currentMatch.awayTeam}? La partita verrà segnata come non disputata.`,
+            confirmText: 'Annulla partita',
+            danger: true,
+            onConfirm: () => this.annullaPartita(currentMatch.id)
         });
     }
 
@@ -238,23 +224,12 @@ export class MatchDetailComponent {
         const currentMatch = this.match();
         if (!currentMatch) return;
 
-        const componentRef = this.viewContainerRef.createComponent(ConfirmModalComponent);
-        componentRef.instance.isVisible = true;
-        componentRef.instance.title = 'Concludi Partita';
-        componentRef.instance.message = 'Sei sicuro di voler concludere la partita? Una volta conclusa, non sarà più possibile registrare nuovi goal.';
-        componentRef.instance.confirmText = 'Concludi';
-
-        const confirmSub = componentRef.instance.confirm.subscribe(() => {
-            this.concludiPartita(currentMatch.id);
-            confirmSub.unsubscribe();
-            cancelSub.unsubscribe();
-            componentRef.destroy();
-        });
-
-        const cancelSub = componentRef.instance.cancel.subscribe(() => {
-            confirmSub.unsubscribe();
-            cancelSub.unsubscribe();
-            componentRef.destroy();
+        this.openConfirmation({
+            title: 'Concludi partita',
+            message: 'Sei sicuro di voler concludere la partita? Una volta conclusa, non sarà più possibile registrare nuovi goal.',
+            confirmText: 'Concludi',
+            danger: false,
+            onConfirm: () => this.concludiPartita(currentMatch.id)
         });
     }
 
@@ -273,53 +248,73 @@ export class MatchDetailComponent {
     }
 
     openAddGoalModal() {
-        this.isAddGoalModalVisible.set(true);
-    }
-
-    handleGoalSubmit(goal: GoalEvent) {
         const currentMatch = this.match();
-        if (currentMatch) {
-            this.matchService.addGoal(currentMatch.id, goal).subscribe({
-                next: () => {
-                    this.message.success('Goal registrato con successo!');
-                    this.isAddGoalModalVisible.set(false);
-                    // Ricarica dal backend: un marcatore/assist potrebbe essere stato aggiunto alla rosa per la prima volta
-                    this.matchService.loadMatches().subscribe();
-                },
-                error: () => {
-                    this.message.error('Errore durante la registrazione del goal.');
-                    this.isAddGoalModalVisible.set(false);
-                }
-            });
-        }
-    }
+        if (!currentMatch) return;
 
-    handleGoalCancel() {
-        this.isAddGoalModalVisible.set(false);
+        this.overlays.open<GoalFormDialogData, GoalEvent>(GoalFormComponent, {
+            title: 'Registra goal',
+            data: { match: currentMatch },
+            modal: { width: 512 },
+            drawer: { height: 'auto' }
+        }).afterClosed$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(goal => {
+                if (!goal) return;
+
+                this.matchService.addGoal(currentMatch.id, goal).subscribe({
+                    next: () => {
+                        this.message.success('Goal registrato con successo!');
+                        this.matchService.loadMatches().subscribe();
+                    },
+                    error: () => this.message.error('Errore durante la registrazione del goal.')
+                });
+            });
     }
 
     openSetupModal() {
-        this.isSetupModalVisible.set(true);
-    }
-
-    handleSetupSubmit(lineup: { homePlayerNames: string[]; awayPlayerNames: string[] }) {
         const currentMatch = this.match();
-        if (currentMatch) {
-            this.matchService.setupLineup(currentMatch.id, lineup.homePlayerNames, lineup.awayPlayerNames).subscribe({
-                next: () => {
-                    this.message.success('Formazioni impostate con successo!');
-                    this.isSetupModalVisible.set(false);
-                    this.matchService.loadMatches().subscribe();
-                },
-                error: () => {
-                    this.message.error('Errore durante l\'impostazione delle formazioni.');
-                    this.isSetupModalVisible.set(false);
-                }
+        if (!currentMatch) return;
+
+        this.overlays.open<LineupFormDialogData, LineupFormResult>(LineupFormComponent, {
+            title: 'Imposta partita',
+            data: { match: currentMatch },
+            modal: { width: '52rem' },
+            drawer: { height: '90dvh' }
+        }).afterClosed$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(lineup => {
+                if (!lineup) return;
+
+                this.matchService.setupLineup(currentMatch.id, lineup.homePlayerNames, lineup.awayPlayerNames).subscribe({
+                    next: () => {
+                        this.message.success('Formazioni impostate con successo!');
+                        this.matchService.loadMatches().subscribe();
+                    },
+                    error: () => this.message.error('Errore durante l\'impostazione delle formazioni.')
+                });
             });
-        }
     }
 
-    handleSetupCancel() {
-        this.isSetupModalVisible.set(false);
+    private openConfirmation(options: {
+        title: string;
+        message: string;
+        confirmText: string;
+        danger: boolean;
+        onConfirm: () => void;
+    }): void {
+        this.overlays.open<ConfirmActionData, true>(ConfirmActionComponent, {
+            title: options.title,
+            data: {
+                message: options.message,
+                confirmText: options.confirmText,
+                danger: options.danger
+            },
+            modal: { width: 416 },
+            drawer: { height: 'auto' }
+        }).afterClosed$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(confirmed => {
+                if (confirmed) options.onConfirm();
+            });
     }
 }

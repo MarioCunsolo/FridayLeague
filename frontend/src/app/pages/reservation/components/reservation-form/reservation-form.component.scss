@@ -1,0 +1,27 @@
+:host {
+  display: block;
+  outline: none;
+}
+
+.custom-input {
+  height: 3.25rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border-color: var(--border-main);
+  border-radius: 0.75rem;
+  font-weight: 500;
+}
+
+.custom-input:hover,
+.custom-input:focus {
+  background: var(--input-bg);
+  border-color: var(--primary-green);
+}
+
+:host ::ng-deep .ant-form-item-label > label {
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}

@@ -1,0 +1,33 @@
+<section class="overlay-content" cdkFocusInitial tabindex="-1">
+  <main class="overlay-content__body">
+    <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="save()">
+      <nz-form-item class="mb-0">
+        <nz-form-label nzFor="reservation-person-name">Nome e cognome</nz-form-label>
+        <nz-form-control nzErrorTip="Seleziona un partecipante">
+          <input
+            nz-input
+            id="reservation-person-name"
+            class="custom-input"
+            formControlName="nomeCognome"
+            placeholder="Cerca un partecipante"
+            autocomplete="off"
+            [nzAutocomplete]="peopleAutocomplete" />
+          <nz-autocomplete #peopleAutocomplete>
+            @for (person of filteredPeople(); track person.id) {
+              <nz-auto-option [nzValue]="person.nomeCognome">
+                {{ person.nomeCognome }}
+              </nz-auto-option>
+            }
+          </nz-autocomplete>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </main>
+
+  <footer class="overlay-content__actions">
+    <button nz-button type="button" (click)="cancel()">Annulla</button>
+    <button nz-button type="button" nzType="primary" [disabled]="form.invalid" (click)="save()">
+      Prenota
+    </button>
+  </footer>
+</section>

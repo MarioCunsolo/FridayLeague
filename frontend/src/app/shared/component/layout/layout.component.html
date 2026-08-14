@@ -25,56 +25,56 @@
     }
 
     <nav class="sidebar-nav">
-      <div class="nav-item-desktop" routerLink="/home" routerLinkActive="active">
+      <a class="nav-item-desktop" routerLink="/home" routerLinkActive="active">
         <i class="fa fa-home"></i>
         <span>Home</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/prenotazioni" routerLinkActive="active">
+      </a>
+      <a class="nav-item-desktop" routerLink="/prenotazioni" routerLinkActive="active">
         <i class="fa fa-calendar"></i>
         <span>Prenota</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/calendario" routerLinkActive="active">
+      </a>
+      <a class="nav-item-desktop" routerLink="/calendario" routerLinkActive="active">
         <i class="fa fa-futbol-o"></i>
         <span>Calendario</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/profilo" routerLinkActive="active">
+      </a>
+      <a class="nav-item-desktop" routerLink="/profilo" routerLinkActive="active">
         <i class="fa fa-user"></i>
         <span>Profilo</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/classifiche" routerLinkActive="active">
+      </a>
+      <a class="nav-item-desktop" routerLink="/classifiche" routerLinkActive="active">
         <i class="fa fa-trophy"></i>
         <span>Classifiche</span>
-      </div>
+      </a>
       @if (authService.isAdminOrCoAdmin()) {
-      <div class="nav-item-desktop" routerLink="/impostazioni" routerLinkActive="active">
+      <a class="nav-item-desktop" routerLink="/impostazioni" routerLinkActive="active">
         <i class="fa fa-cog"></i>
         <span>Impostazioni</span>
-      </div>
+      </a>
       }
     </nav>
 
     <!-- Always visible bottom footer -->
     <div class="sidebar-footer">
       <!-- Account (Desktop) -->
-      <div class="nav-item-desktop" routerLink="/account" routerLinkActive="active">
+      <a class="nav-item-desktop" routerLink="/account" routerLinkActive="active">
         <span nz-icon nzType="user" nzTheme="outline"></span>
         <span>Account</span>
-      </div>
+      </a>
       <!-- Theme Toggle (Desktop) -->
-      <div class="nav-item-desktop" (click)="toggleTheme()">
+      <button type="button" class="nav-item-desktop" (click)="toggleTheme()">
         <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
         <span>{{ currentTheme() === 'dark' ? 'Light Mode' : 'Dark Mode' }}</span>
-      </div>
+      </button>
       <!-- Login (Desktop) -->
-      <div class="nav-item-desktop" (click)="logout()" style="cursor: pointer;">
+      <button type="button" class="nav-item-desktop" (click)="logout()">
         <span nz-icon nzType="logout" nzTheme="outline"></span>
         <span>Esci</span>
-      </div>
+      </button>
     </div>
   </aside>
 
   <!-- Mobile Sidebar Drawer (Slides in from the left) -->
-  <div class="mobile-sidebar-backdrop" [class.open]="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
+  <button type="button" class="mobile-sidebar-backdrop" [class.open]="isMobileMenuOpen()" (click)="closeMobileMenu()" aria-label="Chiudi il menu"></button>
   <aside class="mobile-sidebar-drawer" [class.open]="isMobileMenuOpen()">
     <div class="drawer-header d-flex justify-content-between align-items-center mb-4">
       <div class="sidebar-header d-flex align-items-center gap-2" style="padding-left: 0;">
@@ -105,39 +105,39 @@
     }
 
     <nav class="sidebar-nav">
-      <div class="nav-item-desktop" routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">
+      <a class="nav-item-desktop" routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="fa fa-home"></i>
         <span>Home</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/prenotazioni" routerLinkActive="active" (click)="closeMobileMenu()">
+      </a>
+      <a class="nav-item-desktop" routerLink="/prenotazioni" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="fa fa-calendar"></i>
         <span>Prenota</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/calendario" routerLinkActive="active" (click)="closeMobileMenu()">
+      </a>
+      <a class="nav-item-desktop" routerLink="/calendario" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="fa fa-futbol-o"></i>
         <span>Calendario</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/profilo" routerLinkActive="active" (click)="closeMobileMenu()">
+      </a>
+      <a class="nav-item-desktop" routerLink="/profilo" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="fa fa-user"></i>
         <span>Profilo</span>
-      </div>
-      <div class="nav-item-desktop" routerLink="/classifiche" routerLinkActive="active" (click)="closeMobileMenu()">
+      </a>
+      <a class="nav-item-desktop" routerLink="/classifiche" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="fa fa-trophy"></i>
         <span>Classifiche</span>
-      </div>
+      </a>
       @if (authService.isAdminOrCoAdmin()) {
-      <div class="nav-item-desktop" routerLink="/impostazioni" routerLinkActive="active" (click)="closeMobileMenu()">
+      <a class="nav-item-desktop" routerLink="/impostazioni" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="fa fa-cog"></i>
         <span>Impostazioni</span>
-      </div>
+      </a>
       }
     </nav>
 
     <div class="sidebar-footer">
-      <div class="nav-item-desktop" routerLink="/account" routerLinkActive="active" (click)="closeMobileMenu()">
+      <a class="nav-item-desktop" routerLink="/account" routerLinkActive="active" (click)="closeMobileMenu()">
         <span nz-icon nzType="user" nzTheme="outline"></span>
         <span>Account</span>
-      </div>
+      </a>
     </div>
   </aside>
 
@@ -148,10 +148,10 @@
       <div class="container-fluid d-flex justify-content-between align-items-center h-100 px-4 position-relative">
         
         <!-- Hamburger Menu Button (Mobile) -->
-        <div class="hamburger-mobile" (click)="toggleMobileMenu()"
-          style="cursor: pointer; font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center; z-index: 10;">
+        <button type="button" class="hamburger-mobile" (click)="toggleMobileMenu()" aria-label="Apri il menu"
+          style="font-size: 1.5rem; color: var(--text-primary); display: flex; align-items: center; z-index: 10;">
           <span nz-icon nzType="menu" nzTheme="outline"></span>
-        </div>
+        </button>
 
         <!-- Centered Mobile Logo & Title -->
         <div class="mobile-header-brand d-flex align-items-center gap-2 position-absolute start-50 translate-middle-x">
@@ -162,20 +162,20 @@
         <!-- Right Side Quick Actions (Mobile) -->
         <div class="d-flex align-items-center gap-3 z-index-10">
           <!-- Account (Mobile) -->
-          <div class="account-mobile" routerLink="/account" title="Account"
-            style="cursor: pointer; font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
+          <a class="account-mobile" routerLink="/account" title="Account" aria-label="Account"
+            style="font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
             <span nz-icon nzType="user" nzTheme="outline"></span>
-          </div>
+          </a>
           <!-- Theme Toggle (Mobile) -->
-          <div class="theme-toggle-mobile" (click)="toggleTheme()" title="Cambia Tema"
-            style="cursor: pointer; font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
+          <button type="button" class="theme-toggle-mobile" (click)="toggleTheme()" title="Cambia Tema" aria-label="Cambia tema"
+            style="font-size: 1.4rem; color: var(--text-primary); display: flex; align-items: center;">
             <span nz-icon [nzType]="currentTheme() === 'dark' ? 'sun' : 'moon'" nzTheme="outline"></span>
-          </div>
+          </button>
           <!-- Logout (Mobile) -->
-          <div class="logout-mobile" (click)="logout()" title="Esci"
-            style="cursor: pointer; font-size: 1.4rem; color: var(--danger-red); display: flex; align-items: center;">
+          <button type="button" class="logout-mobile" (click)="logout()" title="Esci" aria-label="Esci"
+            style="font-size: 1.4rem; color: var(--danger-red); display: flex; align-items: center;">
             <span nz-icon nzType="logout" nzTheme="outline"></span>
-          </div>
+          </button>
         </div>
 
       </div>

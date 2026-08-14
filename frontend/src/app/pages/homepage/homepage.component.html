@@ -102,7 +102,9 @@
 
       <!-- Prossima Partita Card -->
       @if (nextMatch()) {
-        <div class="mb-4" (click)="goToMatchDetails(nextMatch()!.id)" style="cursor: pointer;">
+        <div class="mb-4" role="button" tabindex="0" (click)="goToMatchDetails(nextMatch()!.id)"
+          (keydown.enter)="goToMatchDetails(nextMatch()!.id)" (keydown.space)="$event.preventDefault(); goToMatchDetails(nextMatch()!.id)"
+          [attr.aria-label]="'Apri i dettagli della prossima partita: ' + nextMatch()!.homeTeam + ' contro ' + nextMatch()!.awayTeam" style="cursor: pointer;">
           <div class="match-card shadow-sm next-match">
             <div class="match-card-header d-flex justify-content-between align-items-center mb-2">
               <span class="badge bg-success-subtle text-success border border-success-subtle">PROSSIMA PARTITA</span>
@@ -138,7 +140,9 @@
 
       <!-- Ultima Partita Giocata Card -->
       @if (lastMatch()) {
-        <div class="mb-4" (click)="goToMatchDetails(lastMatch()!.id)" style="cursor: pointer;">
+        <div class="mb-4" role="button" tabindex="0" (click)="goToMatchDetails(lastMatch()!.id)"
+          (keydown.enter)="goToMatchDetails(lastMatch()!.id)" (keydown.space)="$event.preventDefault(); goToMatchDetails(lastMatch()!.id)"
+          [attr.aria-label]="'Apri i dettagli dell’ultima partita: ' + lastMatch()!.homeTeam + ' contro ' + lastMatch()!.awayTeam" style="cursor: pointer;">
           <div class="match-card shadow-sm">
             <div class="match-card-header d-flex justify-content-between align-items-center mb-2">
               <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">ULTIMA GIOCATA</span>

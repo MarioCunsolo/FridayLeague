@@ -1,0 +1,69 @@
+<section class="overlay-content lineup-content">
+  <main class="overlay-content__body">
+    <div class="lineup-toolbar">
+      <button nz-button type="button" (click)="generateRandomTeams()">
+        <i class="fa fa-random me-1"></i> Genera a caso
+      </button>
+    </div>
+
+    @if (unassignedPlayers().length > 0) {
+      <section class="unassigned-section">
+        <h3>Giocatori da assegnare ({{ unassignedPlayers().length }})</h3>
+        <div class="player-pills">
+          @for (player of unassignedPlayers(); track player) {
+            <div class="player-pill">
+              <span>{{ player }}</span>
+              <div>
+                <button type="button" class="assign-button assign-button--home" (click)="assignToHome(player)">Casa</button>
+                <button type="button" class="assign-button assign-button--away" (click)="assignToAway(player)">Trasferta</button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <div class="teams-grid">
+      <section class="team-card team-card--home">
+        <header>
+          <h3><i class="fa fa-shield"></i> {{ data.match.homeTeam }}</h3>
+          <span>{{ homeTeamPlayers().length }}</span>
+        </header>
+        @for (player of homeTeamPlayers(); track player; let index = $index) {
+          <div class="player-row">
+            <span><b>{{ index + 1 }}</b>{{ player }}</span>
+            <div>
+              <button type="button" (click)="assignToAway(player)" title="Sposta in trasferta"><i class="fa fa-exchange"></i></button>
+              <button type="button" class="remove" (click)="moveToUnassigned(player)" title="Rimuovi"><i class="fa fa-times"></i></button>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-team">Nessun giocatore assegnato</p>
+        }
+      </section>
+
+      <section class="team-card team-card--away">
+        <header>
+          <h3><i class="fa fa-shield"></i> {{ data.match.awayTeam }}</h3>
+          <span>{{ awayTeamPlayers().length }}</span>
+        </header>
+        @for (player of awayTeamPlayers(); track player; let index = $index) {
+          <div class="player-row">
+            <span><b class="away-number">{{ index + 1 }}</b>{{ player }}</span>
+            <div>
+              <button type="button" (click)="assignToHome(player)" title="Sposta in casa"><i class="fa fa-exchange"></i></button>
+              <button type="button" class="remove" (click)="moveToUnassigned(player)" title="Rimuovi"><i class="fa fa-times"></i></button>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-team">Nessun giocatore assegnato</p>
+        }
+      </section>
+    </div>
+  </main>
+
+  <footer class="overlay-content__actions">
+    <button nz-button type="button" (click)="cancel()">Annulla</button>
+    <button nz-button type="button" nzType="primary" (click)="save()">Salva formazione</button>
+  </footer>
+</section>

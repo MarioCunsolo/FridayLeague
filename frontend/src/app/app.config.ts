@@ -1,8 +1,10 @@
-import { ApplicationConfig, LOCALE_ID, provideAppInitializer, inject } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, importProvidersFrom, provideAppInitializer, inject } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withPreloading, PreloadAllModules } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { provideNzI18n, it_IT } from 'ng-zorro-antd/i18n';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 import { routes } from './app.routes';
 import { authInterceptor } from './shared/interceptor/auth.interceptor';
 import { AuthService } from './shared/service/auth.service';
@@ -16,6 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     provideNzI18n(it_IT),
+    importProvidersFrom(NzModalModule, NzDrawerModule),
     provideAppInitializer(() => inject(AuthService).initSession()),
     { provide: LOCALE_ID, useValue: 'it-IT' }
   ]

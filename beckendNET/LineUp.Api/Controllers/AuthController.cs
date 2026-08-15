@@ -236,6 +236,11 @@ public class AuthController : ControllerBase
             return BadRequest("Per un Torneo è necessario indicare un numero valido di gironi (almeno 1).");
         }
 
+        if (request.TipoLegaId == 1 && (!request.DimensioneSquadra.HasValue || request.DimensioneSquadra.Value < 1 || request.DimensioneSquadra.Value > 50))
+        {
+            return BadRequest("Per una Partita Singola è necessario indicare una dimensione squadra valida (da 1 a 50 giocatori).");
+        }
+
         var inviteCode = await GenerateUniqueInviteCode();
 
         var newLega = new Lega
@@ -245,7 +250,8 @@ public class AuthController : ControllerBase
             CodiceInvito = inviteCode,
             TipoLegaId = request.TipoLegaId,
             NumeroSquadre = request.TipoLegaId == 2 ? request.NumeroSquadre : null,
-            NumeroGironi = request.TipoLegaId == 3 ? request.NumeroGironi : null
+            NumeroGironi = request.TipoLegaId == 3 ? request.NumeroGironi : null,
+            DimensioneSquadra = request.TipoLegaId == 1 ? request.DimensioneSquadra : null
         };
 
         _context.Leghe.Add(newLega);
@@ -652,7 +658,8 @@ public class AuthController : ControllerBase
             TipoLegaCodice = ul.Lega.TipoLega?.Codice ?? "PARTITA_SINGOLA",
             TipoLegaNome = ul.Lega.TipoLega?.Nome ?? "Partita Singola",
             NumeroSquadre = ul.Lega.NumeroSquadre,
-            NumeroGironi = ul.Lega.NumeroGironi
+            NumeroGironi = ul.Lega.NumeroGironi,
+            DimensioneSquadra = ul.Lega.DimensioneSquadra
         }).ToList();
 
         Console.WriteLine($"DEBUG [MapToUserDto]: User {user.Email}, Active LegaId: {user.LegaId}");

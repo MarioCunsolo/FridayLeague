@@ -4,7 +4,7 @@ import { ParticipantDto } from '../../models/api/league.models';
 
 const actor = (role: UserDto['leghe'][number]['ruolo']): UserDto => ({
   id: 'actor-id', nome: 'Attore', cognome: 'Test', email: 'actor@test.it', tema: 'dark', legaId: 'league-id',
-  leghe: [{ id: 'league-id', nome: 'Lega', ruolo: role, codiceInvito: 'ABC123', descrizione: null, tipoLegaId: 1, tipoLegaCodice: 'PARTITA_SINGOLA', tipoLegaNome: 'Partita Singola', numeroSquadre: null, numeroGironi: null }]
+  leghe: [{ id: 'league-id', nome: 'Lega', ruolo: role, codiceInvito: 'ABC123', descrizione: null, tipoLegaId: 1, tipoLegaCodice: 'PARTITA_SINGOLA', tipoLegaNome: 'Partita Singola', numeroSquadre: null, numeroGironi: null, dimensioneSquadra: 7 }]
 });
 
 const target = (ruolo: ParticipantDto['ruolo']): ParticipantDto => ({

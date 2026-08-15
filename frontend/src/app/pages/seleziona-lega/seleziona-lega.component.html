@@ -121,6 +121,29 @@
         </div>
 
         <!-- Parametri specifici in base al tipo di lega -->
+        @if (selectedTipoLegaId() === 1) {
+          <div class="conditional-config-box mb-4">
+            <label class="form-input-label" for="team-size">Dimensione di una squadra</label>
+            <p class="config-help-text">Scegli quanti giocatori compongono ogni squadra: le prenotazioni disponibili saranno il doppio.</p>
+            <div class="quick-selectors d-flex flex-wrap gap-2 mb-3">
+              @for (opt of dimensioniSquadraOptions; track opt) {
+                <button type="button" class="btn-quick-chip"
+                        [class.active]="createForm.controls.dimensioneSquadra.value === opt"
+                        (click)="setDimensioneSquadra(opt)">
+                  {{ opt }} contro {{ opt }}
+                </button>
+              }
+            </div>
+            <nz-form-item class="m-0">
+              <nz-form-control nzErrorTip="Inserisci una dimensione valida (da 1 a 50 giocatori)">
+                <nz-input-group nzPrefixIcon="team">
+                  <input id="team-size" nz-input type="number" formControlName="dimensioneSquadra" min="1" max="50" placeholder="Es. 7" />
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        }
+
         @if (selectedTipoLegaId() === 2) {
           <div class="conditional-config-box mb-4">
             <label class="form-input-label" for="league-teams-count">Numero di Squadre del Campionato</label>

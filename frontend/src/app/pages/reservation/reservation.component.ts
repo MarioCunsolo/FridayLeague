@@ -51,8 +51,13 @@ export class ReservationComponent implements OnInit {
   reservations = this.reservationService.reservations;
   readonly isDevelopment = !environment.production;
 
-  starters = computed(() => this.reservations().slice(0, 14));
-  substitutes = computed(() => this.reservations().slice(14));
+  readonly starterLimit = computed(() => {
+    const user = this.authService.currentUser();
+    const activeLeague = user?.leghe.find(league => league.id === user.legaId);
+    return (activeLeague?.dimensioneSquadra ?? 7) * 2;
+  });
+  starters = computed(() => this.reservations().slice(0, this.starterLimit()));
+  substitutes = computed(() => this.reservations().slice(this.starterLimit()));
 
   ngOnInit(): void {
     this.reservationService.loadReservations().subscribe();

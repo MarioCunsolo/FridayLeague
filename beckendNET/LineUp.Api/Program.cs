@@ -182,6 +182,7 @@ using (var scope = app.Services.CreateScope())
                 TipoLegaId INT NOT NULL DEFAULT 1,
                 NumeroSquadre INT NULL,
                 NumeroGironi INT NULL,
+                DimensioneSquadra INT NULL,
                 CONSTRAINT FK_Leghe_TipiLega_TipoLegaId FOREIGN KEY (TipoLegaId) REFERENCES TipiLega(Id)
             );
         ");
@@ -319,6 +320,15 @@ using (var scope = app.Services.CreateScope())
             if (!hasNumeroGironi)
             {
                 dbContext.Database.ExecuteSqlRaw("ALTER TABLE Leghe ADD COLUMN NumeroGironi INT NULL;");
+            }
+
+            var hasDimensioneSquadra = dbContext.Database.SqlQueryRaw<int>(
+                "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Leghe' AND COLUMN_NAME = 'DimensioneSquadra'"
+            ).AsEnumerable().FirstOrDefault() > 0;
+
+            if (!hasDimensioneSquadra)
+            {
+                dbContext.Database.ExecuteSqlRaw("ALTER TABLE Leghe ADD COLUMN DimensioneSquadra INT NULL;");
             }
 
             var leagueNameColumnType = dbContext.Database.SqlQueryRaw<string>(

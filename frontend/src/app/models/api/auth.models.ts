@@ -11,6 +11,7 @@ export interface LeagueDto {
   tipoLegaNome: string;
   numeroSquadre: number | null;
   numeroGironi: number | null;
+  dimensioneSquadra: number | null;
 }
 
 export interface UserDto {
@@ -70,6 +71,7 @@ export interface CreateLeagueRequest {
   tipoLegaId: number;
   numeroSquadre?: number | null;
   numeroGironi?: number | null;
+  dimensioneSquadra?: number | null;
 }
 
 export interface JoinLeagueRequest {

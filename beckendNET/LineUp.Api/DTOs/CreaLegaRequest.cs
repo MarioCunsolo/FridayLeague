@@ -16,4 +16,6 @@ public class CreaLegaRequest
     public int? NumeroSquadre { get; set; }
 
     public int? NumeroGironi { get; set; }
+
+    public int? DimensioneSquadra { get; set; }
 }

@@ -87,6 +87,7 @@ export class SelezionaLegaComponent {
   // Opzioni rapide per numero di squadre e gironi
   squadreOptions = [4, 6, 8, 10, 12, 16];
   gironiOptions = [1, 2, 4, 8];
+  dimensioniSquadraOptions = [5, 6, 7, 8, 11];
 
   // Form Reattivo per Creare una Lega
   createForm: FormGroup<{
@@ -95,6 +96,7 @@ export class SelezionaLegaComponent {
     tipoLegaId: FormControl<number>;
     numeroSquadre: FormControl<number | null>;
     numeroGironi: FormControl<number | null>;
+    dimensioneSquadra: FormControl<number | null>;
   }>;
 
   // Form Reattivo per Partecipare a una Lega
@@ -108,7 +110,8 @@ export class SelezionaLegaComponent {
       descrizione: [''],
       tipoLegaId: [1, [Validators.required]],
       numeroSquadre: [4 as number | null],
-      numeroGironi: [2 as number | null]
+      numeroGironi: [2 as number | null],
+      dimensioneSquadra: [7 as number | null]
     });
 
     this.joinForm = this.fb.nonNullable.group({
@@ -142,6 +145,10 @@ export class SelezionaLegaComponent {
     this.createForm.controls.numeroGironi.setValue(num);
   }
 
+  setDimensioneSquadra(num: number): void {
+    this.createForm.controls.dimensioneSquadra.setValue(num);
+  }
+
   /**
    * Cambia la modalità del form ('create' | 'join').
    */
@@ -154,7 +161,8 @@ export class SelezionaLegaComponent {
       descrizione: '',
       tipoLegaId: 1,
       numeroSquadre: 4,
-      numeroGironi: 2
+      numeroGironi: 2,
+      dimensioneSquadra: 7
     });
     this.joinForm.reset();
   }
@@ -179,7 +187,12 @@ export class SelezionaLegaComponent {
    */
   submitCreate(): void {
     if (this.createForm.valid) {
-      const { nome, descrizione, tipoLegaId, numeroSquadre, numeroGironi } = this.createForm.value;
+      const { nome, descrizione, tipoLegaId, numeroSquadre, numeroGironi, dimensioneSquadra } = this.createForm.value;
+
+      if (tipoLegaId === 1 && (!dimensioneSquadra || dimensioneSquadra < 1 || dimensioneSquadra > 50)) {
+        this.errorMessage.set('Per una Partita Singola è necessario indicare una dimensione squadra valida (da 1 a 50 giocatori).');
+        return;
+      }
 
       if (tipoLegaId === 2 && (!numeroSquadre || numeroSquadre < 2)) {
         this.errorMessage.set('Per un Campionato è necessario specificare un numero di squadre valido (almeno 2).');
@@ -196,13 +209,15 @@ export class SelezionaLegaComponent {
 
       const squadreVal = tipoLegaId === 2 ? numeroSquadre : null;
       const gironiVal = tipoLegaId === 3 ? numeroGironi : null;
+      const dimensioneSquadraVal = tipoLegaId === 1 ? dimensioneSquadra : null;
 
       this.legaService.creaLega({
         nomeLega: nome!,
         descrizione: descrizione || undefined,
         tipoLegaId: tipoLegaId!,
         numeroSquadre: squadreVal,
-        numeroGironi: gironiVal
+        numeroGironi: gironiVal,
+        dimensioneSquadra: dimensioneSquadraVal
       }).subscribe({
         next: () => {
           this.loadingCreate.set(false);

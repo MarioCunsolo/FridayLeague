@@ -23,5 +23,5 @@ public class LegaDto
     public string TipoLegaNome { get; set; } = "Partita Singola";
     public int? NumeroSquadre { get; set; }
     public int? NumeroGironi { get; set; }
+    public int? DimensioneSquadra { get; set; }
 }
-

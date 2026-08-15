@@ -12,5 +12,5 @@ public class Lega
 
     public int? NumeroSquadre { get; set; }
     public int? NumeroGironi { get; set; }
+    public int? DimensioneSquadra { get; set; }
 }
-

@@ -22,7 +22,7 @@
             <span class="status-badge">Prenotazioni aperte</span>
           }
         </div>
-        <p>{{ starters().length }} di 14 posti da titolare già occupati.</p>
+        <p>{{ starters().length }} di {{ starterLimit() }} posti da titolare già occupati.</p>
       </div>
     </div>
 
@@ -59,7 +59,7 @@
         <h2 id="reservation-list-title">Formazione prenotata</h2>
       </div>
       <div class="reservation-counter" aria-label="Posti titolari occupati">
-        <strong>{{ starters().length }}</strong><span>/14 titolari</span>
+        <strong>{{ starters().length }}</strong><span>/{{ starterLimit() }} titolari</span>
       </div>
     </header>
 
@@ -74,7 +74,7 @@
         </thead>
         <tbody class="scrollable-tbody">
           <tr class="section-header-row">
-            <td colspan="3" class="section-divider-text">Titolari <span>{{ starters().length }}/14</span></td>
+            <td colspan="3" class="section-divider-text">Titolari <span>{{ starters().length }}/{{ starterLimit() }}</span></td>
           </tr>
 
           @if (starters().length === 0) {
@@ -118,7 +118,7 @@
             @for (res of substitutes(); track res.id) {
               <tr class="substitute-row">
                 <td class="player-cell">
-                  <span class="position-badge substitute-badge">{{ $index + 15 }}</span>
+                  <span class="position-badge substitute-badge">{{ $index + starterLimit() + 1 }}</span>
                   <span class="player-name">{{ res.nomeCognome }}</span>
                   @if (res.playerId) {
                     <span nz-icon nzType="check-circle" nzTheme="fill" class="registered-icon"
